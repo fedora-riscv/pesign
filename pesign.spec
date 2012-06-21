@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -12,6 +12,8 @@ Source: pesign-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: git gnu-efi nspr nspr-devel nss nss-devel nss-util popt-devel
 Requires: nspr nss nss-util popt
+
+Patch0: 0001-Fix-decl-of-pe_update-off_t-loff_t.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -48,6 +50,9 @@ rm -rf %{buildroot}
 %attr(0700,root,root) /etc/pki/pesign
 
 %changelog
+* Thu Jun 21 2012 Peter Jones <pjones@redhat.com> - 0.2-2
+- Fix compile problem with f18's compiler.
+
 * Thu Jun 21 2012 Peter Jones <pjones@redhat.com> - 0.2-1
 - Fix some rpmlint complaints nirik pointed out
 - Add popt-devel build dep
