@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -31,7 +31,7 @@ git commit -a -q -m "%{version} baseline."
 git am %{patches} </dev/null
 
 %build
-make PREFIX=/usr %{?_smp_mflags}
+make PREFIX=/usr
 
 %install
 rm -rf %{buildroot}
@@ -52,6 +52,9 @@ rm -rf %{buildroot}
 %attr(0700,root,root) /etc/pki/pesign
 
 %changelog
+* Thu Jun 21 2012 Peter Jones <pjones@redhat.com> - 0.2-4
+- Do not build with smp flags.
+
 * Thu Jun 21 2012 Peter Jones <pjones@redhat.com> - 0.2-3
 - Make it build on i686, though it's unclear it'll ever be necessary.
 
