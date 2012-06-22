@@ -1,17 +1,19 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires: git gnu-efi nspr nspr-devel nss nss-devel nss-util popt-devel
+Requires: nspr nss nss-util popt
+
 # there is no tarball at github, of course.  To get this version do:
 # git clone https://github.com/vathpela/pesign.git
 # git checkout %%{version}
 Source: pesign-%{version}.tar.bz2
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires: git gnu-efi nspr nspr-devel nss nss-devel nss-util popt-devel
-Requires: nspr nss nss-util popt
+Patch0:	0001-Man-page-should-be-in-section-1.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -45,10 +47,13 @@ rm -rf %{buildroot}
 %doc README TODO COPYING
 %{_bindir}/pesign
 %{_sysconfdir}/popt.d/pesign.popt
-%{_mandir}/man8/*.8*
+%{_mandir}/man*/*
 %attr(0700,root,root) /etc/pki/pesign
 
 %changelog
+* Fri Jun 22 2012 Peter Jones <pjones@redhat.com> - 0.3-2
+- Move man page to a more reasonable place.
+
 * Fri Jun 22 2012 Peter Jones <pjones@redhat.com> - 0.3-1
 - Update to upstream's 0.3 .
 
