@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.2
-Release: 4%{?dist}
+Version: 0.3
+Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -12,10 +12,6 @@ Source: pesign-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: git gnu-efi nspr nspr-devel nss nss-devel nss-util popt-devel
 Requires: nspr nss nss-util popt
-
-Patch0: 0001-Fix-decl-of-pe_update-off_t-loff_t.patch
-Patch1: 0002-Use-intptr_t-instead-of-specificly-sized-types-where.patch
-Patch2: 0003-Fix-paths-for-32-bit-builds.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -31,7 +27,7 @@ git commit -a -q -m "%{version} baseline."
 git am %{patches} </dev/null
 
 %build
-make PREFIX=/usr
+make PREFIX=%{_prefix} LIBDIR=%{_libdir}
 
 %install
 rm -rf %{buildroot}
@@ -49,9 +45,13 @@ rm -rf %{buildroot}
 %doc README TODO COPYING
 %{_bindir}/pesign
 %{_sysconfdir}/popt.d/pesign.popt
+%{_mandir}/man8/*.8*
 %attr(0700,root,root) /etc/pki/pesign
 
 %changelog
+* Fri Jun 22 2012 Peter Jones <pjones@redhat.com> - 0.3-1
+- Update to upstream's 0.3 .
+
 * Thu Jun 21 2012 Peter Jones <pjones@redhat.com> - 0.2-4
 - Do not build with smp flags.
 
@@ -67,4 +67,3 @@ rm -rf %{buildroot}
 
 * Fri Jun 15 2012 Peter Jones <pjones@redhat.com> - 0.1-1
 - First version of SRPM.
-
