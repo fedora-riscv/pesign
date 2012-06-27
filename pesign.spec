@@ -8,6 +8,7 @@ URL: https://github.com/vathpela/pesign
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: git gnu-efi nspr nspr-devel nss nss-devel nss-util popt-devel
 Requires: nspr nss nss-util popt
+ExclusiveArch: i686 x86_64 ia64
 
 # there is no tarball at github, of course.  To get this version do:
 # git clone https://github.com/vathpela/pesign.git
