@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.3
-Release: 2%{?dist}
+Version: 0.4
+Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -14,7 +14,6 @@ ExclusiveArch: i686 x86_64 ia64
 # git clone https://github.com/vathpela/pesign.git
 # git checkout %%{version}
 Source: pesign-%{version}.tar.bz2
-Patch0:	0001-Man-page-should-be-in-section-1.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -52,6 +51,9 @@ rm -rf %{buildroot}
 %attr(0700,root,root) /etc/pki/pesign
 
 %changelog
+* Tue Jul 10 2012 Peter Jones <pjones@redhat.com> - 0.3-2
+- Rebase to 0.4
+
 * Fri Jun 22 2012 Peter Jones <pjones@redhat.com> - 0.3-2
 - Move man page to a more reasonable place.
 
