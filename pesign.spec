@@ -1,6 +1,6 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.4
+Version: 0.5
 Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
@@ -51,6 +51,10 @@ rm -rf %{buildroot}
 %attr(0700,root,root) /etc/pki/pesign
 
 %changelog
+* Wed Jul 11 2012 Peter Jones <pjones@redhat.com> - 0.5-1
+- Rebase to 0.5
+- Do more rigorous bounds checking when hashing a new binary.
+
 * Tue Jul 10 2012 Peter Jones <pjones@redhat.com> - 0.3-2
 - Rebase to 0.4
 
