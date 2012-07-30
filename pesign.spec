@@ -1,6 +1,6 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.6
+Version: 0.7
 Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
@@ -51,6 +51,10 @@ rm -rf %{buildroot}
 %attr(0700,root,root) /etc/pki/pesign
 
 %changelog
+* Mon Jul 30 2012 Peter Jones <pjones@redhat.com> - 0.7-1
+- Update to 0.7
+- Better fix for MS compatibility.
+
 * Mon Jul 30 2012 Peter Jones <pjones@redhat.com> - 0.6-1
 - Update to 0.6
 - Bug-for-bug compatibility with signtool.exe .
