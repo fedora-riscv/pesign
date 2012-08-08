@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.7
-Release: 2%{?dist}
+Version: 0.8
+Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -50,10 +50,15 @@ rm -rf %{buildroot}
 %{_bindir}/pesign
 %{_sysconfdir}/popt.d/pesign.popt
 %{_mandir}/man*/*
-%attr(0700,root,root) /etc/pki/pesign
-%attr(0600,root,root) /etc/pki/pesign/*
+%attr(0711,root,root) /etc/pki/pesign
+%attr(0644,root,root) /etc/pki/pesign/*
 
 %changelog
+* Wed Aug 08 2012 Peter Jones <pjones@redhat.com> - 0.8-1
+- Update to 0.8
+- Don't open the db read-write
+- Fix permissions on keystore (everybody can sign with test keys)
+
 * Wed Aug 08 2012 Peter Jones <pjones@redhat.com> - 0.7-2
 - Include test keys.
 
