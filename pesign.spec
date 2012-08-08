@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.7
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -13,14 +13,15 @@ ExclusiveArch: i686 x86_64 ia64
 # there is no tarball at github, of course.  To get this version do:
 # git clone https://github.com/vathpela/pesign.git
 # git checkout %%{version}
-Source: pesign-%{version}.tar.bz2
+Source0: pesign-%{version}.tar.bz2
+Source1: rh-test-certs.tar.bz2
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
 well as other associated tools.
 
 %prep
-%setup -q
+%setup -q -a 1
 git init
 git config user.email "pesign-owner@fedoraproject.org"
 git config user.name "Fedora Ninjas"
@@ -38,6 +39,7 @@ make PREFIX=%{_prefix} LIBDIR=%{_libdir} INSTALLROOT=%{buildroot} install
 
 # there's some stuff that's not really meant to be shipped yet
 rm -rf %{buildroot}/boot %{buildroot}/usr/include %{buildroot}%{_libdir}
+mv rh-test-certs/etc/pki/pesign/* %{buildroot}/etc/pki/pesign/
 
 %clean
 rm -rf %{buildroot}
@@ -49,8 +51,12 @@ rm -rf %{buildroot}
 %{_sysconfdir}/popt.d/pesign.popt
 %{_mandir}/man*/*
 %attr(0700,root,root) /etc/pki/pesign
+%attr(0600,root,root) /etc/pki/pesign/*
 
 %changelog
+* Wed Aug 08 2012 Peter Jones <pjones@redhat.com> - 0.7-2
+- Include test keys.
+
 * Mon Jul 30 2012 Peter Jones <pjones@redhat.com> - 0.7-1
 - Update to 0.7
 - Better fix for MS compatibility.
