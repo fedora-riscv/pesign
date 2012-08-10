@@ -1,6 +1,6 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.8
+Version: 0.9
 Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
@@ -54,6 +54,11 @@ rm -rf %{buildroot}
 %attr(0644,root,root) /etc/pki/pesign/*
 
 %changelog
+* Fri Aug 10 2012 Peter Jones <pjones@redhat.com> - 0.9-1
+- Update to 0.9
+- Bug fix from Gary Ching-Pang Lin
+- Support NSS Token selection for use with smart cards.
+
 * Wed Aug 08 2012 Peter Jones <pjones@redhat.com> - 0.8-1
 - Update to 0.8
 - Don't open the db read-write
