@@ -1,13 +1,13 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.9
+Version: 0.10
 Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: git gnu-efi nspr nspr-devel nss nss-devel nss-util popt-devel
-Requires: nspr nss nss-util popt
+Requires: nspr nss nss-util popt rpm
 ExclusiveArch: i686 x86_64 ia64
 
 # there is no tarball at github, of course.  To get this version do:
@@ -49,11 +49,16 @@ rm -rf %{buildroot}
 %doc README TODO COPYING
 %{_bindir}/pesign
 %{_sysconfdir}/popt.d/pesign.popt
+%{_sysconfdir}/rpm/macros.pesign
 %{_mandir}/man*/*
-%attr(0711,root,root) /etc/pki/pesign
+%attr(0755,root,root) /etc/pki/pesign
 %attr(0644,root,root) /etc/pki/pesign/*
 
 %changelog
+* Mon Aug 13 2012 Peter Jones <pjones@redhat.com> - 0.10-1
+- Update to 0.10
+- Include rpm macros to support easy custom signing of signed packages.
+
 * Fri Aug 10 2012 Peter Jones <pjones@redhat.com> - 0.9-1
 - Update to 0.9
 - Bug fix from Gary Ching-Pang Lin
