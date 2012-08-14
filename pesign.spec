@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.10
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -15,6 +15,8 @@ ExclusiveArch: i686 x86_64 ia64
 # git checkout %%{version}
 Source0: pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
+
+Patch0:	pesign-0.10-better-macros.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -55,6 +57,9 @@ rm -rf %{buildroot}
 %attr(0644,root,root) /etc/pki/pesign/*
 
 %changelog
+* Tue Aug 14 2012 Peter Jones <pjones@redhat.com> - 0.10-2
+- Make macros.pesign more reliable
+
 * Mon Aug 13 2012 Peter Jones <pjones@redhat.com> - 0.10-1
 - Update to 0.10
 - Include rpm macros to support easy custom signing of signed packages.

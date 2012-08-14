@@ -1,0 +1,27 @@
+From 1caa864e41ebd26a2289bf69d44183e88b76b207 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 14 Aug 2012 11:52:29 -0400
+Subject: [PATCH] Make macros.pesign work a bit better.
+
+---
+ src/macros.pesign | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/macros.pesign b/src/macros.pesign
+index d12ad05..beb6489 100644
+--- a/src/macros.pesign
++++ b/src/macros.pesign
+@@ -6,8 +6,8 @@
+ # %pesign -s -i shim.orig -o shim.efi
+ # And magically get the right thing.
+ 
+-%__pesign_token %{expand: %%{?defined(pe_signing_token):%{nil}}%%{!?defined(pe_signing_token):-t "%%{pe_signing_token}"}}
+-%__pesign_cert %{expand: %%{?defined(pe_signing_cert):%{nil}}%%{!?defined(pe_signing_cert):-c "%%{pe_signing_cert}"}}
++%__pesign_token %{expand: %%{nil} %%{?pe_signing_token:-t "%%{pe_signing_token}"}}
++%__pesign_cert %{expand: %%{!?pe_signing_cert:-c "Red Hat Test Certificate"} %%{?pe_signing_cert:-c "%%{pe_signing_cert}"}}
+ 
+ %_pesign /usr/bin/pesign
+ %pesign \
+-- 
+1.7.11.4
+
