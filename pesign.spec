@@ -1,13 +1,14 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.10
-Release: 5%{?dist}
+Version: 0.98
+Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: git gnu-efi nspr nspr-devel nss nss-devel nss-util popt-devel
 Requires: nspr nss nss-util popt rpm
+Requires(pre): shadow-utils
 ExclusiveArch: i686 x86_64 ia64
 
 # there is no tarball at github, of course.  To get this version do:
@@ -15,11 +16,6 @@ ExclusiveArch: i686 x86_64 ia64
 # git checkout %%{version}
 Source0: pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
-
-Patch0:	pesign-0.10-better-macros.patch
-Patch1:	pesign-0.10-only-sign-on-x86-64.patch
-Patch2: pesign-0.10-even-better-macros.patch
-Patch3: pesign-0.10-missing-section-reloc.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -49,17 +45,43 @@ mv rh-test-certs/etc/pki/pesign/* %{buildroot}/etc/pki/pesign/
 %clean
 rm -rf %{buildroot}
 
+%pre
+getent group pesign >/dev/null || groupadd -r pesign
+getent passwd pesign >/dev/null || \
+	useradd -r -g pesign -d /var/run/pesign -s /sbin/nologin \
+		-c "Group for the pesign signing daemon" pesign
+exit 0
+
+%post
+%systemd_post pesign.service
+
+%preun
+%systemd_preun pesign.service
+
+%postun
+%systemd_postun_with_restart pesign.service
+
 %files
 %defattr(-,root,root,-)
 %doc README TODO COPYING
 %{_bindir}/pesign
+%{_bindir}/pesign-client
 %{_sysconfdir}/popt.d/pesign.popt
 %{_sysconfdir}/rpm/macros.pesign
 %{_mandir}/man*/*
-%attr(0755,root,root) /etc/pki/pesign
-%attr(0644,root,root) /etc/pki/pesign/*
+%{_unitdir}/pesign.service
+%{_prefix}/lib/tmpfiles.d/pesign.conf
+%dir %attr(0770,pesign,pesign) /etc/pki/pesign
+%attr(0660,pesign,pesign) /etc/pki/pesign/*
+%dir %attr(0770, pesign, pesign) %{_localstatedir}/run/%{name}
+%ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/socket
+%ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Fri Oct 12 2012 Peter Jones <pjones@redhat.com> - 0.98-1
+- Update to 0.98
+- Add client/server mode.
+
 * Mon Oct 01 2012 Peter Jones <pjones@redhat.com> - 0.10-5
 - Fix missing section address fixup.
 
