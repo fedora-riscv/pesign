@@ -1,6 +1,6 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.98
+Version: 0.99
 Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
@@ -79,6 +79,11 @@ exit 0
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Mon Oct 15 2012 Peter Jones <pjones@redhat.com> - 0.99-1
+- Update to 0.99
+- Add documentation for client/server mode.
+- Add --pinfd and --pinfile to server mode.
+
 * Fri Oct 12 2012 Peter Jones <pjones@redhat.com> - 0.98-1
 - Update to 0.98
 - Add client/server mode.
