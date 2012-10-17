@@ -1,0 +1,26 @@
+From df5afd0e6d92f31a804f5f1631b6fae3b8ef4d8b Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 17 Oct 2012 09:54:37 -0400
+Subject: [PATCH 3/4] Free the certificate list we make once we're done using
+ it.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/wincert.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/wincert.c b/src/wincert.c
+index fe666c5..b487dc5 100644
+--- a/src/wincert.c
++++ b/src/wincert.c
+@@ -74,6 +74,7 @@ finalize_signatures(cms_context *cms, Pe *pe)
+ 		free(clist);
+ 		return -1;
+ 	}
++	free(clist);
+ 	return 0;
+ }
+ 
+-- 
+1.7.12.1
+

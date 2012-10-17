@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.99
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -16,6 +16,11 @@ ExclusiveArch: i686 x86_64 ia64
 # git checkout %%{version}
 Source0: pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
+
+Patch0: 0001-Use-PK11_TraverseCertsForNicknameInSlot-after-all.patch
+Patch1: 0002-Remove-an-unused-field.patch
+Patch2: 0003-Free-the-certificate-list-we-make-once-we-re-done-us.patch
+Patch3: 0004-Make-sure-we-actually-look-up-the-certificate-when-n.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -72,13 +77,17 @@ exit 0
 %{_mandir}/man*/*
 %{_unitdir}/pesign.service
 %{_prefix}/lib/tmpfiles.d/pesign.conf
-%dir %attr(0770,pesign,pesign) /etc/pki/pesign
-%attr(0660,pesign,pesign) /etc/pki/pesign/*
+%dir %attr(0775,pesign,pesign) /etc/pki/pesign
+%attr(0664,pesign,pesign) /etc/pki/pesign/*
 %dir %attr(0770, pesign, pesign) %{_localstatedir}/run/%{name}
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/socket
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Wed Oct 17 2012 Peter Jones <pjones@redhat.com> - 0.99-2
+- Fix various bugs from 0.99-1
+- Don't make the database unreadable just yet.
+
 * Mon Oct 15 2012 Peter Jones <pjones@redhat.com> - 0.99-1
 - Update to 0.99
 - Add documentation for client/server mode.

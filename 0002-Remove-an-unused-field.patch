@@ -1,0 +1,38 @@
+From e4aa0a2755d7b00e31760a7f90561b0566445fa4 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 17 Oct 2012 09:54:10 -0400
+Subject: [PATCH 2/4] Remove an unused field.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/pesign_context.c | 1 -
+ src/pesign_context.h | 1 -
+ 2 files changed, 2 deletions(-)
+
+diff --git a/src/pesign_context.c b/src/pesign_context.c
+index b4b201d..c6afda6 100644
+--- a/src/pesign_context.c
++++ b/src/pesign_context.c
+@@ -88,7 +88,6 @@ pesign_context_fini(pesign_context *ctx)
+ 		ctx->cms_ctx = NULL;
+ 	}
+ 
+-	xfree(ctx->certname);
+ 	xfree(ctx->privkeyfile);
+ 
+ 	if (ctx->outpe) {
+diff --git a/src/pesign_context.h b/src/pesign_context.h
+index cabccf3..8f4e45a 100644
+--- a/src/pesign_context.h
++++ b/src/pesign_context.h
+@@ -58,7 +58,6 @@ typedef struct {
+ 	Pe *outpe;
+ 
+ 	char *privkeyfile;
+-	char *certname;
+ 	cms_context *cms_ctx;
+ 
+ 	int flags;
+-- 
+1.7.12.1
+
