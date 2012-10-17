@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.99
-Release: 2%{?dist}
+Release: 3%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -21,6 +21,7 @@ Patch0: 0001-Use-PK11_TraverseCertsForNicknameInSlot-after-all.patch
 Patch1: 0002-Remove-an-unused-field.patch
 Patch2: 0003-Free-the-certificate-list-we-make-once-we-re-done-us.patch
 Patch3: 0004-Make-sure-we-actually-look-up-the-certificate-when-n.patch
+Patch4: 0005-Fix-check-for-allocations-on-tokenname-certname.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -84,6 +85,9 @@ exit 0
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Wed Oct 17 2012 Peter Jones <pjones@redhat.com> - 0.99-3
+- Fix daemon startup bug from 0.99-2
+
 * Wed Oct 17 2012 Peter Jones <pjones@redhat.com> - 0.99-2
 - Fix various bugs from 0.99-1
 - Don't make the database unreadable just yet.
