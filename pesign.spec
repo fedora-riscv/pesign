@@ -2,7 +2,6 @@ Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.99
 Release: 6%{?dist}
->>>>>>> f18
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
