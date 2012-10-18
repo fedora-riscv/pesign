@@ -1,7 +1,7 @@
 From c13cc0b03dcae9a743cc49aaa62c3923a3e7d8f9 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 09:55:02 -0400
-Subject: [PATCH 4/4] Make sure we actually look up the certificate when not
+Subject: [PATCH 04/30] Make sure we actually look up the certificate when not
  in daemon mode.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>

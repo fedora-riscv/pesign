@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.99
-Release: 3%{?dist}
+Release: 4%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -22,6 +22,31 @@ Patch1: 0002-Remove-an-unused-field.patch
 Patch2: 0003-Free-the-certificate-list-we-make-once-we-re-done-us.patch
 Patch3: 0004-Make-sure-we-actually-look-up-the-certificate-when-n.patch
 Patch4: 0005-Fix-check-for-allocations-on-tokenname-certname.patch
+Patch5: 0006-Update-valgrind.supp-for-newer-codepaths.patch
+Patch6: 0007-Free-the-pid-string-once-we-re-done-writing-it.patch
+Patch7: 0008-valgrind-Don-t-complain-about-unlocking-a-key-and-ke.patch
+Patch8: 0009-Only-try-to-register-OIDs-once.patch
+Patch9: 0010-Check-for-NSS_Shutdown-failure.patch
+Patch10: 0011-Don-t-destroy-stdin-stdout-stderr-if-we-don-t-fork.patch
+Patch11: 0012-valgrind-Add-SECMOD_LoadModule-codepath.patch
+Patch12: 0013-Don-t-set-up-digests-in-cms_context_init.patch
+Patch13: 0014-Do-register_oids-where-we-re-doing-NSS_Init.patch
+Patch14: 0015-Make-daemon-shutdown-actually-close-the-NSS-database.patch
+Patch15: 0016-Reformat-a-bunch-of-error-messages-to-be-vaguely-con.patch
+Patch16: 0017-Use-PORT_ArenaStrdup-where-appropriate.patch
+Patch17: 0018-Minor-whitespace-fixes.patch
+Patch18: 0019-daemon-Make-sure-inpe-is-initialized-before-all-erro.patch
+Patch19: 0020-Allocate-pesign_context-rather-than-having-it-on-the.patch
+Patch20: 0021-pesign-initialize-nss-only-if-we-re-not-a-daemon.patch
+Patch21: 0022-Handle-errors-on-pesign_context_init.patch
+Patch22: 0023-Add-sanity-checking-to-make-sure-we-don-t-emit-unini.patch
+Patch23: 0024-Make-sure-we-free-the-token-cert-we-get-from-the-com.patch
+Patch24: 0025-pesign-Only-shut-down-nss-in-pesign.c-if-we-re-not-t.patch
+Patch25: 0026-Rework-setup_digests-and-teardown_digests.patch
+Patch26: 0027-We-shouldn-t-need-Environment-NSS_STRICT_NOFORK-DISA.patch
+Patch27: 0028-Fix-errors-found-by-coverity.patch
+Patch28: 0029-Don-t-keep-the-DEPS-list-twice.patch
+Patch30: 0030-Don-t-build-util-right-now.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -85,6 +110,10 @@ exit 0
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Wed Oct 17 2012 Peter Jones <pjones@redhat.com> - 0.99-4
+- Fix some more bugs found by valgrind and coverity.
+- Don't build utils/ ; we're not using them and they're not ready anyway. 
+
 * Wed Oct 17 2012 Peter Jones <pjones@redhat.com> - 0.99-3
 - Fix daemon startup bug from 0.99-2
 

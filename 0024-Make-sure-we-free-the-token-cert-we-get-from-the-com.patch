@@ -1,0 +1,47 @@
+From d8ead122f34375a496d280bcc803f730542ca78d Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 17 Oct 2012 17:47:49 -0400
+Subject: [PATCH 24/30] Make sure we free the token/cert we get from the
+ command line.
+
+This probably needs some further examination, but valgrind likes what's
+here currently.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/pesign.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/pesign.c b/src/pesign.c
+index aa09bf5..be6494e 100644
+--- a/src/pesign.c
++++ b/src/pesign.c
+@@ -435,6 +435,7 @@ main(int argc, char *argv[])
+ 
+ 	char *digest_name = "sha256";
+ 	char *tokenname = "NSS Certificate DB";
++	char *origtoken = tokenname;
+ 	char *certname = NULL;
+ 
+ 	rc = pesign_context_new(&ctxp);
+@@ -573,6 +574,8 @@ main(int argc, char *argv[])
+ 			PORT_ErrorToString(PORT_GetError()));
+ 		exit(1);
+ 	}
++	if (tokenname != origtoken)
++		free(tokenname);
+ 
+ 	ctxp->cms_ctx->certname = certname ?
+ 		PORT_ArenaStrdup(ctxp->cms_ctx->arena, certname) : NULL;
+@@ -581,6 +584,8 @@ main(int argc, char *argv[])
+ 			PORT_ErrorToString(PORT_GetError()));
+ 		exit(1);
+ 	}
++	if (certname)
++		free(certname);
+ 
+ 	int action = 0;
+ 	if (daemon)
+-- 
+1.7.12.1
+

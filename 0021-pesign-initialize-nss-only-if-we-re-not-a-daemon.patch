@@ -1,0 +1,67 @@
+From 444a514e1a7c9a27953f914cf416d559ef5be083 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 17 Oct 2012 15:32:57 -0400
+Subject: [PATCH 21/30] [pesign] initialize nss only if we're not a daemon.
+
+If it's a deamon, NSS_Init, register_oids, and setup_digests will be
+done in the daemon code, not in the normal tool code.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/pesign.c | 33 +++++++++++++++++++++++----------
+ 1 file changed, 23 insertions(+), 10 deletions(-)
+
+diff --git a/src/pesign.c b/src/pesign.c
+index e22e814..aa09bf5 100644
+--- a/src/pesign.c
++++ b/src/pesign.c
+@@ -508,15 +508,6 @@ main(int argc, char *argv[])
+ 		POPT_TABLEEND
+ 	};
+ 
+-	if (!daemon) {
+-		SECStatus status = NSS_Init("/etc/pki/pesign");
+-		if (status != SECSuccess) {
+-			fprintf(stderr, "Could not initialize nss: %s\n",
+-				PORT_ErrorToString(PORT_GetError()));
+-			exit(1);
+-		}
+-	}
+-
+ 	optCon = poptGetContext("pesign", argc, (const char **)argv, options,0);
+ 
+ 	rc = poptReadDefaultConfig(optCon, 0);
+@@ -543,7 +534,29 @@ main(int argc, char *argv[])
+ 
+ 	poptFreeContext(optCon);
+ 
+-	rc = set_digest_parameters(ctx.cms_ctx, digest_name);
++	if (!daemon) {
++		SECStatus status = NSS_Init("/etc/pki/pesign");
++		if (status != SECSuccess) {
++			fprintf(stderr, "Could not initialize nss: %s\n",
++				PORT_ErrorToString(PORT_GetError()));
++			exit(1);
++		}
++
++		status = register_oids(ctxp->cms_ctx);
++		if (status != SECSuccess) {
++			fprintf(stderr, "Could not register OIDs\n");
++			exit(1);
++		}
++
++		rc = setup_digests(ctxp->cms_ctx);
++		if (rc < 0) {
++			fprintf(stderr, "Could not initialize digests: %s\n",
++				PORT_ErrorToString(PORT_GetError()));
++			exit(1);
++		}
++	}
++
++	rc = set_digest_parameters(ctxp->cms_ctx, digest_name);
+ 	int is_help  = strcmp(digest_name, "help") ? 0 : 1;
+ 	if (rc < 0) {
+ 		if (!is_help) {
+-- 
+1.7.12.1
+

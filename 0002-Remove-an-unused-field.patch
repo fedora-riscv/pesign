@@ -1,7 +1,7 @@
 From e4aa0a2755d7b00e31760a7f90561b0566445fa4 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 09:54:10 -0400
-Subject: [PATCH 2/4] Remove an unused field.
+Subject: [PATCH 02/30] Remove an unused field.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

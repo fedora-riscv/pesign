@@ -1,0 +1,25 @@
+From 15cd554d35c5ea8d31671b346dffd84e27e7c6ec Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 17 Oct 2012 17:52:57 -0400
+Subject: [PATCH 27/30] We shouldn't need
+ Environment=NSS_STRICT_NOFORK=DISABLED any more.
+
+Since NSS_Init is called from the daemon now, we should get past its
+checking.
+---
+ src/pesign.service | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/pesign.service b/src/pesign.service
+index 4f6d63f..75a73c3 100644
+--- a/src/pesign.service
++++ b/src/pesign.service
+@@ -5,5 +5,4 @@ Description=Pesign signing daemon
+ PrivateTmp=true
+ Type=forking
+ PIDFile=/var/run/pesign.pid
+-Environment=NSS_STRICT_NOFORK=DISABLED
+ ExecStart=/usr/bin/pesign --daemonize
+-- 
+1.7.12.1
+

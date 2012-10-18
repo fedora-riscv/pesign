@@ -1,0 +1,41 @@
+From 95c0fe1d512fcdf3b397359fb0f54dc44e5947c2 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 18 Oct 2012 09:12:25 -0400
+Subject: [PATCH 29/30] Don't keep the DEPS list twice.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/Makefile | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/src/Makefile b/src/Makefile
+index cd06158..cb74c12 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -39,14 +39,20 @@ client_OBJECTS = $(foreach source,$(client_SOURCES),$(patsubst %.c,%,$(source)).
+ client_DEPS = $(foreach source,$(client_SOURCES),.$(patsubst %.c,%,$(source)).P)
+ client : $(client_OBJECTS) $(STATIC_LIBS)
+ 
+-deps : $(generic_DEPS)$(authvar_DEPS) $(pesign_DEPS) $(client_DEPS) \
++fuzzsocket_SOURCES = fuzzsocket.c
++fuzzsocket_OBJECTS = $(foreach source,$(fuzzsocket_SOURCES),$(patsubst %.c,%,$(source)).o)
++fuzzsocket_DEPS = $(foreach source,$(fuzzsocket_SOURCES),.$(patsubst %.c,%,$(source)).P)
++fuzzsocket : $(fuzzsocket_OBJECTS)
++
++DEPS = $(generic_DEPS)$(authvar_DEPS) $(pesign_DEPS) $(client_DEPS) \
+ 	$(peverify_DEPS)
+ 
++deps : $(DEPS)
++
+ depclean :
+ 	@rm -fv .*.P
+ 
+--include $(generic_DEPS) $(authvar_DEPS) $(pesign_DEPS) $(client_DEPS) \
+-	$(peverify_DEPS)
++-include $(DEPS)
+ 
+ clean : depclean
+ 	@rm -rfv *.o *.a *.so $(TARGETS)
+-- 
+1.7.12.1
+

@@ -1,0 +1,26 @@
+From 44aad110fd3f0a12e1817d95047f882c4d8b0fce Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 18 Oct 2012 11:36:10 -0400
+Subject: [PATCH 30/30] Don't build util/ right now.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 531c865..5e9bd31 100644
+--- a/Makefile
++++ b/Makefile
+@@ -2,7 +2,7 @@ TOPDIR = $(shell echo $$PWD)
+ 
+ include $(TOPDIR)/Make.defaults
+ 
+-SUBDIRS := include libdpe src util
++SUBDIRS := include libdpe src
+ DOCDIR := /share/doc/
+ VERSION = 0.99
+ 
+-- 
+1.7.12.1
+
