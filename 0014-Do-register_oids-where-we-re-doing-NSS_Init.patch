@@ -1,7 +1,7 @@
 From e1f8d4e38f4ad08fb407691a3f59edc19a1f15e2 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 14:41:18 -0400
-Subject: [PATCH 14/30] Do register_oids() where we're doing NSS_Init()
+Subject: [PATCH 14/32] Do register_oids() where we're doing NSS_Init()
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

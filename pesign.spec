@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.99
-Release: 4%{?dist}
+Release: 5%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -17,36 +17,38 @@ ExclusiveArch: i686 x86_64 ia64
 Source0: pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
 
-Patch0: 0001-Use-PK11_TraverseCertsForNicknameInSlot-after-all.patch
-Patch1: 0002-Remove-an-unused-field.patch
-Patch2: 0003-Free-the-certificate-list-we-make-once-we-re-done-us.patch
-Patch3: 0004-Make-sure-we-actually-look-up-the-certificate-when-n.patch
-Patch4: 0005-Fix-check-for-allocations-on-tokenname-certname.patch
-Patch5: 0006-Update-valgrind.supp-for-newer-codepaths.patch
-Patch6: 0007-Free-the-pid-string-once-we-re-done-writing-it.patch
-Patch7: 0008-valgrind-Don-t-complain-about-unlocking-a-key-and-ke.patch
-Patch8: 0009-Only-try-to-register-OIDs-once.patch
-Patch9: 0010-Check-for-NSS_Shutdown-failure.patch
-Patch10: 0011-Don-t-destroy-stdin-stdout-stderr-if-we-don-t-fork.patch
-Patch11: 0012-valgrind-Add-SECMOD_LoadModule-codepath.patch
-Patch12: 0013-Don-t-set-up-digests-in-cms_context_init.patch
-Patch13: 0014-Do-register_oids-where-we-re-doing-NSS_Init.patch
-Patch14: 0015-Make-daemon-shutdown-actually-close-the-NSS-database.patch
-Patch15: 0016-Reformat-a-bunch-of-error-messages-to-be-vaguely-con.patch
-Patch16: 0017-Use-PORT_ArenaStrdup-where-appropriate.patch
-Patch17: 0018-Minor-whitespace-fixes.patch
-Patch18: 0019-daemon-Make-sure-inpe-is-initialized-before-all-erro.patch
-Patch19: 0020-Allocate-pesign_context-rather-than-having-it-on-the.patch
-Patch20: 0021-pesign-initialize-nss-only-if-we-re-not-a-daemon.patch
-Patch21: 0022-Handle-errors-on-pesign_context_init.patch
-Patch22: 0023-Add-sanity-checking-to-make-sure-we-don-t-emit-unini.patch
-Patch23: 0024-Make-sure-we-free-the-token-cert-we-get-from-the-com.patch
-Patch24: 0025-pesign-Only-shut-down-nss-in-pesign.c-if-we-re-not-t.patch
-Patch25: 0026-Rework-setup_digests-and-teardown_digests.patch
-Patch26: 0027-We-shouldn-t-need-Environment-NSS_STRICT_NOFORK-DISA.patch
-Patch27: 0028-Fix-errors-found-by-coverity.patch
-Patch28: 0029-Don-t-keep-the-DEPS-list-twice.patch
+Patch1: 0001-Use-PK11_TraverseCertsForNicknameInSlot-after-all.patch
+Patch2: 0002-Remove-an-unused-field.patch
+Patch3: 0003-Free-the-certificate-list-we-make-once-we-re-done-us.patch
+Patch4: 0004-Make-sure-we-actually-look-up-the-certificate-when-n.patch
+Patch5: 0005-Fix-check-for-allocations-on-tokenname-certname.patch
+Patch6: 0006-Update-valgrind.supp-for-newer-codepaths.patch
+Patch7: 0007-Free-the-pid-string-once-we-re-done-writing-it.patch
+Patch8: 0008-valgrind-Don-t-complain-about-unlocking-a-key-and-ke.patch
+Patch9: 0009-Only-try-to-register-OIDs-once.patch
+Patch10: 0010-Check-for-NSS_Shutdown-failure.patch
+Patch11: 0011-Don-t-destroy-stdin-stdout-stderr-if-we-don-t-fork.patch
+Patch12: 0012-valgrind-Add-SECMOD_LoadModule-codepath.patch
+Patch13: 0013-Don-t-set-up-digests-in-cms_context_init.patch
+Patch14: 0014-Do-register_oids-where-we-re-doing-NSS_Init.patch
+Patch15: 0015-Make-daemon-shutdown-actually-close-the-NSS-database.patch
+Patch16: 0016-Reformat-a-bunch-of-error-messages-to-be-vaguely-con.patch
+Patch17: 0017-Use-PORT_ArenaStrdup-where-appropriate.patch
+Patch18: 0018-Minor-whitespace-fixes.patch
+Patch19: 0019-daemon-Make-sure-inpe-is-initialized-before-all-erro.patch
+Patch20: 0020-Allocate-pesign_context-rather-than-having-it-on-the.patch
+Patch21: 0021-pesign-initialize-nss-only-if-we-re-not-a-daemon.patch
+Patch22: 0022-Handle-errors-on-pesign_context_init.patch
+Patch23: 0023-Add-sanity-checking-to-make-sure-we-don-t-emit-unini.patch
+Patch24: 0024-Make-sure-we-free-the-token-cert-we-get-from-the-com.patch
+Patch25: 0025-pesign-Only-shut-down-nss-in-pesign.c-if-we-re-not-t.patch
+Patch26: 0026-Rework-setup_digests-and-teardown_digests.patch
+Patch27: 0027-We-shouldn-t-need-Environment-NSS_STRICT_NOFORK-DISA.patch
+Patch28: 0028-Fix-errors-found-by-coverity.patch
+Patch29: 0029-Don-t-keep-the-DEPS-list-twice.patch
 Patch30: 0030-Don-t-build-util-right-now.patch
+Patch31: 0031-Make-install_systemd-and-install_sysvinit-separate-t.patch
+Patch32: 0032-Get-rid-of-an-unnecessary-allocation.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -68,7 +70,7 @@ make PREFIX=%{_prefix} LIBDIR=%{_libdir}
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/%{_libdir}
 make PREFIX=%{_prefix} LIBDIR=%{_libdir} INSTALLROOT=%{buildroot} \
-	install install_systemd
+	install install_sysvinit
 
 # there's some stuff that's not really meant to be shipped yet
 rm -rf %{buildroot}/boot %{buildroot}/usr/include
@@ -86,13 +88,18 @@ getent passwd pesign >/dev/null || \
 exit 0
 
 %post
-%systemd_post pesign.service
+/sbin/chkconfig --add %{name}
 
 %preun
-%systemd_preun pesign.service
+if [ "$1" = 0 ]; then
+	/sbin/service %{name} stop > /dev/null 2>&1
+	/sbin/chkconfig --del %{name}
+fi
 
 %postun
-%systemd_postun_with_restart pesign.service
+if [ "$1" -ge "1" ]; then
+	/sbin/service %{name} condrestart > /dev/null 2>&1
+fi
 
 %files
 %defattr(-,root,root,-)
@@ -102,8 +109,7 @@ exit 0
 %{_sysconfdir}/popt.d/pesign.popt
 %{_sysconfdir}/rpm/macros.pesign
 %{_mandir}/man*/*
-%{_unitdir}/pesign.service
-%{_prefix}/lib/tmpfiles.d/pesign.conf
+%{_initrddir}/pesign
 %dir %attr(0775,pesign,pesign) /etc/pki/pesign
 %attr(0664,pesign,pesign) /etc/pki/pesign/*
 %dir %attr(0770, pesign, pesign) %{_localstatedir}/run/%{name}
@@ -111,6 +117,9 @@ exit 0
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Thu Oct 18 2012 Peter Jones <pjones@redhat.com> - 0.99-5
+- Make it work on the -el6 branch as well.
+
 * Wed Oct 17 2012 Peter Jones <pjones@redhat.com> - 0.99-4
 - Fix some more bugs found by valgrind and coverity.
 - Don't build utils/ ; we're not using them and they're not ready anyway. 
