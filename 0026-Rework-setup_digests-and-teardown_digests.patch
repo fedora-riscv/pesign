@@ -1,7 +1,7 @@
 From 4efe979d6b781e064fe1afa946753ead9e3bbb9d Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 17:49:17 -0400
-Subject: [PATCH 26/30] Rework setup_digests() and teardown_digests()
+Subject: [PATCH 26/32] Rework setup_digests() and teardown_digests()
 
 This fixes the problem I was seeing with empty content_info digests, and
 makes the code a /little/ bit cleaner in some ways.

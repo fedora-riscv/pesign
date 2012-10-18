@@ -1,7 +1,7 @@
 From 66d3353e6d24c9e69ce71735c5aa4741717a6d68 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 15:31:15 -0400
-Subject: [PATCH 20/30] Allocate pesign_context rather than having it on the
+Subject: [PATCH 20/32] Allocate pesign_context rather than having it on the
  stack.
 
 This way it won't try to re-initialize cms_context when it's cleaned up.

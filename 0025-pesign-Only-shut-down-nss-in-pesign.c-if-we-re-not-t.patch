@@ -1,7 +1,7 @@
 From 2030d382b49a1b957de829a67f74d9cc127c55ee Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 17:48:44 -0400
-Subject: [PATCH 25/30] [pesign] Only shut down nss in pesign.c if we're not
+Subject: [PATCH 25/32] [pesign] Only shut down nss in pesign.c if we're not
  the daemon.
 
 The daemon does its own init and shutdown.

@@ -1,7 +1,7 @@
 From 1b94dd90f5a1c65df16ffe3b0619ce5dc0ca1f06 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 19:59:49 -0400
-Subject: [PATCH 28/30] Fix errors found by coverity.
+Subject: [PATCH 28/32] Fix errors found by coverity.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

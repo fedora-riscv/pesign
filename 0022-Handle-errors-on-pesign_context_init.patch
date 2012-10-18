@@ -1,7 +1,7 @@
 From a1ce809e199c7fbbd6f5c0e75f27a4234fcbd2bc Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 15:34:00 -0400
-Subject: [PATCH 22/30] Handle errors on pesign_context_init()
+Subject: [PATCH 22/32] Handle errors on pesign_context_init()
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

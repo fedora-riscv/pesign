@@ -1,7 +1,7 @@
 From 444a514e1a7c9a27953f914cf416d559ef5be083 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 15:32:57 -0400
-Subject: [PATCH 21/30] [pesign] initialize nss only if we're not a daemon.
+Subject: [PATCH 21/32] [pesign] initialize nss only if we're not a daemon.
 
 If it's a deamon, NSS_Init, register_oids, and setup_digests will be
 done in the daemon code, not in the normal tool code.

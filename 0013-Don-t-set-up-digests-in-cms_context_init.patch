@@ -1,7 +1,7 @@
 From 186b6d5d39a1feeaa5f9493d28dc4f53015d551d Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 14:33:35 -0400
-Subject: [PATCH 13/30] Don't set up digests in cms_context_init.
+Subject: [PATCH 13/32] Don't set up digests in cms_context_init.
 
 Move digest setup out of cms_context_init, so we can avoid leaking the
 reference to the digests by not having them in ctx->backup_cms in the

@@ -1,7 +1,7 @@
 From c196b462ad5267e8ed20c0b855b9921268b22a7b Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 15:26:47 -0400
-Subject: [PATCH 18/30] Minor whitespace fixes.
+Subject: [PATCH 18/32] Minor whitespace fixes.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
