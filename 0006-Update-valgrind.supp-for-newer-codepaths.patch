@@ -1,7 +1,7 @@
 From 682233d107460b49071017b4d88c0430373dbd35 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 10:55:25 -0400
-Subject: [PATCH 06/32] Update valgrind.supp for newer codepaths.
+Subject: [PATCH 06/36] Update valgrind.supp for newer codepaths.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
