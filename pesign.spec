@@ -67,7 +67,8 @@ make PREFIX=%{_prefix} LIBDIR=%{_libdir}
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/%{_libdir}
-make PREFIX=%{_prefix} LIBDIR=%{_libdir} INSTALLROOT=%{buildroot} install
+make PREFIX=%{_prefix} LIBDIR=%{_libdir} INSTALLROOT=%{buildroot} \
+	install install_systemd
 
 # there's some stuff that's not really meant to be shipped yet
 rm -rf %{buildroot}/boot %{buildroot}/usr/include
