@@ -1,7 +1,7 @@
 From 44aad110fd3f0a12e1817d95047f882c4d8b0fce Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 18 Oct 2012 11:36:10 -0400
-Subject: [PATCH 30/32] Don't build util/ right now.
+Subject: [PATCH 30/36] Don't build util/ right now.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

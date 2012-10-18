@@ -1,7 +1,7 @@
 From 4c13f6d393db0aa5ff5b327cb5e842ee21522236 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 18 Oct 2012 13:09:58 -0400
-Subject: [PATCH 31/32] Make "install_systemd" and "install_sysvinit" separate
+Subject: [PATCH 31/36] Make "install_systemd" and "install_sysvinit" separate
  targets
 
 Signed-off-by: Peter Jones <pjones@redhat.com>

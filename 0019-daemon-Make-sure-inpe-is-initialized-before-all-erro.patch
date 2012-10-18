@@ -1,7 +1,7 @@
 From 7a8c50f620c7484af9d750f484df8a6837e6b2a5 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 15:27:03 -0400
-Subject: [PATCH 19/32] [daemon] Make sure inpe is initialized before all
+Subject: [PATCH 19/36] [daemon] Make sure inpe is initialized before all
  error handling.
 
 find_certificate() and set_up_inpe() errors wind up being at the same

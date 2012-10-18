@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.99
-Release: 5%{?dist}
+Release: 6%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -49,6 +49,10 @@ Patch29: 0029-Don-t-keep-the-DEPS-list-twice.patch
 Patch30: 0030-Don-t-build-util-right-now.patch
 Patch31: 0031-Make-install_systemd-and-install_sysvinit-separate-t.patch
 Patch32: 0032-Get-rid-of-an-unnecessary-allocation.patch
+Patch33: 0033-Allow-use-of-e-from-rpm-macro.patch
+Patch34: 0034-Make-client-use-e-like-pesign-does-rather-than-detac.patch
+Patch35: 0035-Fix-shutdown-by-systemd-to-remove-socket-and-pidfile.patch
+Patch36: 0036-Make-the-macros-use-the-default-fedora-signer-if-the.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -113,6 +117,9 @@ exit 0
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Thu Oct 18 2012 Peter Jones <pjones@redhat.com> - 0.99-6
+- Automatically select daemon as signer when using rpm macros.
+
 * Thu Oct 18 2012 Peter Jones <pjones@redhat.com> - 0.99-5
 - Make it work on the -el6 branch as well.
 

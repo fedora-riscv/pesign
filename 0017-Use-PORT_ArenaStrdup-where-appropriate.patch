@@ -1,7 +1,7 @@
 From 8ffe6943f04d42314f81eb8b5e3350d4ccc41895 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 15:26:23 -0400
-Subject: [PATCH 17/32] Use PORT_ArenaStrdup() where appropriate.
+Subject: [PATCH 17/36] Use PORT_ArenaStrdup() where appropriate.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

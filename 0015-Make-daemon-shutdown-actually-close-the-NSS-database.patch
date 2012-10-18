@@ -1,7 +1,7 @@
 From 092e3f81233655849156b0948a53f3b5f51b8c97 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 14:43:58 -0400
-Subject: [PATCH 15/32] Make daemon shutdown actually close the NSS databases
+Subject: [PATCH 15/36] Make daemon shutdown actually close the NSS databases
  and whatnot.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
