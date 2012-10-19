@@ -1,7 +1,7 @@
 From 9c2daa8d3761b49961498cb9a9bbc8a37e05b0da Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Fri, 19 Oct 2012 10:19:39 -0400
-Subject: [PATCH 40/41] Use setfacl in sysvinit script to allow kojibuilder
+Subject: [PATCH 40/42] Use setfacl in sysvinit script to allow kojibuilder
  access.
 
 ---

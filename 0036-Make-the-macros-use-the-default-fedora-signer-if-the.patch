@@ -1,7 +1,7 @@
 From 22308fbfb540b5215efb9ce96a4dfdce08ef9165 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 18 Oct 2012 15:16:05 -0400
-Subject: [PATCH 36/41] Make the macros use the default (fedora) signer if
+Subject: [PATCH 36/42] Make the macros use the default (fedora) signer if
  there's a daemon running.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>

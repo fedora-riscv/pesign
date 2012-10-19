@@ -1,7 +1,7 @@
 From b71f1d2e8f7ad6853e5e68134a66baf9dea2471b Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 11:26:04 -0400
-Subject: [PATCH 09/41] Only try to register OIDs once.
+Subject: [PATCH 09/42] Only try to register OIDs once.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

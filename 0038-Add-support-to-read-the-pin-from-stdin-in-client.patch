@@ -1,7 +1,7 @@
 From 8067d9bace148a254528fdf752f083d2a0debada Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Fri, 19 Oct 2012 10:08:26 -0400
-Subject: [PATCH 38/41] Add support to read the pin from stdin in client.
+Subject: [PATCH 38/42] Add support to read the pin from stdin in client.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

@@ -1,7 +1,7 @@
 From 2bd84dcfbdf084bcfb3e6d7c26756ca3783cdae4 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Fri, 19 Oct 2012 10:20:40 -0400
-Subject: [PATCH 41/41] Don't return quite so immediately if we're the parent
+Subject: [PATCH 41/42] Don't return quite so immediately if we're the parent
  pid when daemonizing.
 
 Long term we probably want to look for the socket and/or sigchld instead

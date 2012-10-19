@@ -1,7 +1,7 @@
 From f1a2f097cfb290951702251703abcd34ca0bf9e6 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 18 Oct 2012 15:13:11 -0400
-Subject: [PATCH 35/41] Fix shutdown by systemd to remove socket and pidfile.
+Subject: [PATCH 35/42] Fix shutdown by systemd to remove socket and pidfile.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

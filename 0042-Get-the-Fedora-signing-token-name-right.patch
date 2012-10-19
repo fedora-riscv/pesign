@@ -1,0 +1,28 @@
+From b699c67004807c53d7c22328ba15304c4f9748a9 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 19 Oct 2012 19:16:52 -0400
+Subject: [PATCH 42/42] Get the Fedora signing token name right.
+
+Because, you know, we're not signing with the CA token.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/macros.pesign | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/macros.pesign b/src/macros.pesign
+index fb9d21e..4996d7c 100644
+--- a/src/macros.pesign
++++ b/src/macros.pesign
+@@ -15,7 +15,7 @@
+ %pesign(i:o:C:e:s) \
+   if [ -x %{_pesign} -a "%{_target_cpu}" == "x86_64" ]; then \
+     if [ -e /var/run/pesign/socket ]; then \
+-      %{_pesign_client} -t "OpenSC Card (Fedora Signing CA)" \\\
++      %{_pesign_client} -t "OpenSC Card (Fedora Signer)" \\\
+       			-c "/CN=Fedora Secure Boot Signer" \\\
+ 			%{-i} %{-o} %{-e} %{-s} \
+     else \
+-- 
+1.7.12.1
+

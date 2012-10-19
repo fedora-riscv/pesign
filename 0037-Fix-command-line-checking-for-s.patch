@@ -1,7 +1,7 @@
 From abe7981ba049b23ae9c42da92559576c6e0cc53b Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Fri, 19 Oct 2012 10:07:40 -0400
-Subject: [PATCH 37/41] Fix command line checking for -s.
+Subject: [PATCH 37/42] Fix command line checking for -s.
 
 Accidentally applied when not using -s.  Woops.
 

@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.99
-Release: 7%{?dist}
+Release: 8%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -59,6 +59,7 @@ Patch38: 0038-Add-support-to-read-the-pin-from-stdin-in-client.patch
 Patch39: 0039-Fix-token-auth-authentication-failure-error-reportin.patch
 Patch40: 0040-Use-setfacl-in-sysvinit-script-to-allow-kojibuilder-.patch
 Patch41: 0041-Don-t-return-quite-so-immediately-if-we-re-the-paren.patch
+Patch42: 0042-Get-the-Fedora-signing-token-name-right.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -128,6 +129,9 @@ exit 0
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Fri Oct 19 2012 Peter Jones <pjones@redhat.com> - 0.99-8
+- Get the Fedora signing token name right.
+
 * Fri Oct 19 2012 Peter Jones <pjones@redhat.com>
 - Add coolkey and opensc modules to pki database during %%install.
 

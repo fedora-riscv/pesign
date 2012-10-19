@@ -1,7 +1,7 @@
 From 24a63eab7ddbe2be3ab6b25b04602d8e3fe5d775 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 18 Oct 2012 14:28:36 -0400
-Subject: [PATCH 33/41] Allow use of -e from rpm macro.
+Subject: [PATCH 33/42] Allow use of -e from rpm macro.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

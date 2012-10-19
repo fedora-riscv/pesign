@@ -1,7 +1,7 @@
 From df1b69e304f2a7eb82e2f94e50f07099afbf4578 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 18 Oct 2012 13:10:28 -0400
-Subject: [PATCH 32/41] Get rid of an unnecessary allocation.
+Subject: [PATCH 32/42] Get rid of an unnecessary allocation.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

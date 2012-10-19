@@ -1,7 +1,7 @@
 From 50c50c8fbebab3d8b5efff35dc1a7ca4b44d6b19 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 11:08:30 -0400
-Subject: [PATCH 08/41] [valgrind] Don't complain about unlocking a key and
+Subject: [PATCH 08/42] [valgrind] Don't complain about unlocking a key and
  keeping the handle.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>

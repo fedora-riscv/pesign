@@ -1,7 +1,7 @@
 From 19c8e797d092e17f2882d249d5446728a76db050 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 14:29:30 -0400
-Subject: [PATCH 12/41] [valgrind] Add SECMOD_LoadModule codepath.
+Subject: [PATCH 12/42] [valgrind] Add SECMOD_LoadModule codepath.
 
 This is called once when we initialize the database.
 

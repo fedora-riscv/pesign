@@ -1,7 +1,7 @@
 From e5c632516a2a31f3e184d0ca9d8ac5ceba1f9015 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 18 Oct 2012 14:55:07 -0400
-Subject: [PATCH 34/41] Make client use -e like pesign does, rather than
+Subject: [PATCH 34/42] Make client use -e like pesign does, rather than
  --detached.
 
 This way we can use the same macros for them.

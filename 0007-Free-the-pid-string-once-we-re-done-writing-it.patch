@@ -1,7 +1,7 @@
 From 81bf0e36a82a3d746a01aee50d8ee460dc794b19 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 10:57:20 -0400
-Subject: [PATCH 07/41] Free the pid string once we're done writing it.
+Subject: [PATCH 07/42] Free the pid string once we're done writing it.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
