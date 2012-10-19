@@ -1,7 +1,7 @@
 From df5afd0e6d92f31a804f5f1631b6fae3b8ef4d8b Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 09:54:37 -0400
-Subject: [PATCH 03/36] Free the certificate list we make once we're done
+Subject: [PATCH 03/41] Free the certificate list we make once we're done
  using it.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>

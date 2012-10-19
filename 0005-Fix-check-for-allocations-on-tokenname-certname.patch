@@ -1,7 +1,7 @@
 From 844138e07535a8aa2be80496378c9929acaa1687 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 10:35:41 -0400
-Subject: [PATCH 05/36] Fix check for allocations on tokenname,certname.
+Subject: [PATCH 05/41] Fix check for allocations on tokenname,certname.
 
 If we didn't have anything to start with, we won't have anything when
 we're done...

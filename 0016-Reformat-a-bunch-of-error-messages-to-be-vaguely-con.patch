@@ -1,7 +1,7 @@
 From b6ff405da1bf4627a40fc104457a539788c9f470 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 15:18:08 -0400
-Subject: [PATCH 16/36] Reformat a bunch of error messages to be vaguely
+Subject: [PATCH 16/41] Reformat a bunch of error messages to be vaguely
  consistent.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
