@@ -7,7 +7,8 @@ License: GPLv2
 URL: https://github.com/vathpela/pesign
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: git gnu-efi nspr nspr-devel nss nss-devel nss-util popt-devel
-Requires: nspr nss nss-util popt rpm acl
+BuildRequires: coolkey opensc nss-tools
+Requires: nspr nss nss-util popt rpm acl coolkey opensc
 Requires(pre): shadow-utils
 ExclusiveArch: i686 x86_64 ia64
 
@@ -86,6 +87,11 @@ rm -rf %{buildroot}/boot %{buildroot}/usr/include
 rm -rf %{buildroot}%{_libdir}/libdpe*
 mv rh-test-certs/etc/pki/pesign/* %{buildroot}/etc/pki/pesign/
 
+modutil -dbdir /etc/pki/pesign -add coolkey \
+	-libfile %{_libdir}pkcs11/libcoolkeypk11.so
+modutil -dbdir /etc/pki/pesign -add opensc \
+	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
+
 %clean
 rm -rf %{buildroot}
 
@@ -126,6 +132,9 @@ fi
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Fri Oct 19 2012 Peter Jones <pjones@redhat.com>
+- Add coolkey and opensc modules to pki database during %%install.
+
 * Fri Oct 19 2012 Peter Jones <pjones@redhat.com> - 0.99-7
 - setfacl u:kojibuilder:rw /var/run/pesign/socket
 - Fix command line checking in client
