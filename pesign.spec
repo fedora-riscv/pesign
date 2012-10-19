@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.99
-Release: 6%{?dist}
+Release: 7%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -53,6 +53,11 @@ Patch33: 0033-Allow-use-of-e-from-rpm-macro.patch
 Patch34: 0034-Make-client-use-e-like-pesign-does-rather-than-detac.patch
 Patch35: 0035-Fix-shutdown-by-systemd-to-remove-socket-and-pidfile.patch
 Patch36: 0036-Make-the-macros-use-the-default-fedora-signer-if-the.patch
+Patch37: 0037-Fix-command-line-checking-for-s.patch
+Patch38: 0038-Add-support-to-read-the-pin-from-stdin-in-client.patch
+Patch39: 0039-Fix-token-auth-authentication-failure-error-reportin.patch
+Patch40: 0040-Use-setfacl-in-sysvinit-script-to-allow-kojibuilder-.patch
+Patch41: 0041-Don-t-return-quite-so-immediately-if-we-re-the-paren.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -121,6 +126,11 @@ fi
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Fri Oct 19 2012 Peter Jones <pjones@redhat.com> - 0.99-7
+- setfacl u:kojibuilder:rw /var/run/pesign/socket
+- Fix command line checking in client
+- Add client stdin pin reading.
+
 * Thu Oct 18 2012 Peter Jones <pjones@redhat.com> - 0.99-6
 - Automatically select daemon as signer when using rpm macros.
 

@@ -1,7 +1,7 @@
 From 406a08cc45a2d0761294002d946ee3381a4706ee Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 09:53:07 -0400
-Subject: [PATCH 01/36] Use PK11_TraverseCertsForNicknameInSlot after all.
+Subject: [PATCH 01/41] Use PK11_TraverseCertsForNicknameInSlot after all.
 
 As of 76bc13c it doesn't appear to be leaky any more, and it does a
 better job of disinguishing between certificates with the same nickname

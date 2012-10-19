@@ -1,7 +1,7 @@
 From 4ed91a1bb65769401c0fd6c1c5b2a3c64c0c1266 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 17 Oct 2012 16:35:43 -0400
-Subject: [PATCH 23/36] Add sanity checking to make sure we don't emit
+Subject: [PATCH 23/41] Add sanity checking to make sure we don't emit
  uninitialized hashes.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
