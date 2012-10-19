@@ -7,7 +7,7 @@ License: GPLv2
 URL: https://github.com/vathpela/pesign
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: git gnu-efi nspr nspr-devel nss nss-devel nss-util popt-devel
-Requires: nspr nss nss-util popt rpm
+Requires: nspr nss nss-util popt rpm acl
 Requires(pre): shadow-utils
 ExclusiveArch: i686 x86_64 ia64
 
