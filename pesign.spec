@@ -6,8 +6,10 @@ Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires: git gnu-efi nspr nspr-devel nss nss-devel nss-util popt-devel
+BuildRequires: git gnu-efi nspr nss nss-util popt-devel
 BuildRequires: coolkey opensc nss-tools
+BuildRequires: nspr-devel >= 4.9.2-1
+BuildRequires: nss-devel >= 3.13.6-1
 Requires: nspr nss nss-util popt rpm coolkey opensc
 Requires(pre): shadow-utils
 ExclusiveArch: i686 x86_64 ia64
