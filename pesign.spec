@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.99
-Release: 8%{?dist}
+Release: 9%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -62,6 +62,7 @@ Patch39: 0039-Fix-token-auth-authentication-failure-error-reportin.patch
 Patch40: 0040-Use-setfacl-in-sysvinit-script-to-allow-kojibuilder-.patch
 Patch41: 0041-Don-t-return-quite-so-immediately-if-we-re-the-paren.patch
 Patch42: 0042-Get-the-Fedora-signing-token-name-right.patch
+Patch43: 0043-Add-support-for-local-certificate-database-directori.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -131,6 +132,9 @@ exit 0
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Mon Nov 26 2012 Matthew Garrett <mjg59@srcf.ucam.org> - 0.99-9
+- Add a patch needed for new shim builds
+
 * Fri Oct 19 2012 Peter Jones <pjones@redhat.com> - 0.99-8
 - Get the Fedora signing token name right.
 

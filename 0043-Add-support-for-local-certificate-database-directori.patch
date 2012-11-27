@@ -1,0 +1,46 @@
+From 3e257e96c9b48e07e0885f391f1e50fd69b52408 Mon Sep 17 00:00:00 2001
+From: Fedora Ninjas <pesign-owner@fedoraproject.org>
+Date: Mon, 26 Nov 2012 19:05:54 -0500
+Subject: [PATCH] Add support for local certificate database directories
+
+Users may wish to use a certificate database other than the systemwide one.
+Add an option for that.
+---
+ src/pesign.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/pesign.c b/src/pesign.c
+index 2c98600..cd3031c 100644
+--- a/src/pesign.c
++++ b/src/pesign.c
+@@ -437,6 +437,7 @@ main(int argc, char *argv[])
+ 	char *tokenname = "NSS Certificate DB";
+ 	char *origtoken = tokenname;
+ 	char *certname = NULL;
++	char *certdir = "/etc/pki/pesign";
+ 
+ 	rc = pesign_context_new(&ctxp);
+ 	if (rc < 0) {
+@@ -454,6 +455,10 @@ main(int argc, char *argv[])
+ 		{"certficate", 'c', POPT_ARG_STRING, &certname, 0,
+ 			"specify certificate nickname",
+ 			"<certificate nickname>" },
++		{"certdir", 'n', POPT_ARG_STRING|POPT_ARGFLAG_SHOW_DEFAULT,
++			&certdir, 0,
++			"specify nss certificate database directory",
++			"<certificate directory path>" },
+ 		{"privkey", 'p', POPT_ARG_STRING, &ctxp->privkeyfile, 0,
+ 			"specify private key file", "<privkey>" },
+ 		{"force", 'f', POPT_ARG_VAL, &ctxp->force,  1,
+@@ -536,7 +541,7 @@ main(int argc, char *argv[])
+ 	poptFreeContext(optCon);
+ 
+ 	if (!daemon) {
+-		SECStatus status = NSS_Init("/etc/pki/pesign");
++		SECStatus status = NSS_Init(certdir);
+ 		if (status != SECSuccess) {
+ 			fprintf(stderr, "Could not initialize nss: %s\n",
+ 				PORT_ErrorToString(PORT_GetError()));
+-- 
+1.8.0
+
