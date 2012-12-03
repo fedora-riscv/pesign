@@ -19,6 +19,7 @@ ExclusiveArch: i686 x86_64 ia64
 # git checkout %%{version}
 Source0: pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
+Patch0: 0001-Fix-a-casting-problem-on-32-bit.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
