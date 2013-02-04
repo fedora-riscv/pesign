@@ -76,6 +76,7 @@ exit 0
 %doc README TODO COPYING
 %{_bindir}/pesign
 %{_bindir}/pesign-client
+%{_bindir}/efikeygen
 %{_sysconfdir}/popt.d/pesign.popt
 %{_sysconfdir}/rpm/macros.pesign
 %{_mandir}/man*/*
