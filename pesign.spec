@@ -1,6 +1,6 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.100
+Version: 0.101
 Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
@@ -19,7 +19,6 @@ ExclusiveArch: i686 x86_64 ia64
 # git checkout %%{version}
 Source0: pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
-Patch0: 0001-Fix-a-casting-problem-on-32-bit.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -89,6 +88,9 @@ exit 0
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Mon Feb 04 2013 Peter Jones <pjones@redhat.com> - 0.101-1
+- Update to 0.101 to fix more "pesign -E" issues.
+
 * Fri Nov 30 2012 Peter Jones <pjones@redhat.com> - 0.100-1
 - Fix insertion of signatures from a file.
 
