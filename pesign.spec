@@ -1,6 +1,6 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.102
+Version: 0.103
 Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
@@ -89,6 +89,9 @@ exit 0
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 
 %changelog
+* Tue Feb 05 2013 Peter Jones <pjones@redhat.com> - 0.103-1
+- One more compiler problem.  Let's expect a few more, shall we?
+
 * Tue Feb 05 2013 Peter Jones <pjones@redhat.com> - 0.102-1
 - Don't use --std=gnu11 because we have to work on RHEL 6 builders.
 
