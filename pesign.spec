@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.103
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -40,12 +40,18 @@ make PREFIX=%{_prefix} LIBDIR=%{_libdir}
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/%{_libdir}
 make PREFIX=%{_prefix} LIBDIR=%{_libdir} INSTALLROOT=%{buildroot} \
-	install install_systemd
+	install
+%if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
+make PREFIX=%{_prefix} LIBDIR=%{_libdir} INSTALLROOT=%{buildroot} \
+	install_systemd
+%endif
 
 # there's some stuff that's not really meant to be shipped yet
 rm -rf %{buildroot}/boot %{buildroot}/usr/include
 rm -rf %{buildroot}%{_libdir}/libdpe*
 mv rh-test-certs/etc/pki/pesign/* %{buildroot}/etc/pki/pesign/
+
+
 
 #modutil -force -dbdir %{buildroot}/etc/pki/pesign -add coolkey \
 #	-libfile %{_libdir}/pkcs11/libcoolkeypk11.so
@@ -62,6 +68,7 @@ getent passwd pesign >/dev/null || \
 		-c "Group for the pesign signing daemon" pesign
 exit 0
 
+%if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
 %post
 %systemd_post pesign.service
 
@@ -70,6 +77,7 @@ exit 0
 
 %postun
 %systemd_postun_with_restart pesign.service
+%endif
 
 %files
 %defattr(-,root,root,-)
@@ -80,15 +88,20 @@ exit 0
 %{_sysconfdir}/popt.d/pesign.popt
 %{_sysconfdir}/rpm/macros.pesign
 %{_mandir}/man*/*
-%{_unitdir}/pesign.service
-%{_prefix}/lib/tmpfiles.d/pesign.conf
 %dir %attr(0775,pesign,pesign) /etc/pki/pesign
 %attr(0664,pesign,pesign) /etc/pki/pesign/*
 %dir %attr(0770, pesign, pesign) %{_localstatedir}/run/%{name}
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/socket
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
+%if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
+%{_prefix}/lib/tmpfiles.d/pesign.conf
+%{_unitdir}/pesign.service
+%endif
 
 %changelog
+* Wed Feb 06 2013 Peter Jones <pjones@redhat.com> - 0.103-2
+- Conditionalize systemd bits so they don't show up in RHEL 6 builds
+
 * Tue Feb 05 2013 Peter Jones <pjones@redhat.com> - 0.103-1
 - One more compiler problem.  Let's expect a few more, shall we?
 
