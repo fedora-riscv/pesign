@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.99
-Release: 7%{?dist}
+Version: 0.104
+Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -9,6 +9,8 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: git gnu-efi nspr nspr-devel nss nss-devel nss-util popt-devel
 BuildRequires: coolkey opensc nss-tools
 Requires: nspr nss nss-util popt rpm acl coolkey opensc
+BuildRequires: nspr-devel >= 4.9.2-1
+BuildRequires: nss-devel >= 3.13.6-1
 Requires(pre): shadow-utils
 ExclusiveArch: i686 x86_64 ia64
 
@@ -17,48 +19,6 @@ ExclusiveArch: i686 x86_64 ia64
 # git checkout %%{version}
 Source0: pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
-
-Patch1: 0001-Use-PK11_TraverseCertsForNicknameInSlot-after-all.patch
-Patch2: 0002-Remove-an-unused-field.patch
-Patch3: 0003-Free-the-certificate-list-we-make-once-we-re-done-us.patch
-Patch4: 0004-Make-sure-we-actually-look-up-the-certificate-when-n.patch
-Patch5: 0005-Fix-check-for-allocations-on-tokenname-certname.patch
-Patch6: 0006-Update-valgrind.supp-for-newer-codepaths.patch
-Patch7: 0007-Free-the-pid-string-once-we-re-done-writing-it.patch
-Patch8: 0008-valgrind-Don-t-complain-about-unlocking-a-key-and-ke.patch
-Patch9: 0009-Only-try-to-register-OIDs-once.patch
-Patch10: 0010-Check-for-NSS_Shutdown-failure.patch
-Patch11: 0011-Don-t-destroy-stdin-stdout-stderr-if-we-don-t-fork.patch
-Patch12: 0012-valgrind-Add-SECMOD_LoadModule-codepath.patch
-Patch13: 0013-Don-t-set-up-digests-in-cms_context_init.patch
-Patch14: 0014-Do-register_oids-where-we-re-doing-NSS_Init.patch
-Patch15: 0015-Make-daemon-shutdown-actually-close-the-NSS-database.patch
-Patch16: 0016-Reformat-a-bunch-of-error-messages-to-be-vaguely-con.patch
-Patch17: 0017-Use-PORT_ArenaStrdup-where-appropriate.patch
-Patch18: 0018-Minor-whitespace-fixes.patch
-Patch19: 0019-daemon-Make-sure-inpe-is-initialized-before-all-erro.patch
-Patch20: 0020-Allocate-pesign_context-rather-than-having-it-on-the.patch
-Patch21: 0021-pesign-initialize-nss-only-if-we-re-not-a-daemon.patch
-Patch22: 0022-Handle-errors-on-pesign_context_init.patch
-Patch23: 0023-Add-sanity-checking-to-make-sure-we-don-t-emit-unini.patch
-Patch24: 0024-Make-sure-we-free-the-token-cert-we-get-from-the-com.patch
-Patch25: 0025-pesign-Only-shut-down-nss-in-pesign.c-if-we-re-not-t.patch
-Patch26: 0026-Rework-setup_digests-and-teardown_digests.patch
-Patch27: 0027-We-shouldn-t-need-Environment-NSS_STRICT_NOFORK-DISA.patch
-Patch28: 0028-Fix-errors-found-by-coverity.patch
-Patch29: 0029-Don-t-keep-the-DEPS-list-twice.patch
-Patch30: 0030-Don-t-build-util-right-now.patch
-Patch31: 0031-Make-install_systemd-and-install_sysvinit-separate-t.patch
-Patch32: 0032-Get-rid-of-an-unnecessary-allocation.patch
-Patch33: 0033-Allow-use-of-e-from-rpm-macro.patch
-Patch34: 0034-Make-client-use-e-like-pesign-does-rather-than-detac.patch
-Patch35: 0035-Fix-shutdown-by-systemd-to-remove-socket-and-pidfile.patch
-Patch36: 0036-Make-the-macros-use-the-default-fedora-signer-if-the.patch
-Patch37: 0037-Fix-command-line-checking-for-s.patch
-Patch38: 0038-Add-support-to-read-the-pin-from-stdin-in-client.patch
-Patch39: 0039-Fix-token-auth-authentication-failure-error-reportin.patch
-Patch40: 0040-Use-setfacl-in-sysvinit-script-to-allow-kojibuilder-.patch
-Patch41: 0041-Don-t-return-quite-so-immediately-if-we-re-the-paren.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -87,10 +47,12 @@ rm -rf %{buildroot}/boot %{buildroot}/usr/include
 rm -rf %{buildroot}%{_libdir}/libdpe*
 mv rh-test-certs/etc/pki/pesign/* %{buildroot}/etc/pki/pesign/
 
-modutil -dbdir /etc/pki/pesign -add coolkey \
-	-libfile %{_libdir}pkcs11/libcoolkeypk11.so
-modutil -dbdir /etc/pki/pesign -add opensc \
-	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
+
+
+#modutil -force -dbdir %{buildroot}/etc/pki/pesign -add coolkey \
+#	-libfile %{_libdir}/pkcs11/libcoolkeypk11.so
+#modutil -force -dbdir %{buildroot}/etc/pki/pesign -add opensc \
+#	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
 
 %clean
 rm -rf %{buildroot}
@@ -121,6 +83,7 @@ fi
 %doc README TODO COPYING
 %{_bindir}/pesign
 %{_bindir}/pesign-client
+%{_bindir}/efikeygen
 %{_sysconfdir}/popt.d/pesign.popt
 %{_sysconfdir}/rpm/macros.pesign
 %{_mandir}/man*/*
@@ -130,8 +93,38 @@ fi
 %dir %attr(0770, pesign, pesign) %{_localstatedir}/run/%{name}
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/socket
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
+%if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
+%{_prefix}/lib/tmpfiles.d/pesign.conf
+%{_unitdir}/pesign.service
+%endif
 
 %changelog
+* Wed May 15 2013 Peter Jones <pjones@redhat.com> - 0.104-1
+- Make sure alignment is correct on signature list entries
+  Resolves: rhbz#963361
+- Make sure section alignment is correct if we have to extend the file
+
+* Wed Feb 06 2013 Peter Jones <pjones@redhat.com> - 0.103-2
+- Conditionalize systemd bits so they don't show up in RHEL 6 builds
+
+* Tue Feb 05 2013 Peter Jones <pjones@redhat.com> - 0.103-1
+- One more compiler problem.  Let's expect a few more, shall we?
+
+* Tue Feb 05 2013 Peter Jones <pjones@redhat.com> - 0.102-1
+- Don't use --std=gnu11 because we have to work on RHEL 6 builders.
+
+* Mon Feb 04 2013 Peter Jones <pjones@redhat.com> - 0.101-1
+- Update to 0.101 to fix more "pesign -E" issues.
+
+* Fri Nov 30 2012 Peter Jones <pjones@redhat.com> - 0.100-1
+- Fix insertion of signatures from a file.
+
+* Mon Nov 26 2012 Matthew Garrett <mjg59@srcf.ucam.org> - 0.99-9
+- Add a patch needed for new shim builds
+
+* Fri Oct 19 2012 Peter Jones <pjones@redhat.com> - 0.99-8
+- Get the Fedora signing token name right.
+
 * Fri Oct 19 2012 Peter Jones <pjones@redhat.com>
 - Add coolkey and opensc modules to pki database during %%install.
 
