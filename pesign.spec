@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.103
-Release: 2%{?dist}
+Version: 0.104
+Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -99,6 +99,11 @@ exit 0
 %endif
 
 %changelog
+* Wed May 15 2013 Peter Jones <pjones@redhat.com> - 0.104-1
+- Make sure alignment is correct on signature list entries
+  Resolves: rhbz#963361
+- Make sure section alignment is correct if we have to extend the file
+
 * Wed Feb 06 2013 Peter Jones <pjones@redhat.com> - 0.103-2
 - Conditionalize systemd bits so they don't show up in RHEL 6 builds
 
