@@ -47,12 +47,10 @@ rm -rf %{buildroot}/boot %{buildroot}/usr/include
 rm -rf %{buildroot}%{_libdir}/libdpe*
 mv rh-test-certs/etc/pki/pesign/* %{buildroot}/etc/pki/pesign/
 
-
-
 #modutil -force -dbdir %{buildroot}/etc/pki/pesign -add coolkey \
 #	-libfile %{_libdir}/pkcs11/libcoolkeypk11.so
-#modutil -force -dbdir %{buildroot}/etc/pki/pesign -add opensc \
-#	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
+modutil -force -dbdir %{buildroot}/etc/pki/pesign -add opensc \
+	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
 
 %clean
 rm -rf %{buildroot}
