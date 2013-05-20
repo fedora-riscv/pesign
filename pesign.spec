@@ -1,6 +1,6 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.104
+Version: 0.105
 Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
@@ -97,6 +97,9 @@ exit 0
 %endif
 
 %changelog
+* Mon May 20 2013 Peter Jones <pjones@redhat.com> - 0.105-1
+- Various bug fixes.
+
 * Wed May 15 2013 Peter Jones <pjones@redhat.com> - 0.104-1
 - Make sure alignment is correct on signature list entries
   Resolves: rhbz#963361
