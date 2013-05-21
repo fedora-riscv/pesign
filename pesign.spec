@@ -1,6 +1,6 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.105
+Version: 0.106
 Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
@@ -97,6 +97,10 @@ fi
 %endif
 
 %changelog
+* Tue May 21 2013 Peter Jones <pjones@redhat.com> - 0.106-1
+- Update to 0.106
+- Hopefully fix the segfault dgilmore was seeing.
+
 * Mon May 20 2013 Peter Jones <pjones@redhat.com> - 0.105-1
 - Various bug fixes.
 
