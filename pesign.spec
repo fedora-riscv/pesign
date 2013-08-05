@@ -18,6 +18,7 @@ ExclusiveArch: i686 x86_64 ia64
 # git checkout %%{version}
 Source0: pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
+Patch0: 0001-Apparently-we-want-documentation-in-a-non-versioned-.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -96,6 +97,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Aug 05 2013 Peter Jones <pjones@redhat.com> - 0.106-2
+- Fix for new %%doc rules.
+
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.106-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
