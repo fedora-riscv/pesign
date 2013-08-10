@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.106
-Release: 4%{?dist}
+Version: 0.107
+Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -21,15 +21,6 @@ BuildRequires: rh-signing-tools >= 1.20-2
 # git checkout %%{version}
 Source0: pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
-Patch0001: 0001-Make-the-RHEL-pesign-macro-a-little-better.patch
-Patch0002: 0002-Apparently-we-want-documentation-in-a-non-versioned-.patch
-Patch0003: 0003-Make-the-RHEL-bits-for-macros.pesign-a-bit-cleaner.patch
-Patch0004: 0004-Include-the-issuer-s-certificate-only-when-available.patch
-Patch0005: 0005-Try-harder-to-figure-out-if-this-is-RHEL.patch
-Patch0006: 0006-Don-t-use-ASCII-mode-for-RHEL-certificate-imports.patch
-Patch0007: 0007-Apparently-if-something-goes-wrong-on-the-HSM-we-win.patch
-Patch0008: 0008-Use-force-when-we-ve-got-a-sattrs-blob-from-mktemp.patch
-Patch0009: 0009-Remove-errant-results-from-signing.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
