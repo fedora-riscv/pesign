@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.106
-Release: 2%{?dist}
+Release: 4%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -12,13 +12,24 @@ BuildRequires: nss-devel >= 3.13.6-1
 Requires: nspr nss nss-util popt rpm coolkey opensc
 Requires(pre): shadow-utils
 ExclusiveArch: i686 x86_64 ia64
+%if 0%{?rhel} >= 7
+BuildRequires: rh-signing-tools >= 1.20-2
+%endif
 
 # there is no tarball at github, of course.  To get this version do:
 # git clone https://github.com/vathpela/pesign.git
 # git checkout %%{version}
 Source0: pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
-Patch0: 0001-Apparently-we-want-documentation-in-a-non-versioned-.patch
+Patch0001: 0001-Make-the-RHEL-pesign-macro-a-little-better.patch
+Patch0002: 0002-Apparently-we-want-documentation-in-a-non-versioned-.patch
+Patch0003: 0003-Make-the-RHEL-bits-for-macros.pesign-a-bit-cleaner.patch
+Patch0004: 0004-Include-the-issuer-s-certificate-only-when-available.patch
+Patch0005: 0005-Try-harder-to-figure-out-if-this-is-RHEL.patch
+Patch0006: 0006-Don-t-use-ASCII-mode-for-RHEL-certificate-imports.patch
+Patch0007: 0007-Apparently-if-something-goes-wrong-on-the-HSM-we-win.patch
+Patch0008: 0008-Use-force-when-we-ve-got-a-sattrs-blob-from-mktemp.patch
+Patch0009: 0009-Remove-errant-results-from-signing.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -97,6 +108,12 @@ exit 0
 %endif
 
 %changelog
+* Sat Aug 10 2013 Peter Jones <pjones@redhat.com> - 0.106-4
+- Remove errant result files and raise an error from %%pesign 
+
+* Tue Aug 06 2013 Peter Jones <pjones@redhat.com> - 0.106-3
+- Add code for signing in RHEL 7
+
 * Mon Aug 05 2013 Peter Jones <pjones@redhat.com> - 0.106-2
 - Fix for new %%doc rules.
 

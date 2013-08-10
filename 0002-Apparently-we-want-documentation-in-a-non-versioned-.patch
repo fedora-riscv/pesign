@@ -1,8 +1,8 @@
 From 1079f81298d461583851578ad6afb4a130b675e0 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 5 Aug 2013 09:09:46 -0400
-Subject: [PATCH] Apparently we want documentation in a non-versioned directory
- these days.
+Subject: [PATCH 2/8] Apparently we want documentation in a non-versioned
+ directory these days.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
