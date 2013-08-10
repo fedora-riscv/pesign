@@ -1,7 +1,7 @@
 From 39466ae9ed3ce5f78fc20c6e74eb0fb3aa93349e Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 6 Aug 2013 16:49:06 -0400
-Subject: [PATCH 5/8] Try harder to figure out if this is RHEL.
+Subject: [PATCH 5/9] Try harder to figure out if this is RHEL.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

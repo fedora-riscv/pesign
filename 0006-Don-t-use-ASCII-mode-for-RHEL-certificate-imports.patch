@@ -1,7 +1,7 @@
 From f8b19278775fe8a5c599b94fcae90b99a781a42b Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 7 Aug 2013 09:06:33 -0400
-Subject: [PATCH 6/8] Don't use ASCII mode for RHEL certificate imports.
+Subject: [PATCH 6/9] Don't use ASCII mode for RHEL certificate imports.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

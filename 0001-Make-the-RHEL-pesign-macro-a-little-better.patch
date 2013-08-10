@@ -1,7 +1,7 @@
 From 2933901ce69d3830e0dad983d20d5d17e8087c75 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 23 Jul 2013 16:58:32 -0400
-Subject: [PATCH 1/8] Make the RHEL %%pesign macro a little better.
+Subject: [PATCH 1/9] Make the RHEL %%pesign macro a little better.
 
 Use mktemp to avoid clobering anybody's local files, and document the
 arguments better.

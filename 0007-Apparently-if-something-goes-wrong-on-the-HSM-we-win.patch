@@ -1,7 +1,7 @@
 From c7318444b811125f26828fd39e8a46de81cd5f86 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 7 Aug 2013 09:13:11 -0400
-Subject: [PATCH 7/8] Apparently if something goes wrong on the HSM, we wind up
+Subject: [PATCH 7/9] Apparently if something goes wrong on the HSM, we wind up
  with 0-size.
 
 Handle zero-sized output by erroring in the rpm macro.  Eventually we

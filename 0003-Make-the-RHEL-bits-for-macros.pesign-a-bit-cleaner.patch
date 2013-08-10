@@ -1,7 +1,7 @@
 From c2d54b835ca3db92c9110a2596429710453c2a95 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 6 Aug 2013 12:32:43 -0400
-Subject: [PATCH 3/8] Make the RHEL bits for macros.pesign a bit cleaner.
+Subject: [PATCH 3/9] Make the RHEL bits for macros.pesign a bit cleaner.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

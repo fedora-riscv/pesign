@@ -1,7 +1,7 @@
 From 7c25ea77c81e63c88cf1fbeb2fc9baba94bce8b7 Mon Sep 17 00:00:00 2001
 From: Gary Ching-Pang Lin <glin@suse.com>
 Date: Mon, 4 Mar 2013 16:25:08 +0800
-Subject: [PATCH 4/8] Include the issuer's certificate only when available
+Subject: [PATCH 4/9] Include the issuer's certificate only when available
 
 When pesign generates a signature, it also includes the issuer's certificate.
 In SUSE build server, we only import the signer's certificate and pesign
