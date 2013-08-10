@@ -1,6 +1,6 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.107
+Version: 0.108
 Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
@@ -99,7 +99,7 @@ exit 0
 %endif
 
 %changelog
-* Sat Aug 10 2013 Peter Jones <pjones@redhat.com> - 0.106-4
+* Sat Aug 10 2013 Peter Jones <pjones@redhat.com> - 0.108-1
 - Remove errant result files and raise an error from %%pesign 
 
 * Tue Aug 06 2013 Peter Jones <pjones@redhat.com> - 0.106-3
