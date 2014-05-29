@@ -1,11 +1,11 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.108
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
-BuildRequires: git gnu-efi nspr nss nss-util popt-devel
+BuildRequires: git nspr nss nss-util popt-devel
 BuildRequires: coolkey opensc nss-tools
 BuildRequires: nspr-devel >= 4.9.2-1
 BuildRequires: nss-devel >= 3.13.6-1
@@ -21,6 +21,7 @@ BuildRequires: rh-signing-tools >= 1.20-2
 # git checkout %%{version}
 Source0: pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
+Patch0001: 0001-Don-t-set-SO_PASSCRED.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -99,6 +100,9 @@ exit 0
 %endif
 
 %changelog
+* Thu May 29 2014 Peter Jones <pjones@redhat.com> - 0.108-2
+- Fix a networking problem nirik observed when reinstalling builders.
+
 * Sat Aug 10 2013 Peter Jones <pjones@redhat.com> - 0.108-1
 - Remove errant result files and raise an error from %%pesign 
 
