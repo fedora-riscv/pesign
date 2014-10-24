@@ -10,6 +10,7 @@ BuildRequires: coolkey opensc nss-tools
 BuildRequires: nspr-devel >= 4.9.2-1
 BuildRequires: nss-devel >= 3.13.6-1
 BuildRequires: efivar-devel >= 0.14-1
+BuildRequires: libuuid-devel
 Requires: nspr nss nss-util popt rpm coolkey opensc
 Requires(pre): shadow-utils
 ExclusiveArch: i686 x86_64 ia64 aarch64
