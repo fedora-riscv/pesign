@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.108
-Release: 5%{?dist}
+Version: 0.110
+Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -9,6 +9,7 @@ BuildRequires: git nspr nss nss-util popt-devel
 BuildRequires: coolkey opensc nss-tools
 BuildRequires: nspr-devel >= 4.9.2-1
 BuildRequires: nss-devel >= 3.13.6-1
+BuildRequires: efivar-devel >= 0.14-1
 Requires: nspr nss nss-util popt rpm coolkey opensc
 Requires(pre): shadow-utils
 ExclusiveArch: i686 x86_64 ia64 aarch64
@@ -16,12 +17,10 @@ ExclusiveArch: i686 x86_64 ia64 aarch64
 BuildRequires: rh-signing-tools >= 1.20-2
 %endif
 
-# there is no tarball at github, of course.  To get this version do:
-# git clone https://github.com/vathpela/pesign.git
-# git checkout %%{version}
-Source0: pesign-%{version}.tar.bz2
+Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: rh-test-certs.tar.bz2
-Patch0001: 0001-Don-t-set-SO_PASSCRED.patch
+Patch0001: 0001-Make-make-install_systemd-and-make-install_sysvinit-.patch
+Patch0002: 0002-Install-authvar-and-efisiglist.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -35,6 +34,8 @@ git config user.name "Fedora Ninjas"
 git add .
 git commit -a -q -m "%{version} baseline."
 git am %{patches} </dev/null
+git config --unset user.email
+git config --unset user.name
 
 %build
 make PREFIX=%{_prefix} LIBDIR=%{_libdir}
@@ -59,9 +60,6 @@ mv rh-test-certs/etc/pki/pesign/* %{buildroot}/etc/pki/pesign/
 modutil -force -dbdir %{buildroot}/etc/pki/pesign -add opensc \
 	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
 
-%clean
-rm -rf %{buildroot}
-
 %pre
 getent group pesign >/dev/null || groupadd -r pesign
 getent passwd pesign >/dev/null || \
@@ -83,9 +81,12 @@ exit 0
 %files
 %defattr(-,root,root,-)
 %doc README TODO COPYING
+%{_bindir}/authvar
+%{_bindir}/efikeygen
+%{_bindir}/efisiglist
+%{_bindir}/pesigcheck
 %{_bindir}/pesign
 %{_bindir}/pesign-client
-%{_bindir}/efikeygen
 %{_sysconfdir}/popt.d/pesign.popt
 %{_sysconfdir}/rpm/macros.pesign
 %{_mandir}/man*/*
