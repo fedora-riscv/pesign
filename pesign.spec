@@ -1,7 +1,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.108
-Release: 4%{?dist}
+Release: 5%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -11,7 +11,7 @@ BuildRequires: nspr-devel >= 4.9.2-1
 BuildRequires: nss-devel >= 3.13.6-1
 Requires: nspr nss nss-util popt rpm coolkey opensc
 Requires(pre): shadow-utils
-ExclusiveArch: i686 x86_64 ia64
+ExclusiveArch: i686 x86_64 ia64 aarch64
 %if 0%{?rhel} >= 7
 BuildRequires: rh-signing-tools >= 1.20-2
 %endif
@@ -100,6 +100,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Dec 03 2014 Peter Jones <pjones@redhat.com> - 0.108-5
+- Add aarch64 support here.
+
 * Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.108-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
