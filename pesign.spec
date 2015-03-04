@@ -1,7 +1,9 @@
+%global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
+
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.110
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -61,6 +63,13 @@ mv rh-test-certs/etc/pki/pesign/* %{buildroot}/etc/pki/pesign/
 modutil -force -dbdir %{buildroot}/etc/pki/pesign -add opensc \
 	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
 
+if [ %{macrosdir} != %{_sysconfdir}/rpm ]; then
+	mkdir -p %{buildroot}%{macrosdir}
+	mv %{buildroot}%{_sysconfdir}/rpm/macros.pesign \
+		%{buildroot}%{macrosdir}
+	rmdir %{buildroot}%{_sysconfdir}/rpm
+fi
+
 %pre
 getent group pesign >/dev/null || groupadd -r pesign
 getent passwd pesign >/dev/null || \
@@ -89,7 +98,7 @@ exit 0
 %{_bindir}/pesign
 %{_bindir}/pesign-client
 %{_sysconfdir}/popt.d/pesign.popt
-%{_sysconfdir}/rpm/macros.pesign
+%{macrosdir}/macros.pesign
 %{_mandir}/man*/*
 %dir %attr(0775,pesign,pesign) /etc/pki/pesign
 %attr(0664,pesign,pesign) /etc/pki/pesign/*
