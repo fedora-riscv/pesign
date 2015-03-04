@@ -1,7 +1,9 @@
+%global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
+
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.110
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -61,6 +63,13 @@ mv rh-test-certs/etc/pki/pesign/* %{buildroot}/etc/pki/pesign/
 modutil -force -dbdir %{buildroot}/etc/pki/pesign -add opensc \
 	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
 
+if [ %{macrosdir} != %{_sysconfdir}/rpm ]; then
+	mkdir -p %{buildroot}%{macrosdir}
+	mv %{buildroot}%{_sysconfdir}/rpm/macros.pesign \
+		%{buildroot}%{macrosdir}
+	rmdir %{buildroot}%{_sysconfdir}/rpm
+fi
+
 %pre
 getent group pesign >/dev/null || groupadd -r pesign
 getent passwd pesign >/dev/null || \
@@ -89,7 +98,7 @@ exit 0
 %{_bindir}/pesign
 %{_bindir}/pesign-client
 %{_sysconfdir}/popt.d/pesign.popt
-%{_sysconfdir}/rpm/macros.pesign
+%{macrosdir}/macros.pesign
 %{_mandir}/man*/*
 %dir %attr(0775,pesign,pesign) /etc/pki/pesign
 %attr(0664,pesign,pesign) /etc/pki/pesign/*
@@ -102,6 +111,9 @@ exit 0
 %endif
 
 %changelog
+* Wed Mar  4 2015 Ville Skyttä <ville.skytta@iki.fi> - 0.110-2
+- Install macros in %%{_rpmconfigdir}/macros.d where available (#1074281)
+
 * Fri Oct 24 2014 Peter Jones <pjones@redhat.com> - 0.110-1
 - Update to pesign-0.110
 
