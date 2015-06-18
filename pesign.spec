@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.110
-Release: 2%{?dist}
+Release: 3%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -111,6 +111,9 @@ exit 0
 %endif
 
 %changelog
+* Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.110-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Wed Mar  4 2015 Ville Skyttä <ville.skytta@iki.fi> - 0.110-2
 - Install macros in %%{_rpmconfigdir}/macros.d where available (#1074281)
 
