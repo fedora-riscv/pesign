@@ -24,6 +24,7 @@ BuildRequires: rh-signing-tools >= 1.20-2
 
 Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
+Patch0001: 0001-Fix-one-more-Wsign-compare-problem-I-missed.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
