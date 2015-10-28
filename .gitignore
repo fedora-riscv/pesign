@@ -2,3 +2,4 @@
 clog
 /rh-test-certs.tar.bz2
 *.rpm
+/certs.tar.xz
