@@ -2,10 +2,11 @@
 
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.110
-Release: 3%{?dist}
+Version: 0.111
+Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
+Recommends: pesign-rh-test-certs
 URL: https://github.com/vathpela/pesign
 BuildRequires: git nspr nss nss-util popt-devel
 BuildRequires: coolkey opensc nss-tools
@@ -13,6 +14,7 @@ BuildRequires: nspr-devel >= 4.9.2-1
 BuildRequires: nss-devel >= 3.13.6-1
 BuildRequires: efivar-devel >= 0.14-1
 BuildRequires: libuuid-devel
+BuildRequires: tar xz
 Requires: nspr nss nss-util popt rpm coolkey opensc
 Requires(pre): shadow-utils
 ExclusiveArch: i686 x86_64 ia64 aarch64
@@ -21,16 +23,24 @@ BuildRequires: rh-signing-tools >= 1.20-2
 %endif
 
 Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
-Source1: rh-test-certs.tar.bz2
-Patch0001: 0001-Make-make-install_systemd-and-make-install_sysvinit-.patch
-Patch0002: 0002-Install-authvar-and-efisiglist.patch
+Source1: certs.tar.xz
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
 well as other associated tools.
 
+%package rh-test-certs
+Summary: Test keys for pesign
+Group: Development/System
+License: GPLv2
+Requires: pesign = %{version}-%{release}
+
+%description rh-test-certs
+This package contains test keys for use with pesign
+
 %prep
-%setup -q -a 1
+%setup -q -a 0 
+%setup -a 1 -D -c -n pesign-%{version}/
 git init
 git config user.email "pesign-owner@fedoraproject.org"
 git config user.name "Fedora Ninjas"
@@ -56,12 +66,8 @@ make PREFIX=%{_prefix} LIBDIR=%{_libdir} INSTALLROOT=%{buildroot} \
 # there's some stuff that's not really meant to be shipped yet
 rm -rf %{buildroot}/boot %{buildroot}/usr/include
 rm -rf %{buildroot}%{_libdir}/libdpe*
-mv rh-test-certs/etc/pki/pesign/* %{buildroot}/etc/pki/pesign/
-
-#modutil -force -dbdir %{buildroot}/etc/pki/pesign -add coolkey \
-#	-libfile %{_libdir}/pkcs11/libcoolkeypk11.so
-modutil -force -dbdir %{buildroot}/etc/pki/pesign -add opensc \
-	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
+mkdir -p %{buildroot}%{_sysconfdir}/pki/pesign/
+cp -a etc/pki/pesign/* %{buildroot}%{_sysconfdir}/pki/pesign/
 
 if [ %{macrosdir} != %{_sysconfdir}/rpm ]; then
 	mkdir -p %{buildroot}%{macrosdir}
@@ -69,6 +75,7 @@ if [ %{macrosdir} != %{_sysconfdir}/rpm ]; then
 		%{buildroot}%{macrosdir}
 	rmdir %{buildroot}%{_sysconfdir}/rpm
 fi
+rm -f %{buildroot}/usr/usr/share/doc/pesign-0.111/COPYING
 
 %pre
 getent group pesign >/dev/null || groupadd -r pesign
@@ -77,40 +84,74 @@ getent passwd pesign >/dev/null || \
 		-c "Group for the pesign signing daemon" pesign
 exit 0
 
+%post rh-test-certs
+certutil --merge -d %{_sysconfdir}/pki/pesign/ --source-dir %{_sysconfdir}/pki/pesign/rh-test-certs/
+
+%postun rh-test-certs
+if [ "$1" -eq 0 ]; then
+	certutil -d %{_sysconfdir}/pki/pesign -F -n "Red Hat Test Certificate"
+	certutil -d %{_sysconfdir}/pki/pesign -D -n "Red Hat Test Certificate"
+	certutil -d %{_sysconfdir}/pki/pesign -D -n "Red Hat Test CA"
+fi
+
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
 %post
 %systemd_post pesign.service
+modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
+	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
+#modutil -force -dbdir %{_sysconfdir}/pki/pesign -add coolkey \
+#	-libfile %%{_libdir}/pkcs11/libcoolkeypk11.so
 
 %preun
 %systemd_preun pesign.service
 
 %postun
 %systemd_postun_with_restart pesign.service
+%else
+%post
+modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
+	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
 %endif
 
 %files
 %defattr(-,root,root,-)
-%doc README TODO COPYING
+%{!?_licensedir:%global license %%doc}
+%license COPYING
+%doc README TODO
 %{_bindir}/authvar
 %{_bindir}/efikeygen
 %{_bindir}/efisiglist
 %{_bindir}/pesigcheck
 %{_bindir}/pesign
 %{_bindir}/pesign-client
+%dir %{_libexecdir}/pesign/
+%exclude %{_sysconfdir}/pki/pesign/rh-test-certs/
+%{_libexecdir}/pesign/pesign-authorize-users
+%{_libexecdir}/pesign/pesign-authorize-groups
+%config(noreplace)/%{_sysconfdir}/pesign/users
+%config(noreplace)/%{_sysconfdir}/pesign/groups
 %{_sysconfdir}/popt.d/pesign.popt
 %{macrosdir}/macros.pesign
 %{_mandir}/man*/*
-%dir %attr(0775,pesign,pesign) /etc/pki/pesign
-%attr(0664,pesign,pesign) /etc/pki/pesign/*
+%dir %attr(0770,pesign,pesign) %{_sysconfdir}/pki/pesign
+%attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/*
 %dir %attr(0770, pesign, pesign) %{_localstatedir}/run/%{name}
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/socket
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
-%{_prefix}/lib/tmpfiles.d/pesign.conf
+%{_tmpfilesdir}/pesign.conf
 %{_unitdir}/pesign.service
 %endif
 
+%files rh-test-certs
+%dir %attr(0770,pesign,pesign) %{_sysconfdir}/pki/pesign/rh-test-certs/
+%attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/rh-test-certs/*
+
 %changelog
+* Wed Oct 28 2015 Peter Jones <pjones@redhat.com> - 0.111-1
+- Rebase to 0.111
+- Split test certs out into a "Recommends" subpackage.
+
 * Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.110-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
