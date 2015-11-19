@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.111
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/System
 License: GPLv2
 Recommends: pesign-rh-test-certs
@@ -25,6 +25,7 @@ BuildRequires: rh-signing-tools >= 1.20-2
 Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
 Patch0001: 0001-Fix-one-more-Wsign-compare-problem-I-missed.patch
+Patch0002: 0001-setfacl-the-nss-DBs-to-our-authorized-users-not-just.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -87,6 +88,9 @@ exit 0
 
 %post rh-test-certs
 certutil --merge -d %{_sysconfdir}/pki/pesign/ --source-dir %{_sysconfdir}/pki/pesign/rh-test-certs/
+getent passwd mockbuild >/dev/null && \
+	echo mockbuild >> %{_sysconfdir}/pesign/users &&
+	%{_libexecdir}/pesign/pesign-authorize-users
 
 %postun rh-test-certs
 if [ "$1" -eq 0 ]; then
@@ -149,6 +153,9 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/rh-test-certs/*
 
 %changelog
+* Thu Nov 19 2015 Peter Jones <pjones@redhat.com> - 0.111-2
+- Allow the mockbuild user to read the nss database if the account exists.
+
 * Wed Oct 28 2015 Peter Jones <pjones@redhat.com> - 0.111-1
 - Rebase to 0.111
 - Split test certs out into a "Recommends" subpackage.
