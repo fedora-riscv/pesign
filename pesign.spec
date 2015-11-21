@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.111
-Release: 2%{?dist}
+Release: 3%{?dist}
 Group: Development/System
 License: GPLv2
 Recommends: pesign-rh-test-certs
@@ -25,7 +25,8 @@ BuildRequires: rh-signing-tools >= 1.20-2
 Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
 Patch0001: 0001-Fix-one-more-Wsign-compare-problem-I-missed.patch
-Patch0002: 0001-setfacl-the-nss-DBs-to-our-authorized-users-not-just.patch
+Patch0002: 0001-Don-t-setfacl-when-the-socket-or-dir-aren-t-there.patch
+Patch0003: 0002-setfacl-the-db-as-well.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -103,7 +104,7 @@ fi
 %post
 %systemd_post pesign.service
 modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
-	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
+	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so >/dev/null
 #modutil -force -dbdir %{_sysconfdir}/pki/pesign -add coolkey \
 #	-libfile %%{_libdir}/pkcs11/libcoolkeypk11.so
 
@@ -153,6 +154,10 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/rh-test-certs/*
 
 %changelog
+* Fri Nov 20 2015 Peter Jones <pjones@redhat.com> - 0.111-3
+- Better ACL setting code.
+  Related: rhbz#1283745
+
 * Thu Nov 19 2015 Peter Jones <pjones@redhat.com> - 0.111-2
 - Allow the mockbuild user to read the nss database if the account exists.
 
