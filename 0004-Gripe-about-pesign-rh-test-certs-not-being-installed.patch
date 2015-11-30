@@ -1,0 +1,112 @@
+From 54dd12c2653dc3aecdd73b9ffb2a85d92e39d858 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Mon, 30 Nov 2015 15:34:35 -0500
+Subject: [PATCH 4/4] Gripe about pesign-rh-test-certs not being installed
+
+---
+ src/Makefile                    |  7 +++++--
+ src/macros.pesign               | 10 ++++++++--
+ src/missing-stuff.txt           | 11 +++++++++++
+ src/pesign-authorize.service.in |  8 ++++++++
+ 4 files changed, 32 insertions(+), 4 deletions(-)
+ create mode 100644 src/missing-stuff.txt
+ create mode 100644 src/pesign-authorize.service.in
+
+diff --git a/src/Makefile b/src/Makefile
+index af3fd07..9e27ee6 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -6,7 +6,7 @@ include $(TOPDIR)/Make.rules
+ include $(TOPDIR)/Make.defaults
+ 
+ BINTARGETS=authvar client efikeygen efisiglist pesigcheck pesign
+-SVCTARGETS=pesign.sysvinit pesign.service
++SVCTARGETS=pesign.sysvinit pesign.service pesign-authorize.service
+ TARGETS=$(BINTARGETS) $(SVCTARGETS)
+ 
+ all : deps $(TARGETS)
+@@ -53,11 +53,12 @@ clean :
+ 	@rm -rfv *.o *.a *.so $(TARGETS)
+ 	@rm -rfv .*.d
+ 
+-install_systemd: pesign.service
++install_systemd: pesign.service pesign-authorize.service
+ 	$(INSTALL) -d -m 755 $(INSTALLROOT)$(libdatadir)tmpfiles.d/
+ 	$(INSTALL) -m 644 tmpfiles.conf $(INSTALLROOT)$(libdatadir)tmpfiles.d/pesign.conf
+ 	$(INSTALL) -d -m 755 $(INSTALLROOT)$(libdatadir)systemd/system/
+ 	$(INSTALL) -m 644 pesign.service $(INSTALLROOT)$(libdatadir)systemd/system/
++	$(INSTALL) -m 644 pesign-authorize.service $(INSTALLROOT)$(libdatadir)systemd/system/
+ 
+ install_sysvinit: pesign.sysvinit
+ 	$(INSTALL) -d -m 755 $(INSTALLROOT)/etc/rc.d/init.d/
+@@ -84,6 +85,8 @@ install :
+ 	$(INSTALL) -m 644 efisiglist.1 $(INSTALLROOT)$(mandir)man1/
+ 	$(INSTALL) -d -m 755 $(INSTALLROOT)/etc/rpm/
+ 	$(INSTALL) -m 644 macros.pesign $(INSTALLROOT)/etc/rpm/
++	$(INSTALL) -d -m 755 $(INSTALLROOT)/usr/share/doc/pesign/
++	$(INSTALL) -m 644 missing-stuff.txt $(INSTALLROOT)/usr/share/doc/pesign/
+ 	$(INSTALL) -d -m 755 $(INSTALLROOT)$(libexecdir)/pesign/
+ 	$(INSTALL) -m 750 pesign-authorize-users $(INSTALLROOT)$(libexecdir)/pesign/
+ 	$(INSTALL) -m 750 pesign-authorize-groups $(INSTALLROOT)$(libexecdir)/pesign/
+diff --git a/src/macros.pesign b/src/macros.pesign
+index 39374ce..3197ed7 100644
+--- a/src/macros.pesign
++++ b/src/macros.pesign
+@@ -7,7 +7,7 @@
+ # And magically get the right thing.
+ 
+ %__pesign_token %{nil}%{?pe_signing_token:-t "%{pe_signing_token}"}
+-%__pesign_cert %{!?pe_signing_cert:-c "Red Hat Test Certificate"}%{?pe_signing_cert:-c "%{pe_signing_cert}"}
++%__pesign_cert %{!?pe_signing_cert:"Red Hat Test Certificate"}%{?pe_signing_cert:"%{pe_signing_cert}"}
+ 
+ %_pesign /usr/bin/pesign
+ %_pesign_client /usr/bin/pesign-client
+@@ -41,7 +41,13 @@
+                         -c "/CN=Fedora Secure Boot Signer"		\\\
+                         %{-i} %{-o} %{-e} %{-s} %{-C}			\
+     else								\
+-      %{_pesign} %{__pesign_token} %{__pesign_cert}			\\\
++      if ! certutil -d /etc/pki/pesign -L -n %{__pesign_cert} >/dev/null 2>&1 ; then \		\
++	if [ %{__pesign_cert} = "Red Hat Test Certificate" ]; then	\
++	  cat /usr/share/doc/pesign/missing-stuff.txt 1>&2		\
++	  exit 1							\
++	fi								\
++      fi								\
++      %{_pesign} %{__pesign_token} -c %{__pesign_cert}			\\\
+                  %{-i} %{-o} %{-e} %{-s} %{-C}				\
+     fi									\
+   else									\
+diff --git a/src/missing-stuff.txt b/src/missing-stuff.txt
+new file mode 100644
+index 0000000..55b68e3
+--- /dev/null
++++ b/src/missing-stuff.txt
+@@ -0,0 +1,11 @@
++
++
++You are attempting to sign the with the "Red Hat Test Certificate",
++which is not installed or cannot be accessed.  If you mean to be signing
++with this key, ensure that the "pesign-rh-test-certs" package is
++installed and that your user name is listed in "/etc/pesign/users", and
++then run:
++
++  systemctl restart pesign-authorize.service
++
++
+diff --git a/src/pesign-authorize.service.in b/src/pesign-authorize.service.in
+new file mode 100644
+index 0000000..ccb1d4f
+--- /dev/null
++++ b/src/pesign-authorize.service.in
+@@ -0,0 +1,8 @@
++[Unit]
++Description=Pesign database authentication management service
++
++[Service]
++PrivateTmp=true
++Type=oneshot
++ExecStart=@@LIBEXECDIR@@/pesign/pesign-authorize-users
++ExecStart=@@LIBEXECDIR@@/pesign/pesign-authorize-groups
+-- 
+2.5.0
+

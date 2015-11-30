@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.111
-Release: 3%{?dist}
+Release: 5%{?dist}
 Group: Development/System
 License: GPLv2
 Recommends: pesign-rh-test-certs
@@ -25,8 +25,10 @@ BuildRequires: rh-signing-tools >= 1.20-2
 Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
 Patch0001: 0001-Fix-one-more-Wsign-compare-problem-I-missed.patch
-Patch0002: 0001-Don-t-setfacl-when-the-socket-or-dir-aren-t-there.patch
-Patch0003: 0002-setfacl-the-db-as-well.patch
+Patch10001: 0001-setfacl-the-nss-DBs-to-our-authorized-users-not-just.patch
+Patch10002: 0002-Don-t-setfacl-when-the-socket-or-dir-aren-t-there.patch
+Patch10003: 0003-setfacl-the-db-as-well.patch
+Patch10004: 0004-Gripe-about-pesign-rh-test-certs-not-being-installed.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -89,15 +91,20 @@ exit 0
 
 %post rh-test-certs
 certutil --merge -d %{_sysconfdir}/pki/pesign/ --source-dir %{_sysconfdir}/pki/pesign/rh-test-certs/
-getent passwd mockbuild >/dev/null && \
-	echo mockbuild >> %{_sysconfdir}/pesign/users &&
-	%{_libexecdir}/pesign/pesign-authorize-users
+if getent passwd mockbuild >/dev/null ; then
+  if ! grep -q mockbuild %{_sysconfdir}/pesign/users ; then
+    echo mockbuild >> %{_sysconfdir}/pesign/users
+    %{_libexecdir}/pesign/pesign-authorize-users
+  fi
+fi
 
-%postun rh-test-certs
+%preun rh-test-certs
 if [ "$1" -eq 0 ]; then
-	certutil -d %{_sysconfdir}/pki/pesign -F -n "Red Hat Test Certificate"
-	certutil -d %{_sysconfdir}/pki/pesign -D -n "Red Hat Test Certificate"
-	certutil -d %{_sysconfdir}/pki/pesign -D -n "Red Hat Test CA"
+  if certutil -d %{_sysconfdir}/pki/pesign -L -n "Red Hat Test Certificate" >/dev/null 2>&1 ; then
+    certutil -d %{_sysconfdir}/pki/pesign -F -n "Red Hat Test Certificate" >/dev/null 2>&1 || :
+    certutil -d %{_sysconfdir}/pki/pesign -D -n "Red Hat Test Certificate" >/dev/null 2>&1 || :
+    certutil -d %{_sysconfdir}/pki/pesign -D -n "Red Hat Test CA" >/dev/null 2>&1 || :
+  fi
 fi
 
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
@@ -116,7 +123,7 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %else
 %post
 modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
-	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so
+	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so >/dev/null
 %endif
 
 %files
@@ -138,6 +145,7 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %config(noreplace)/%{_sysconfdir}/pesign/groups
 %{_sysconfdir}/popt.d/pesign.popt
 %{macrosdir}/macros.pesign
+%{_docdir}/pesign/missing-stuff.txt
 %{_mandir}/man*/*
 %dir %attr(0770,pesign,pesign) %{_sysconfdir}/pki/pesign
 %attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/*
@@ -147,6 +155,7 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
 %{_tmpfilesdir}/pesign.conf
 %{_unitdir}/pesign.service
+%{_unitdir}/pesign-authorize.service
 %endif
 
 %files rh-test-certs
@@ -154,9 +163,15 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/rh-test-certs/*
 
 %changelog
+* Mon Nov 30 2015 Peter Jones <pjones@redhat.com> - 0.111-5
+- setfacl even harder.
+  Resolves: rhbz#1283475
+  Resolves: rhbz#1284063
+  Resolves: rhbz#1284561
+
 * Fri Nov 20 2015 Peter Jones <pjones@redhat.com> - 0.111-3
 - Better ACL setting code.
-  Related: rhbz#1283745
+  Related: rhbz#1283475
 
 * Thu Nov 19 2015 Peter Jones <pjones@redhat.com> - 0.111-2
 - Allow the mockbuild user to read the nss database if the account exists.
