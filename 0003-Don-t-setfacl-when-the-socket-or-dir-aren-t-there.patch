@@ -1,7 +1,7 @@
 From 4c70ae807156099bf027b57a94b7eae0a810b947 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Fri, 20 Nov 2015 19:19:49 -0500
-Subject: [PATCH 2/3] Don't setfacl when the socket or dir aren't there.
+Subject: [PATCH 3/5] Don't setfacl when the socket or dir aren't there.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
