@@ -1,7 +1,7 @@
 From f7a16f89f3ed327d3e2f4ce897917c2966fb427d Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Fri, 20 Nov 2015 19:21:39 -0500
-Subject: [PATCH 3/3] setfacl the db as well
+Subject: [PATCH 4/5] setfacl the db as well
 
 And also get all our "-m [ug]:${name}:$perm" arguments right.
 
