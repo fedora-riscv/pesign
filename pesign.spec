@@ -6,8 +6,8 @@ Version: 0.111
 Release: 5%{?dist}
 Group: Development/System
 License: GPLv2
-Recommends: pesign-rh-test-certs
 URL: https://github.com/vathpela/pesign
+Obsoletes: rh-test-certs <= 0.111-5
 BuildRequires: git nspr nss nss-util popt-devel
 BuildRequires: coolkey opensc nss-tools
 BuildRequires: nspr-devel >= 4.9.2-1
@@ -25,23 +25,15 @@ BuildRequires: rh-signing-tools >= 1.20-2
 Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
 Patch0001: 0001-Fix-one-more-Wsign-compare-problem-I-missed.patch
-Patch10001: 0001-setfacl-the-nss-DBs-to-our-authorized-users-not-just.patch
-Patch10002: 0002-Don-t-setfacl-when-the-socket-or-dir-aren-t-there.patch
-Patch10003: 0003-setfacl-the-db-as-well.patch
-Patch10004: 0004-Gripe-about-pesign-rh-test-certs-not-being-installed.patch
+Patch10001: 0001-pesign-when-nss-fails-to-tell-us-EPERM-or-ENOENT-fig.patch
+Patch10002: 0002-setfacl-the-nss-DBs-to-our-authorized-users-not-just.patch
+Patch10003: 0003-Don-t-setfacl-when-the-socket-or-dir-aren-t-there.patch
+Patch10004: 0004-setfacl-the-db-as-well.patch
+Patch10005: 0005-Do-a-better-job-of-isolating-pesign-rh-test-crap.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
 well as other associated tools.
-
-%package rh-test-certs
-Summary: Test keys for pesign
-Group: Development/System
-License: GPLv2
-Requires: pesign = %{version}-%{release}
-
-%description rh-test-certs
-This package contains test keys for use with pesign
 
 %prep
 %setup -q -a 0 
@@ -72,7 +64,9 @@ make PREFIX=%{_prefix} LIBDIR=%{_libdir} INSTALLROOT=%{buildroot} \
 rm -rf %{buildroot}/boot %{buildroot}/usr/include
 rm -rf %{buildroot}%{_libdir}/libdpe*
 mkdir -p %{buildroot}%{_sysconfdir}/pki/pesign/
+mkdir -p %{buildroot}%{_sysconfdir}/pki/pesign-rh-test/
 cp -a etc/pki/pesign/* %{buildroot}%{_sysconfdir}/pki/pesign/
+cp -a etc/pki/pesign-rh-test/* %{buildroot}%{_sysconfdir}/pki/pesign-rh-test/
 
 if [ %{macrosdir} != %{_sysconfdir}/rpm ]; then
 	mkdir -p %{buildroot}%{macrosdir}
@@ -89,24 +83,6 @@ getent passwd pesign >/dev/null || \
 		-c "Group for the pesign signing daemon" pesign
 exit 0
 
-%post rh-test-certs
-certutil --merge -d %{_sysconfdir}/pki/pesign/ --source-dir %{_sysconfdir}/pki/pesign/rh-test-certs/
-if getent passwd mockbuild >/dev/null ; then
-  if ! grep -q mockbuild %{_sysconfdir}/pesign/users ; then
-    echo mockbuild >> %{_sysconfdir}/pesign/users
-    %{_libexecdir}/pesign/pesign-authorize-users
-  fi
-fi
-
-%preun rh-test-certs
-if [ "$1" -eq 0 ]; then
-  if certutil -d %{_sysconfdir}/pki/pesign -L -n "Red Hat Test Certificate" >/dev/null 2>&1 ; then
-    certutil -d %{_sysconfdir}/pki/pesign -F -n "Red Hat Test Certificate" >/dev/null 2>&1 || :
-    certutil -d %{_sysconfdir}/pki/pesign -D -n "Red Hat Test Certificate" >/dev/null 2>&1 || :
-    certutil -d %{_sysconfdir}/pki/pesign -D -n "Red Hat Test CA" >/dev/null 2>&1 || :
-  fi
-fi
-
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
 %post
 %systemd_post pesign.service
@@ -114,7 +90,6 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so >/dev/null
 #modutil -force -dbdir %{_sysconfdir}/pki/pesign -add coolkey \
 #	-libfile %%{_libdir}/pkcs11/libcoolkeypk11.so
-
 %preun
 %systemd_preun pesign.service
 
@@ -138,14 +113,16 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %{_bindir}/pesign
 %{_bindir}/pesign-client
 %dir %{_libexecdir}/pesign/
-%exclude %{_sysconfdir}/pki/pesign/rh-test-certs/
+%dir %attr(0770,pesign,pesign) %{_sysconfdir}/pki/pesign/
+%attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/*
+%dir %attr(0775,pesign,pesign) %{_sysconfdir}/pki/pesign-rh-test/
+%attr(0664,pesign,pesign) %{_sysconfdir}/pki/pesign-rh-test/*
 %{_libexecdir}/pesign/pesign-authorize-users
 %{_libexecdir}/pesign/pesign-authorize-groups
 %config(noreplace)/%{_sysconfdir}/pesign/users
 %config(noreplace)/%{_sysconfdir}/pesign/groups
 %{_sysconfdir}/popt.d/pesign.popt
 %{macrosdir}/macros.pesign
-%{_docdir}/pesign/missing-stuff.txt
 %{_mandir}/man*/*
 %dir %attr(0770,pesign,pesign) %{_sysconfdir}/pki/pesign
 %attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/*
@@ -155,12 +132,7 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
 %{_tmpfilesdir}/pesign.conf
 %{_unitdir}/pesign.service
-%{_unitdir}/pesign-authorize.service
 %endif
-
-%files rh-test-certs
-%dir %attr(0770,pesign,pesign) %{_sysconfdir}/pki/pesign/rh-test-certs/
-%attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/rh-test-certs/*
 
 %changelog
 * Mon Nov 30 2015 Peter Jones <pjones@redhat.com> - 0.111-5
