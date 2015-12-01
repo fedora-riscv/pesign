@@ -135,11 +135,18 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %endif
 
 %changelog
-* Mon Nov 30 2015 Peter Jones <pjones@redhat.com> - 0.111-5
-- setfacl even harder.
+* Tue Dec 01 2015 Peter Jones <pjones@redhat.com> - 0.111-5
+- Actually do a better job of choosing which cert to use when, so people will
+  stop seeing any of this problem.  (Thanks for the thought, jforbes.)
   Resolves: rhbz#1283475
   Resolves: rhbz#1284063
   Resolves: rhbz#1284561
+
+* Mon Nov 30 2015 Peter Jones <pjones@redhat.com> - 0.111-5
+- setfacl even harder.
+  Related: rhbz#1283475
+  Related: rhbz#1284063
+  Related: rhbz#1284561
 
 * Fri Nov 20 2015 Peter Jones <pjones@redhat.com> - 0.111-3
 - Better ACL setting code.
