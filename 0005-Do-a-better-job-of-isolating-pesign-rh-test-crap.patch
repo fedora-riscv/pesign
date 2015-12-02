@@ -44,11 +44,10 @@ index 39374ce..9644940 100644
    if [ -x %{_pesign} ] &&  						\\\
         [ "%{_target_cpu}" == "x86_64" -o 				\\\
           "%{_target_cpu}" == "aarch64" ]; then				\
-@@ -39,9 +43,11 @@
+@@ -39,9 +43,10 @@
      elif [ -S /var/run/pesign/socket ]; then				\
        %{_pesign_client} -t "OpenSC Card (Fedora Signer)"		\\\
                          -c "/CN=Fedora Secure Boot Signer"		\\\
-+			--certdir ${_pesign_nssdir}			\\\
                          %{-i} %{-o} %{-e} %{-s} %{-C}			\
      else								\
 -      %{_pesign} %{__pesign_token} %{__pesign_cert}			\\\

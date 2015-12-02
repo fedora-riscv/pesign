@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.111
-Release: 5%{?dist}
+Release: 6%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -135,6 +135,12 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %endif
 
 %changelog
+* Wed Dec 02 2015 Peter Jones <pjones@redhat.com> - 0.111-6
+- *Don't* use --certdir if we're using the socket.
+  Related: rhbz#1283475
+  Related: rhbz#1284063
+  Related: rhbz#1284561
+
 * Tue Dec 01 2015 Peter Jones <pjones@redhat.com> - 0.111-5
 - Actually do a better job of choosing which cert to use when, so people will
   stop seeing any of this problem.  (Thanks for the thought, jforbes.)
