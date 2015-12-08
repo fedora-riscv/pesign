@@ -3,11 +3,11 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.111
-Release: 6%{?dist}
+Release: 7%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
-Obsoletes: rh-test-certs <= 0.111-5
+Obsoletes: pesign-rh-test-certs <= 0.111-7
 BuildRequires: git nspr nss nss-util popt-devel
 BuildRequires: coolkey opensc nss-tools
 BuildRequires: nspr-devel >= 4.9.2-1
@@ -135,6 +135,10 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %endif
 
 %changelog
+* Thu Dec 10 2015 Peter Jones <pjones@redhat.com> - 0.111-7
+- Obsolete pesign-rh-test-certs, it was in -1's update.
+  Resolves: rhbz#1283475
+
 * Wed Dec 02 2015 Peter Jones <pjones@redhat.com> - 0.111-6
 - *Don't* use --certdir if we're using the socket.
   Related: rhbz#1283475
