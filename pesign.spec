@@ -25,6 +25,8 @@ BuildRequires: rh-signing-tools >= 1.20-2
 Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
 
+Patch0001: 0001-cms-kill-generate_integer-it-doesn-t-build-on-i686-a.patch
+
 %description
 This package contains the pesign utility for signing UEFI binaries as
 well as other associated tools.
