@@ -2,8 +2,8 @@
 
 Summary: Signing utility for UEFI binaries
 Name: pesign
-Version: 0.111
-Release: 8%{?dist}
+Version: 0.112
+Release: 1%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -17,27 +17,21 @@ BuildRequires: libuuid-devel
 BuildRequires: tar xz
 Requires: nspr nss nss-util popt rpm coolkey opensc
 Requires(pre): shadow-utils
-ExclusiveArch: i686 x86_64 ia64 aarch64
+ExclusiveArch: %{ix86} x86_64 ia64 aarch64 arm
 %if 0%{?rhel} >= 7
 BuildRequires: rh-signing-tools >= 1.20-2
 %endif
 
 Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
-Patch0001: 0001-Fix-one-more-Wsign-compare-problem-I-missed.patch
-Patch10001: 0001-pesign-when-nss-fails-to-tell-us-EPERM-or-ENOENT-fig.patch
-Patch10002: 0002-setfacl-the-nss-DBs-to-our-authorized-users-not-just.patch
-Patch10003: 0003-Don-t-setfacl-when-the-socket-or-dir-aren-t-there.patch
-Patch10004: 0004-setfacl-the-db-as-well.patch
-Patch10005: 0005-Do-a-better-job-of-isolating-pesign-rh-test-crap.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
 well as other associated tools.
 
 %prep
-%setup -q -a 0 
-%setup -a 1 -D -c -n pesign-%{version}/
+%setup -q -T -b 0
+%setup -q -T -D -c -n pesign-%{version}/ -a 1
 git init
 git config user.email "pesign-owner@fedoraproject.org"
 git config user.name "Fedora Ninjas"
@@ -74,7 +68,10 @@ if [ %{macrosdir} != %{_sysconfdir}/rpm ]; then
 		%{buildroot}%{macrosdir}
 	rmdir %{buildroot}%{_sysconfdir}/rpm
 fi
-rm -f %{buildroot}/usr/usr/share/doc/pesign-0.111/COPYING
+rm -vf %{buildroot}/usr/share/doc/pesign-%{version}/COPYING
+
+# and find-debuginfo.sh has some pretty awful deficencies too...
+cp -av libdpe/*.[ch] src/
 
 %pre
 getent group pesign >/dev/null || groupadd -r pesign
@@ -135,6 +132,12 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %endif
 
 %changelog
+* Wed Apr 20 2016 Peter Jones <pjones@redhat.com> - 0.112-1
+- Update to 0.112
+- Also fix up some spec file woes:
+  - dumb things in %%setup
+  - find-debuginfo.sh not working right for some source files...
+
 * Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0.111-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
