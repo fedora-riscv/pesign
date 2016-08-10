@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 1%{?dist}
+Release: 2%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -12,7 +12,7 @@ BuildRequires: git nspr nss nss-util popt-devel
 BuildRequires: coolkey opensc nss-tools
 BuildRequires: nspr-devel >= 4.9.2-1
 BuildRequires: nss-devel >= 3.13.6-1
-BuildRequires: efivar-devel >= 0.14-1
+BuildRequires: efivar-devel >= 26-1
 BuildRequires: libuuid-devel
 BuildRequires: tar xz
 Requires: nspr nss nss-util popt rpm coolkey opensc
@@ -134,6 +134,9 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %endif
 
 %changelog
+* Wed Aug 10 2016 Peter Jones <pjones@redhat.com> - 0.112-2
+- Build with newer efivar.
+
 * Wed Apr 20 2016 Peter Jones <pjones@redhat.com> - 0.112-1
 - Update to 0.112
 - Also fix up some spec file woes:
