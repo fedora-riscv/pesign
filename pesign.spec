@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 2%{?dist}
+Release: 3%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -26,6 +26,7 @@ Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-
 Source1: certs.tar.xz
 
 Patch0001: 0001-cms-kill-generate_integer-it-doesn-t-build-on-i686-a.patch
+Patch0002: 0002-Fix-command-line-parsing.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -134,6 +135,9 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %endif
 
 %changelog
+* Fri Aug 12 2016 Adam Williamson <awilliam@redhat.com> - 0.112-3
+- backport fix for command line parsing from upstream master
+
 * Wed Aug 10 2016 Peter Jones <pjones@redhat.com> - 0.112-2
 - Build with newer efivar.
 
