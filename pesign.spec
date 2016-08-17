@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 3%{?dist}
+Release: 4%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -135,6 +135,9 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %endif
 
 %changelog
+* Wed Aug 17 2016 Peter Jones <pjones@redhat.com> - 0.112-4
+- Build as -4 to make bodhi happy.
+
 * Fri Aug 12 2016 Adam Williamson <awilliam@redhat.com> - 0.112-3
 - backport fix for command line parsing from upstream master
 
