@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.111
-Release: 8%{?dist}
+Release: 9%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -135,6 +135,9 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %endif
 
 %changelog
+* Wed Sep 28 2016 Peter Jones <pjones@redhat.com> - 0.111-9
+- Rebuild for efivar-30-3
+
 * Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0.111-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
