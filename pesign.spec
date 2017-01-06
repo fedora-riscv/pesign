@@ -3,19 +3,19 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 4%{?dist}
+Release: 5%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
 Obsoletes: pesign-rh-test-certs <= 0.111-7
 BuildRequires: git nspr nss nss-util popt-devel
-BuildRequires: coolkey opensc nss-tools
+BuildRequires: nss-tools
 BuildRequires: nspr-devel >= 4.9.2-1
 BuildRequires: nss-devel >= 3.13.6-1
 BuildRequires: efivar-devel >= 26-1
 BuildRequires: libuuid-devel
 BuildRequires: tar xz
-Requires: nspr nss nss-util popt rpm coolkey opensc
+Requires: nspr nss nss-util popt rpm
 Requires(pre): shadow-utils
 ExclusiveArch: %{ix86} x86_64 ia64 aarch64 arm
 %if 0%{?rhel} >= 7
@@ -86,19 +86,12 @@ exit 0
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
 %post
 %systemd_post pesign.service
-modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
-	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so >/dev/null
-#modutil -force -dbdir %{_sysconfdir}/pki/pesign -add coolkey \
-#	-libfile %%{_libdir}/pkcs11/libcoolkeypk11.so
+
 %preun
 %systemd_preun pesign.service
 
 %postun
 %systemd_postun_with_restart pesign.service
-%else
-%post
-modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
-	-libfile %{_libdir}/pkcs11/opensc-pkcs11.so >/dev/null
 %endif
 
 %files
@@ -135,6 +128,11 @@ modutil -force -dbdir %{_sysconfdir}/pki/pesign -add opensc \
 %endif
 
 %changelog
+* Fri Jan 06 2017 Peter Jones <pjones@redhat.com> - 0.112-5
+- Don't Req: or BuildReq: coolkey or opensc; those belong in system deploy
+  scripts.
+  Related: rhbz#1349073
+
 * Wed Aug 17 2016 Peter Jones <pjones@redhat.com> - 0.112-4
 - Build as -4 to make bodhi happy.
 
