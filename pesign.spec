@@ -15,6 +15,9 @@ BuildRequires: nss-devel >= 3.13.6-1
 BuildRequires: efivar-devel >= 26-1
 BuildRequires: libuuid-devel
 BuildRequires: tar xz
+%if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
+BuildRequires: systemd
+%endif
 Requires: nspr nss nss-util popt rpm
 Requires(pre): shadow-utils
 ExclusiveArch: %{ix86} x86_64 ia64 aarch64 arm
