@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 5%{?dist}
+Release: 6%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -131,6 +131,9 @@ exit 0
 %endif
 
 %changelog
+* Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.112-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
 * Fri Jan 06 2017 Peter Jones <pjones@redhat.com> - 0.112-5
 - Don't Req: or BuildReq: coolkey or opensc; those belong in system deploy
   scripts.
