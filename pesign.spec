@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 6%{?dist}
+Release: 7%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -12,7 +12,7 @@ BuildRequires: git nspr nss nss-util popt-devel
 BuildRequires: nss-tools
 BuildRequires: nspr-devel >= 4.9.2-1
 BuildRequires: nss-devel >= 3.13.6-1
-BuildRequires: efivar-devel >= 26-1
+BuildRequires: efivar-devel >= 31-1
 BuildRequires: libuuid-devel
 BuildRequires: tar xz
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
@@ -131,6 +131,10 @@ exit 0
 %endif
 
 %changelog
+* Sat Jul 08 2017 Peter Jones <pjones@redhat.com> - 0.112-7
+- Rebuild for efivar-31-1.fc26
+  Related: rhbz#1468841
+
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.112-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
