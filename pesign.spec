@@ -30,6 +30,7 @@ Source1: certs.tar.xz
 
 Patch0001: 0001-cms-kill-generate_integer-it-doesn-t-build-on-i686-a.patch
 Patch0002: 0002-Fix-command-line-parsing.patch
+Patch0003: 0003-Document-implicit-fallthrough.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
