@@ -1,7 +1,7 @@
 From 81583146602bba96728fa7544c8e856b32c22ee4 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 25 Apr 2017 17:01:13 -0400
-Subject: [PATCH 20/25] try to say why something fails
+Subject: [PATCH 20/26] try to say why something fails
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

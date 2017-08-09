@@ -1,7 +1,7 @@
 From a7b0f7e1ce2de1acea9a8c286a0ff3dd9bc245cb Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 8 Aug 2017 17:28:19 -0400
-Subject: [PATCH 24/25] Make the daemon also try to give better errors on
+Subject: [PATCH 24/26] Make the daemon also try to give better errors on
  -EPERM etc.
 
 Basically 6796e5f but also for the daemon.  This also tries to fix them

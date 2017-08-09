@@ -1,7 +1,7 @@
 From 713e61448a6ffa3e6029a7c89fad61b8cb08c9ff Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 25 Apr 2017 17:00:46 -0400
-Subject: [PATCH 19/25] more about the time
+Subject: [PATCH 19/26] more about the time
 
 ---
  src/certdb.c | 59 +++++++++++++++++++++++++++++++++--------------------------
