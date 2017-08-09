@@ -1,7 +1,7 @@
 From 868b42b338d919917ea31cfbf0f96e9586947eaf Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 25 Apr 2017 16:23:36 -0400
-Subject: [PATCH 11/24] pesign: make "pesign -h" tell you the file name.
+Subject: [PATCH 11/25] pesign: make "pesign -h" tell you the file name.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

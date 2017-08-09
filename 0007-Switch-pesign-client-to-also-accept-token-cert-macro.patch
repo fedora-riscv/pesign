@@ -1,7 +1,7 @@
 From d618de733865eab359890b4e677c368a133dad99 Mon Sep 17 00:00:00 2001
 From: Pat Riehecky <riehecky@fnal.gov>
 Date: Mon, 7 Nov 2016 11:37:08 -0600
-Subject: [PATCH 07/24] Switch pesign client to also accept token/cert macros
+Subject: [PATCH 07/25] Switch pesign client to also accept token/cert macros
  rather than use hard coded values
 
 ---

@@ -1,7 +1,7 @@
 From 01b89fb7a191f4639a93c5a7c47a80752118ba95 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 25 Apr 2017 16:58:50 -0400
-Subject: [PATCH 18/24] show which db we're checking
+Subject: [PATCH 18/25] show which db we're checking
 
 ---
  src/certdb.c             | 35 ++++++++++++++++++++++++++++++++++-

@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 7%{?dist}.pj0
+Release: 8%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -52,6 +52,7 @@ Patch0021: 0021-Fix-race-condition-in-SEC_GetPassword.patch
 Patch0022: 0022-sysvinit-Create-the-socket-directory-at-runtime.patch
 Patch0023: 0023-Better-authorization-scripts.-Again.patch
 Patch0024: 0024-Make-the-daemon-also-try-to-give-better-errors-on-EP.patch
+Patch0025: 0025-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as

@@ -1,7 +1,7 @@
 From 6de291458cbab99bcc317e282c16e1523d6de9b8 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 10 Aug 2016 17:12:39 -0400
-Subject: [PATCH 03/24] gcc: don't error on stuff in includes.
+Subject: [PATCH 03/25] gcc: don't error on stuff in includes.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

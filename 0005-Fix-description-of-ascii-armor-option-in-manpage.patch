@@ -1,7 +1,7 @@
 From 7bc8e8b04c74be5c4e0ebf211affc37cf9f5db37 Mon Sep 17 00:00:00 2001
 From: Julien Cristau <jcristau@debian.org>
 Date: Mon, 27 Jun 2016 15:38:38 +0200
-Subject: [PATCH 05/24] Fix description of --ascii-armor option in manpage
+Subject: [PATCH 05/25] Fix description of --ascii-armor option in manpage
 
 The --ascii option does not exist.
 ---

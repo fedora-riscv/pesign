@@ -1,7 +1,7 @@
 From 95327e6d9bd4f70980acd8fd6c9524265990dc4d Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 10 May 2017 10:49:57 -0400
-Subject: [PATCH 12/24] Add coverity build scripts
+Subject: [PATCH 12/25] Add coverity build scripts
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
