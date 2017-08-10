@@ -1,7 +1,7 @@
-From 6f250c3e9f3f14f860c91bc59491760efd9449fb Mon Sep 17 00:00:00 2001
+From a133d051c3f8acf3e058e92711eb528c3c0f41f9 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 10 Aug 2017 10:03:37 -0400
-Subject: [PATCH 28/28] Make pesign-{users,groups} static in the repo.
+Subject: [PATCH 27/28] Make pesign-{users,groups} static in the repo.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

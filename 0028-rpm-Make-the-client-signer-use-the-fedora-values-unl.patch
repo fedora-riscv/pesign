@@ -1,7 +1,7 @@
-From 8836e45b3c863570249fcba005e6f9b151038025 Mon Sep 17 00:00:00 2001
+From 025eb8aea94761fdc45507b6192aafdef80d4842 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 9 Aug 2017 17:31:31 -0400
-Subject: [PATCH 25/28] rpm: Make the client signer use the fedora values
+Subject: [PATCH 28/28] rpm: Make the client signer use the fedora values
  unless overridden
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
@@ -10,15 +10,11 @@ Signed-off-by: Peter Jones <pjones@redhat.com>
  1 file changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/src/macros.pesign b/src/macros.pesign
-index 69280e9..518ca0f 100644
+index 69280e9..22a3ee6 100644
 --- a/src/macros.pesign
 +++ b/src/macros.pesign
-@@ -6,9 +6,12 @@
- # %pesign -s -i shim.orig -o shim.efi
- # And magically get the right thing.
- 
--%__pesign_token %{nil}%{?pe_signing_token:-t "%{pe_signing_token}"}
-+%__pesign_token %{nil}%{?pe_signing_token:"%{pe_signing_token}"}
+@@ -9,6 +9,9 @@
+ %__pesign_token %{nil}%{?pe_signing_token:-t "%{pe_signing_token}"}
  %__pesign_cert %{!?pe_signing_cert:"Red Hat Test Certificate"}%{?pe_signing_cert:"%{pe_signing_cert}"}
  
 +%__pesign_client_token %{!?pe_signing_token:"Fedora Signer (OpenSC Card)"}%{?pe_signing_token:"%{pe_signing_token}}
@@ -27,7 +23,7 @@ index 69280e9..518ca0f 100644
  %_pesign /usr/bin/pesign
  %_pesign_client /usr/bin/pesign-client
  
-@@ -41,8 +44,8 @@
+@@ -41,11 +44,11 @@
                   --certdir ${nss} -c signer %{-o}			\
        rm -rf ${sattrs} ${sattrs}.sig ${nss}				\
      elif [ -S /var/run/pesign/socket ]; then				\
@@ -37,7 +33,11 @@ index 69280e9..518ca0f 100644
 +                        -c %{__pesign_client_cert}			\\\
                          %{-i} %{-o} %{-e} %{-s} %{-C}			\
      else								\
-       %{_pesign} -t %{__pesign_token} -c %{__pesign_cert}		\\\
+-      %{_pesign} -t %{__pesign_token} -c %{__pesign_cert}		\\\
++      %{_pesign} %{__pesign_token} -c %{__pesign_cert}			\\\
+ 		 --certdir ${_pesign_nssdir}				\\\
+                  %{-i} %{-o} %{-e} %{-s} %{-C}				\
+     fi									\
 -- 
 2.13.4
 

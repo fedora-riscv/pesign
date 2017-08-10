@@ -1,7 +1,7 @@
-From 6be09b72dc7cbc2d5ef258f1111133b90bb508ce Mon Sep 17 00:00:00 2001
+From a44115c9b4f43a1a7219f897bd33555e653d2e20 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 10 Aug 2017 10:02:38 -0400
-Subject: [PATCH 27/28] Clean up gcc command lines a little
+Subject: [PATCH 26/28] Clean up gcc command lines a little
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

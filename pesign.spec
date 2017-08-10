@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 8%{?dist}
+Release: 9%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -52,10 +52,10 @@ Patch0021: 0021-Fix-race-condition-in-SEC_GetPassword.patch
 Patch0022: 0022-sysvinit-Create-the-socket-directory-at-runtime.patch
 Patch0023: 0023-Better-authorization-scripts.-Again.patch
 Patch0024: 0024-Make-the-daemon-also-try-to-give-better-errors-on-EP.patch
-Patch0025: 0025-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
-Patch0026: 0026-certdb-fix-PRTime-printfs-for-i686.patch
-Patch0027: 0027-Clean-up-gcc-command-lines-a-little.patch
-Patch0028: 0028-Make-pesign-users-groups-static-in-the-repo.patch
+Patch0025: 0025-certdb-fix-PRTime-printfs-for-i686.patch
+Patch0026: 0026-Clean-up-gcc-command-lines-a-little.patch
+Patch0027: 0027-Make-pesign-users-groups-static-in-the-repo.patch
+Patch0028: 0028-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -157,6 +157,9 @@ exit 0
 %endif
 
 %changelog
+* Thu Aug 10 2017 Peter Jones <pjones@redhat.com> - 0.112-9
+- Try to fix the db problem nirik is seeing trying to upgrade the builders.
+
 * Tue Aug 08 2017 Peter Jones <pjones@redhat.com> - 0.112-8
 - Try to fix the db problem nirik is seeing trying to upgrade the builders.
 
