@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 9%{?dist}
+Release: 10%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -30,7 +30,32 @@ Source1: certs.tar.xz
 
 Patch0001: 0001-cms-kill-generate_integer-it-doesn-t-build-on-i686-a.patch
 Patch0002: 0002-Fix-command-line-parsing.patch
-Patch0003: 0003-Document-implicit-fallthrough.patch
+Patch0003: 0003-gcc-don-t-error-on-stuff-in-includes.patch
+Patch0004: 0004-Fix-certficate-argument-name.patch
+Patch0005: 0005-Fix-description-of-ascii-armor-option-in-manpage.patch
+Patch0006: 0006-Make-ascii-work-since-we-documented-it.patch
+Patch0007: 0007-Switch-pesign-client-to-also-accept-token-cert-macro.patch
+Patch0008: 0008-pesigcheck-Verify-with-the-cert-as-an-object-signer.patch
+Patch0009: 0009-pesigcheck-make-certfile-actually-work.patch
+Patch0010: 0010-signerInfos-make-sure-err-is-always-initialized.patch
+Patch0011: 0011-pesign-make-pesign-h-tell-you-the-file-name.patch
+Patch0012: 0012-Add-coverity-build-scripts.patch
+Patch0013: 0013-Document-implicit-fallthrough.patch
+Patch0014: 0014-Actually-setfacl-each-directory-of-our-key-storage.patch
+Patch0015: 0015-oid-add-SHIM_EKU_MODULE_SIGNING_ONLY-and-fix-our-arr.patch
+Patch0016: 0016-efikeygen-add-modsign.patch
+Patch0017: 0017-check_cert_db-try-even-harder-to-pick-a-reasonable-v.patch
+Patch0018: 0018-show-which-db-we-re-checking.patch
+Patch0019: 0019-more-about-the-time.patch
+Patch0020: 0020-try-to-say-why-something-fails.patch
+Patch0021: 0021-Fix-race-condition-in-SEC_GetPassword.patch
+Patch0022: 0022-sysvinit-Create-the-socket-directory-at-runtime.patch
+Patch0023: 0023-Better-authorization-scripts.-Again.patch
+Patch0024: 0024-Make-the-daemon-also-try-to-give-better-errors-on-EP.patch
+Patch0025: 0025-certdb-fix-PRTime-printfs-for-i686.patch
+Patch0026: 0026-Clean-up-gcc-command-lines-a-little.patch
+Patch0027: 0027-Make-pesign-users-groups-static-in-the-repo.patch
+Patch0028: 0028-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -91,6 +116,9 @@ exit 0
 %post
 %systemd_post pesign.service
 
+%posttrans
+%{_libexecdir}/pesign/pesign-authorize
+
 %preun
 %systemd_preun pesign.service
 
@@ -111,18 +139,15 @@ exit 0
 %{_bindir}/pesign-client
 %dir %{_libexecdir}/pesign/
 %dir %attr(0770,pesign,pesign) %{_sysconfdir}/pki/pesign/
-%attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/*
+%config(noreplace) %attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/*
 %dir %attr(0775,pesign,pesign) %{_sysconfdir}/pki/pesign-rh-test/
-%attr(0664,pesign,pesign) %{_sysconfdir}/pki/pesign-rh-test/*
-%{_libexecdir}/pesign/pesign-authorize-users
-%{_libexecdir}/pesign/pesign-authorize-groups
+%config(noreplace) %attr(0664,pesign,pesign) %{_sysconfdir}/pki/pesign-rh-test/*
+%{_libexecdir}/pesign/pesign-authorize
 %config(noreplace)/%{_sysconfdir}/pesign/users
 %config(noreplace)/%{_sysconfdir}/pesign/groups
 %{_sysconfdir}/popt.d/pesign.popt
 %{macrosdir}/macros.pesign
 %{_mandir}/man*/*
-%dir %attr(0770,pesign,pesign) %{_sysconfdir}/pki/pesign
-%attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/*
 %dir %attr(0770, pesign, pesign) %{_localstatedir}/run/%{name}
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/socket
 %ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
@@ -132,6 +157,9 @@ exit 0
 %endif
 
 %changelog
+* Thu Aug 10 2017 Peter Jones <pjones@redhat.com> - 0.112-10
+- Try to fix the db problem nirik is seeing trying to upgrade the builders.
+
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.112-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 

@@ -1,7 +1,7 @@
 From 4b9e7cf3e869de36daf2ea705b9efef55ae87ef8 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Sat, 8 Jul 2017 16:31:18 -0400
-Subject: [PATCH] Document implicit fallthrough.
+Subject: [PATCH 13/28] Document implicit fallthrough.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -21,5 +21,5 @@ index ad659ca..03e0c47 100644
  	default:
  		fprintf(stderr, "authvar: invalid flags: ");
 -- 
-2.13.0
+2.13.4
 
