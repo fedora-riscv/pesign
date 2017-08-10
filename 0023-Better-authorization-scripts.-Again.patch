@@ -1,7 +1,7 @@
 From 31560e2784722b986b8a73cc28e3510870180b07 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 8 Aug 2017 15:44:44 -0400
-Subject: [PATCH 23/26] Better authorization scripts.  Again.
+Subject: [PATCH 23/28] Better authorization scripts.  Again.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

@@ -1,7 +1,7 @@
 From a95e28e5cb10d417c81c8720e8521eb63793da37 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 16 May 2016 15:25:53 -0400
-Subject: [PATCH 14/26] Actually setfacl /each/ directory of our key storage.
+Subject: [PATCH 14/28] Actually setfacl /each/ directory of our key storage.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

@@ -1,7 +1,7 @@
 From 33bcca8303cad962606df3bfc6a031a9b0626375 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 21 Apr 2016 10:47:34 -0400
-Subject: [PATCH 01/26] cms: kill generate_integer(), it doesn't build on i686
+Subject: [PATCH 01/28] cms: kill generate_integer(), it doesn't build on i686
  and it's unused.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>

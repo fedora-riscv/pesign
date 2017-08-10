@@ -54,6 +54,8 @@ Patch0023: 0023-Better-authorization-scripts.-Again.patch
 Patch0024: 0024-Make-the-daemon-also-try-to-give-better-errors-on-EP.patch
 Patch0025: 0025-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
 Patch0026: 0026-certdb-fix-PRTime-printfs-for-i686.patch
+Patch0027: 0027-Clean-up-gcc-command-lines-a-little.patch
+Patch0028: 0028-Make-pesign-users-groups-static-in-the-repo.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as

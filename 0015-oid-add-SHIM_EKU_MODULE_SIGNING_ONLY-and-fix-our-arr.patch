@@ -1,7 +1,7 @@
 From a3cc2ad5d49ed61187527281da351e80d8f76a89 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 22 Aug 2016 13:31:38 -0400
-Subject: [PATCH 15/26] oid: add SHIM_EKU_MODULE_SIGNING_ONLY and fix our array
+Subject: [PATCH 15/28] oid: add SHIM_EKU_MODULE_SIGNING_ONLY and fix our array
  indices.
 
 That was all kinds of wrong.

@@ -1,7 +1,7 @@
 From 9f411f4e797e983d2e8cb51dc5b9ab8db250c2e3 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 18 Apr 2017 19:05:40 -0400
-Subject: [PATCH 06/26] Make --ascii work, since we documented it.
+Subject: [PATCH 06/28] Make --ascii work, since we documented it.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

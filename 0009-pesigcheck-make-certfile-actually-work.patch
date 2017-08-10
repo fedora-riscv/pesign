@@ -1,7 +1,7 @@
 From e0238e2363f9668aee07b2e44a8f358e694551c0 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 24 Apr 2017 15:18:10 -0400
-Subject: [PATCH 09/26] pesigcheck: make --certfile actually work
+Subject: [PATCH 09/28] pesigcheck: make --certfile actually work
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

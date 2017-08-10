@@ -1,7 +1,7 @@
 From 5be0515dee24308fd7e270bf2e0fb5e5a7a78f32 Mon Sep 17 00:00:00 2001
 From: Julien Cristau <jcristau@debian.org>
 Date: Thu, 9 Jun 2016 14:30:37 +0200
-Subject: [PATCH 02/26] Fix command line parsing
+Subject: [PATCH 02/28] Fix command line parsing
 
 The gettext translation domain should be passed as .arg, not .descrip,
 otherwise popt won't process any of the command line options (it stops
