@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 9%{?dist}
+Release: 10%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -56,6 +56,7 @@ Patch0025: 0025-certdb-fix-PRTime-printfs-for-i686.patch
 Patch0026: 0026-Clean-up-gcc-command-lines-a-little.patch
 Patch0027: 0027-Make-pesign-users-groups-static-in-the-repo.patch
 Patch0028: 0028-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
+Patch0029: 0029-Make-macros.pesign-error-in-kojibuilder-if-we-don-t-.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -157,6 +158,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Aug 14 2017 Peter Jones <pjones@redhat.com> - 0.112-10
+- Error if we're in kojibuilder on fedora and we don't have the socket.
+
 * Thu Aug 10 2017 Peter Jones <pjones@redhat.com> - 0.112-9
 - Try to fix the db problem nirik is seeing trying to upgrade the builders.
 

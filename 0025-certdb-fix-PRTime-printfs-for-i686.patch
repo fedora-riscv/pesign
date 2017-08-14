@@ -1,7 +1,7 @@
 From bc1043bf2b428971e29a61a341da9a57595bada5 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 9 Aug 2017 17:40:33 -0400
-Subject: [PATCH 25/28] certdb: fix PRTime printfs for i686
+Subject: [PATCH 25/29] certdb: fix PRTime printfs for i686
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
