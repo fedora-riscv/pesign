@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 13%{?dist}
+Release: 14%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -158,6 +158,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Aug 14 2017 Peter Jones <pjones@redhat.com> - 0.112-14
+- Same, but ignore errors in my debugging code.
+
 * Mon Aug 14 2017 Peter Jones <pjones@redhat.com> - 0.112-13
 - Same, but pretending I remember shell syntax.
 
