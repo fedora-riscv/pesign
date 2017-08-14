@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 10%{?dist}
+Release: 11%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -158,6 +158,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Aug 14 2017 Peter Jones <pjones@redhat.com> - 0.112-11
+- Even more work on bhkernel problems
+
 * Mon Aug 14 2017 Peter Jones <pjones@redhat.com> - 0.112-10
 - Error if we're in kojibuilder on fedora and we don't have the socket.
 
