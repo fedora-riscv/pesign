@@ -16,12 +16,12 @@ index 22a3ee6..1665b4c 100644
        %{_pesign} -R ${sattrs}.sig -I ${sattrs} %{-i}			\\\
                   --certdir ${nss} -c signer %{-o}			\
        rm -rf ${sattrs} ${sattrs}.sig ${nss}				\
-+    elif [ "$(id -un)" == "kojibuilder" -a				\\\
-+    	   grep -q ID=fedora /etc/os-release -a ] && 			\\\
++    elif [ "$(id -un)" == "mockbuild" -a				\\\
++    	   grep -q ID=fedora /etc/os-release ] && 			\\\
 +	   ! [ -S /var/run/pesign/socket ]; then			\
 +      echo "No socket even though this is kojibuilder" 1>&2		\
 +      ls -ld /var/run/pesign 1>&2					\
-+      ls -l /var/run/pesign/socket 1>&2					\
++      ls -l /var/run/pesign/socket 1>&2				\
 +      getfacl /var/run/pesign 1>&2					\
 +      getfacl /var/run/pesign/socket 1>&2				\
 +      exit 1								\
