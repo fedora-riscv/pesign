@@ -12,18 +12,21 @@ diff --git a/src/macros.pesign b/src/macros.pesign
 index 22a3ee6..1665b4c 100644
 --- a/src/macros.pesign
 +++ b/src/macros.pesign
-@@ -43,6 +43,15 @@
+@@ -43,6 +43,18 @@
        %{_pesign} -R ${sattrs}.sig -I ${sattrs} %{-i}			\\\
                   --certdir ${nss} -c signer %{-o}			\
        rm -rf ${sattrs} ${sattrs}.sig ${nss}				\
-+    elif [ "$(id -un)" == "mockbuild" -a				\\\
-+    	   grep -q ID=fedora /etc/os-release ] && 			\\\
-+	   ! [ -S /var/run/pesign/socket ]; then			\
-+      echo "No socket even though this is kojibuilder" 1>&2		\
++    elif [ "$(id -un)" == "mockbuild" ] && 				\\\
++         grep -q ID=fedora /etc/os-release && 				\\\
++         ! [ -S /var/run/pesign/socket ]; then				\
++      echo "No socket even though this is mockbuilder" 1>&2		\
 +      ls -ld /var/run/pesign 1>&2					\
 +      ls -l /var/run/pesign/socket 1>&2				\
 +      getfacl /var/run/pesign 1>&2					\
 +      getfacl /var/run/pesign/socket 1>&2				\
++      echo =========== env ============== 1>&2				\
++      set 1>&2								\
++      echo =========== env ============== 1>&2				\
 +      exit 1								\
      elif [ -S /var/run/pesign/socket ]; then				\
        %{_pesign_client} -t %{__pesign_client_token}			\\\
