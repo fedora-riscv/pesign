@@ -108,7 +108,7 @@ rm -vf %{buildroot}/usr/share/doc/pesign-%{version}/COPYING
 cp -av libdpe/*.[ch] src/
 
 install -d -m 0755 %{python3_sitelib}/mockbuild/plugins/
-install -m 0755 %{SOURCE3} %{python3_sitelib}/mockbuild/plugins/
+install -m 0755 %{SOURCE2} %{python3_sitelib}/mockbuild/plugins/
 
 %pre
 getent group pesign >/dev/null || groupadd -r pesign
