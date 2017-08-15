@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 18%{?dist}
+Release: 19%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -165,6 +165,9 @@ exit 0
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Tue Aug 15 2017 Peter Jones <pjones@redhat.com> - 0.112-19
+- One more build to try on bkernel01
+
 * Mon Aug 14 2017 Peter Jones <pjones@redhat.com> - 0.112-18
 - This one will actually work.
 

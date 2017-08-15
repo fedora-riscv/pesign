@@ -12,23 +12,24 @@ diff --git a/src/macros.pesign b/src/macros.pesign
 index 22a3ee6..1665b4c 100644
 --- a/src/macros.pesign
 +++ b/src/macros.pesign
-@@ -43,6 +43,20 @@
+@@ -43,6 +43,21 @@
        %{_pesign} -R ${sattrs}.sig -I ${sattrs} %{-i}			\\\
                   --certdir ${nss} -c signer %{-o}			\
        rm -rf ${sattrs} ${sattrs}.sig ${nss}				\
-+    elif [ "$(id -un)" == "mockbuild" ] && 				\\\
-+         [ "$(uname -m)" == "x86_64" ] &&				\\\
++    elif [ "%{vendor}" == "Fedora Project" -a				\\\
++           "$(id -un)" == "mockbuild" -a				\\\
++           "$(uname -m)" == "x86_64" ] &&				\\\
 +         grep -q ID=fedora /etc/os-release && 				\\\
-+         ! [ -S /var/run/pesign/socket ] &&				\\\
-+         [ "%{vendor}" == "Fedora Project" ]; then			\
-+      echo "No socket even though this is mockbuilder" 1>&2		\
-+      ls -ld /var/run/pesign || : 1>&2					\
-+      getfacl /var/run/pesign || : 1>&2				\
-+      ls -l /var/run/pesign/socket || : 1>&2				\
-+      getfacl /var/run/pesign/socket || : 1>&2				\
-+      echo =========== env ============== 1>&2				\
-+      set 1>&2								\
-+      echo =========== env ============== 1>&2				\
++         [[ "%{_buildhost}" =~ ^bkernel.* ]] &&			\\\
++         ! [ -S /var/run/pesign/socket ]; then				\
++      echo "No socket even though this is "%{_buildhost}"		\
++      ls -ld /var/run/pesign || :					\
++      getfacl /var/run/pesign || :					\
++      ls -l /var/run/pesign/socket || :				\
++      getfacl /var/run/pesign/socket || :				\
++      echo =========== env ==============				\
++      set								\
++      echo =========== env ==============				\
 +      exit 1								\
      elif [ -S /var/run/pesign/socket ]; then				\
        %{_pesign_client} -t %{__pesign_client_token}			\\\
