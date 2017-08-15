@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 14%{?dist}
+Release: 15%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -12,7 +12,7 @@ BuildRequires: git nspr nss nss-util popt-devel
 BuildRequires: nss-tools
 BuildRequires: nspr-devel >= 4.9.2-1
 BuildRequires: nss-devel >= 3.13.6-1
-BuildRequires: efivar-devel >= 31-1
+BuildRequires: efivar-devel >= 30-4
 BuildRequires: libuuid-devel
 BuildRequires: tar xz
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
@@ -27,6 +27,7 @@ BuildRequires: rh-signing-tools >= 1.20-2
 
 Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
+Source2: pesign.py
 
 Patch0001: 0001-cms-kill-generate_integer-it-doesn-t-build-on-i686-a.patch
 Patch0002: 0002-Fix-command-line-parsing.patch
@@ -106,6 +107,9 @@ rm -vf %{buildroot}/usr/share/doc/pesign-%{version}/COPYING
 # and find-debuginfo.sh has some pretty awful deficencies too...
 cp -av libdpe/*.[ch] src/
 
+install -d -m 0755 %{python3_sitelib}/mockbuild/plugins/
+install -m 0755 %{SOURCE3} %{python3_sitelib}/mockbuild/plugins/
+
 %pre
 getent group pesign >/dev/null || groupadd -r pesign
 getent passwd pesign >/dev/null || \
@@ -158,6 +162,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Aug 14 2017 Peter Jones <pjones@redhat.com> - 0.112-15
+- Provide a mockbuild plugin to sync up UIDs for koji builders...
+
 * Mon Aug 14 2017 Peter Jones <pjones@redhat.com> - 0.112-14
 - Same, but ignore errors in my debugging code.
 
