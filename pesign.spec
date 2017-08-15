@@ -161,6 +161,8 @@ exit 0
 %{_tmpfilesdir}/pesign.conf
 %{_unitdir}/pesign.service
 %endif
+%{python3_sitelib}/mockbuild/plugins/*/pesign.*
+%{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
 * Mon Aug 14 2017 Peter Jones <pjones@redhat.com> - 0.112-16
