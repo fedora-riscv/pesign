@@ -1,7 +1,7 @@
 From 9b4b12928c0450ac69d83293e179eec439465c03 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 22 Aug 2016 13:43:56 -0400
-Subject: [PATCH 16/28] efikeygen: add --modsign
+Subject: [PATCH 16/29] efikeygen: add --modsign
 
 ---
  src/cms_common.c | 29 ++++++++++++++++++++++++++++

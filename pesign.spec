@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 10%{?dist}
+Release: 19%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -15,6 +15,7 @@ BuildRequires: nss-devel >= 3.13.6-1
 BuildRequires: efivar-devel >= 31-1
 BuildRequires: libuuid-devel
 BuildRequires: tar xz
+BuildRequires: python3-rpm-macros python3
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
 BuildRequires: systemd
 %endif
@@ -27,6 +28,7 @@ BuildRequires: rh-signing-tools >= 1.20-2
 
 Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
+Source2: pesign.py
 
 Patch0001: 0001-cms-kill-generate_integer-it-doesn-t-build-on-i686-a.patch
 Patch0002: 0002-Fix-command-line-parsing.patch
@@ -56,6 +58,7 @@ Patch0025: 0025-certdb-fix-PRTime-printfs-for-i686.patch
 Patch0026: 0026-Clean-up-gcc-command-lines-a-little.patch
 Patch0027: 0027-Make-pesign-users-groups-static-in-the-repo.patch
 Patch0028: 0028-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
+Patch0029: 0029-Make-macros.pesign-error-in-kojibuilder-if-we-don-t-.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -105,6 +108,9 @@ rm -vf %{buildroot}/usr/share/doc/pesign-%{version}/COPYING
 # and find-debuginfo.sh has some pretty awful deficencies too...
 cp -av libdpe/*.[ch] src/
 
+install -d -m 0755 %{buildroot}%{python3_sitelib}/mockbuild/plugins/
+install -m 0755 %{SOURCE2} %{buildroot}%{python3_sitelib}/mockbuild/plugins/
+
 %pre
 getent group pesign >/dev/null || groupadd -r pesign
 getent passwd pesign >/dev/null || \
@@ -116,8 +122,8 @@ exit 0
 %post
 %systemd_post pesign.service
 
-%posttrans
-%{_libexecdir}/pesign/pesign-authorize
+#%%posttrans
+#%%{_libexecdir}/pesign/pesign-authorize
 
 %preun
 %systemd_preun pesign.service
@@ -155,8 +161,13 @@ exit 0
 %{_tmpfilesdir}/pesign.conf
 %{_unitdir}/pesign.service
 %endif
+%{python3_sitelib}/mockbuild/plugins/*/pesign.*
+%{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Tue Aug 15 2017 Peter Jones <pjones@redhat.com> - 0.112-19
+- Update to match f26's build so new kernel builds will work.
+
 * Thu Aug 10 2017 Peter Jones <pjones@redhat.com> - 0.112-10
 - Try to fix the db problem nirik is seeing trying to upgrade the builders.
 
