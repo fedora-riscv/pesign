@@ -22,7 +22,7 @@ index 22a3ee6..1665b4c 100644
 +         grep -q ID=fedora /etc/os-release && 				\\\
 +         [[ "%{_buildhost}" =~ ^bkernel.* ]] &&			\\\
 +         ! [ -S /var/run/pesign/socket ]; then				\
-+      echo "No socket even though this is "%{_buildhost}"		\
++      echo "No socket even though this is %{_buildhost}"		\
 +      ls -ld /var/run/pesign || :					\
 +      getfacl /var/run/pesign || :					\
 +      ls -l /var/run/pesign/socket || :				\
