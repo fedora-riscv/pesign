@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 15%{?dist}
+Release: 16%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -15,6 +15,7 @@ BuildRequires: nss-devel >= 3.13.6-1
 BuildRequires: efivar-devel >= 30-4
 BuildRequires: libuuid-devel
 BuildRequires: tar xz
+BuildRequires: python3-rpm-macros python3
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
 BuildRequires: systemd
 %endif
@@ -107,8 +108,8 @@ rm -vf %{buildroot}/usr/share/doc/pesign-%{version}/COPYING
 # and find-debuginfo.sh has some pretty awful deficencies too...
 cp -av libdpe/*.[ch] src/
 
-install -d -m 0755 %{python3_sitelib}/mockbuild/plugins/
-install -m 0755 %{SOURCE2} %{python3_sitelib}/mockbuild/plugins/
+install -d -m 0755 %{buildroot}%{python3_sitelib}/mockbuild/plugins/
+install -m 0755 %{SOURCE2} %{buildroot}%{python3_sitelib}/mockbuild/plugins/
 
 %pre
 getent group pesign >/dev/null || groupadd -r pesign
@@ -162,6 +163,9 @@ exit 0
 %endif
 
 %changelog
+* Mon Aug 14 2017 Peter Jones <pjones@redhat.com> - 0.112-16
+- I swear I'm not this stupid.
+
 * Mon Aug 14 2017 Peter Jones <pjones@redhat.com> - 0.112-15
 - Provide a mockbuild plugin to sync up UIDs for koji builders...
 
