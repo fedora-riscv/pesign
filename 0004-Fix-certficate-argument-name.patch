@@ -1,7 +1,7 @@
 From b20fc54c08e8afe1365e56cacade3ec39984da8d Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 18 Apr 2017 19:00:34 -0400
-Subject: [PATCH 04/28] Fix "certficate" argument name.
+Subject: [PATCH 04/29] Fix "certficate" argument name.
 
 This fixes our typoed argument name by making the incorrectly spelled
 version be a popt alias, and fixing the real implementation to be

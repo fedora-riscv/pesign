@@ -1,7 +1,7 @@
 From 025eb8aea94761fdc45507b6192aafdef80d4842 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Wed, 9 Aug 2017 17:31:31 -0400
-Subject: [PATCH 28/28] rpm: Make the client signer use the fedora values
+Subject: [PATCH 28/29] rpm: Make the client signer use the fedora values
  unless overridden
 
 Signed-off-by: Peter Jones <pjones@redhat.com>

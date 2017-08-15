@@ -1,7 +1,7 @@
 From 27afa5a4ea8de1679603f5871935096280d0b12e Mon Sep 17 00:00:00 2001
 From: David Michael <david.michael@coreos.com>
 Date: Tue, 13 Jun 2017 13:20:16 -0700
-Subject: [PATCH 22/28] sysvinit: Create the socket directory at runtime
+Subject: [PATCH 22/29] sysvinit: Create the socket directory at runtime
 
 This better supports non-systemd configurations with tmpfs on /run.
 ---
