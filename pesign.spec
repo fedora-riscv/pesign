@@ -3,7 +3,7 @@
 Summary: Signing utility for UEFI binaries
 Name: pesign
 Version: 0.112
-Release: 20%{?dist}
+Release: 21%{?dist}
 Group: Development/System
 License: GPLv2
 URL: https://github.com/vathpela/pesign
@@ -22,7 +22,7 @@ BuildRequires: systemd
 Requires: nspr nss nss-util popt rpm
 Requires(pre): shadow-utils
 ExclusiveArch: %{ix86} x86_64 ia64 aarch64 arm
-%if 0%{?rhel} >= 7
+%if 0%{?rhel} == 7
 BuildRequires: rh-signing-tools >= 1.20-2
 %endif
 
@@ -165,6 +165,9 @@ exit 0
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Fri Oct 06 2017 Troy Dawson <tdawson@redhat.com> - 0.112-21
+- Cleanup spec file conditionals
+
 * Tue Aug 15 2017 Peter Jones <pjones@redhat.com> - 0.112-20
 - Maybe fewer typoes would be better.
 
