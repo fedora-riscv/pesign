@@ -1,12 +1,12 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
+Name:    pesign
 Summary: Signing utility for UEFI binaries
-Name: pesign
 Version: 0.112
-Release: 21%{?dist}
-Group: Development/System
+Release: 22%{?dist}
 License: GPLv2
-URL: https://github.com/vathpela/pesign
+URL:     https://github.com/vathpela/pesign
+
 Obsoletes: pesign-rh-test-certs <= 0.111-7
 BuildRequires: git nspr nss nss-util popt-devel
 BuildRequires: nss-tools
@@ -21,7 +21,7 @@ BuildRequires: systemd
 %endif
 Requires: nspr nss nss-util popt rpm
 Requires(pre): shadow-utils
-ExclusiveArch: %{ix86} x86_64 ia64 aarch64 arm
+ExclusiveArch: %{ix86} x86_64 ia64 aarch64 %{arm}
 %if 0%{?rhel} == 7
 BuildRequires: rh-signing-tools >= 1.20-2
 %endif
@@ -80,7 +80,6 @@ git config --unset user.name
 make PREFIX=%{_prefix} LIBDIR=%{_libdir}
 
 %install
-rm -rf %{buildroot}
 mkdir -p %{buildroot}/%{_libdir}
 make PREFIX=%{_prefix} LIBDIR=%{_libdir} INSTALLROOT=%{buildroot} \
 	install
@@ -133,7 +132,6 @@ exit 0
 %endif
 
 %files
-%defattr(-,root,root,-)
 %{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc README TODO
@@ -165,6 +163,9 @@ exit 0
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Mon Jan 22 2018 Peter Robinson <pbrobinson@fedoraproject.org> 0.112-22
+- Minor spec cleanups, fix arm conditional
+
 * Fri Oct 06 2017 Troy Dawson <tdawson@redhat.com> - 0.112-21
 - Cleanup spec file conditionals
 
