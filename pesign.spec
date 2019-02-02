@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 0.112
-Release: 24%{?dist}
+Release: 25%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -163,6 +163,9 @@ exit 0
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.112-25
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0.112-24
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
