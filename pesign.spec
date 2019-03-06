@@ -176,6 +176,7 @@ exit 0
 %changelog
 * Wed Mar  6 2019 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.112-25
 - Fix build (#1605427)
+- Add missing closing quote in macro (#1651020)
 
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0.112-24
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
