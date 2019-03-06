@@ -8,18 +8,29 @@ License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
 Obsoletes: pesign-rh-test-certs <= 0.111-7
-BuildRequires: git nspr nss nss-util popt-devel
+BuildRequires: gcc
+BuildRequires: git
+BuildRequires: nspr
+BuildRequires: nss
+BuildRequires: nss-util
+BuildRequires: popt-devel
 BuildRequires: nss-tools
 BuildRequires: nspr-devel >= 4.9.2-1
 BuildRequires: nss-devel >= 3.13.6-1
 BuildRequires: efivar-devel >= 31-1
 BuildRequires: libuuid-devel
-BuildRequires: tar xz
-BuildRequires: python3-rpm-macros python3
+BuildRequires: tar
+BuildRequires: xz
+BuildRequires: python3-rpm-macros
+BuildRequires: python3
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
-BuildRequires: systemd
+BuildRequires: systemd-rpm-macros
 %endif
-Requires: nspr nss nss-util popt rpm
+Requires:      nspr
+Requires:      nss
+Requires:      nss-util
+Requires:      popt
+Requires:      rpm
 Requires(pre): shadow-utils
 ExclusiveArch: %{ix86} x86_64 ia64 aarch64 %{arm}
 %if 0%{?rhel} == 7
@@ -163,6 +174,10 @@ exit 0
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Wed Mar  6 2019 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.112-25
+- Fix build (#1675653)
+- Add missing closing quote in macro (#1651020)
+
 * Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.112-25
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
