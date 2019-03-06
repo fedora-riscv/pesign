@@ -87,6 +87,9 @@ git am %{patches} </dev/null
 git config --unset user.email
 git config --unset user.name
 
+# https://bugzilla.redhat.com/show_bug.cgi?id=1678146
+sed -i 's|/var/run/pesign|/run/pesign|' src/tmpfiles.conf
+
 %build
 make PREFIX=%{_prefix} LIBDIR=%{_libdir}
 
@@ -177,6 +180,7 @@ exit 0
 * Wed Mar  6 2019 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.112-25
 - Fix build (#1675653)
 - Add missing closing quote in macro (#1651020)
+- Update obsolete /var/run/ path (#1678146)
 
 * Sat Feb 02 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.112-25
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
