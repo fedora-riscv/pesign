@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 0.112
-Release: 25%{?dist}
+Release: 26%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -177,6 +177,9 @@ exit 0
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.112-26
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
 * Wed Mar  6 2019 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.112-25
 - Fix build (#1675653)
 - Add missing closing quote in macro (#1651020)
