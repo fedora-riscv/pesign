@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 0.112
-Release: 26%{?dist}
+Release: 27%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -70,6 +70,7 @@ Patch0026: 0026-Clean-up-gcc-command-lines-a-little.patch
 Patch0027: 0027-Make-pesign-users-groups-static-in-the-repo.patch
 Patch0028: 0028-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
 Patch0029: 0029-Make-macros.pesign-error-in-kojibuilder-if-we-don-t-.patch
+Patch0030: 0030-efikeygen-Fix-the-build-with-nss-3.44.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -177,6 +178,9 @@ exit 0
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Tue Nov 12 2019 Peter Jones <pjones@redhat.com> - 0.112-27
+- Rebuild to fix an NSS API issue.	
+
 * Fri Jul 26 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.112-26
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
