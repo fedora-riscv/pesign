@@ -71,6 +71,7 @@ Patch0027: 0027-Make-pesign-users-groups-static-in-the-repo.patch
 Patch0028: 0028-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
 Patch0029: 0029-Make-macros.pesign-error-in-kojibuilder-if-we-don-t-.patch
 Patch0030: 0030-efikeygen-Fix-the-build-with-nss-3.44.patch
+Patch0031: 0031-pesigcheck-Fix-a-wrong-assignment.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
