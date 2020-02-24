@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 0.112
-Release: 29%{?dist}
+Release: 30%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -179,6 +179,10 @@ exit 0
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Mon Feb 24 2020 Peter Jones <pjones@redhat.com> - 0.112-30
+- Make sure the patch for -29 is actually in the build in f32, and
+  synchronize with master.
+
 * Tue Feb 18 2020 Peter Jones <pjones@redhat.com> - 0.112-29
 - Rebuild to match OpenSC's token name mangling change.
 
