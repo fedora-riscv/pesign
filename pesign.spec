@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 0.112
-Release: 30%{?dist}
+Release: 31%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -72,6 +72,7 @@ Patch0028: 0028-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
 Patch0029: 0029-Make-macros.pesign-error-in-kojibuilder-if-we-don-t-.patch
 Patch0030: 0030-efikeygen-Fix-the-build-with-nss-3.44.patch
 Patch0031: 0031-pesigcheck-Fix-a-wrong-assignment.patch
+Patch0032: 0032-Use-sql-type-nss-database-everywhere-by-default.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -145,6 +146,9 @@ exit 0
 
 %postun
 %systemd_postun_with_restart pesign.service
+
+%posttrans
+certutil -d /etc/pki/pesign/ -X -L > /dev/null
 %endif
 
 %files
@@ -179,6 +183,10 @@ exit 0
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Mon Jun 08 2020 Javier Martinez Canillas <javierm@redhat.com> - 0.112-31
+- Switch default NSS database to SQLite format (pjones)
+  Resolves: rhbz#1827902
+
 * Mon Feb 24 2020 Peter Jones <pjones@redhat.com> - 0.112-30
 - Make sure the patch for -29 is actually in the build in f32, and
   synchronize with master.
