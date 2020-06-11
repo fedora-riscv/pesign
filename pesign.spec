@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -43,6 +43,7 @@ Source2: pesign.py
 
 Patch0001: 0001-efikeygen-Fix-the-build-with-nss-3.44.patch
 Patch0002: 0002-pesigcheck-Fix-a-wrong-assignment.patch
+Patch0003: 0003-Make-0.112-client-and-server-work-with-the-113-proto.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -151,6 +152,11 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Thu Jun 11 2020 Peter Jones <pjones@redhat.com> - 113-2
+- Fix a signing protocol bug we introduced in 113 that makes the fedora
+  kernel builders fail.
+  Related: rhbz#1708773
+
 * Thu Jun 11 2020 Javier Martinez Canillas <javierm@redhat.com> - 113-1
 - Update to 113 release
   Resolves: rhbz#1708773
