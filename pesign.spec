@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -44,6 +44,8 @@ Source2: pesign.py
 Patch0001: 0001-efikeygen-Fix-the-build-with-nss-3.44.patch
 Patch0002: 0002-pesigcheck-Fix-a-wrong-assignment.patch
 Patch0003: 0003-Make-0.112-client-and-server-work-with-the-113-proto.patch
+Patch0004: 0004-Rename-var-run-to-run.patch
+Patch0005: 0005-Apparently-opensc-got-updated-and-the-token-name-cha.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -60,9 +62,6 @@ git commit -a -q -m "%{version} baseline."
 git am %{patches} </dev/null
 git config --unset user.email
 git config --unset user.name
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1678146
-sed -i 's|/var/run/pesign|/run/pesign|' src/tmpfiles.conf
 
 %build
 make PREFIX=%{_prefix} LIBDIR=%{_libdir}
@@ -101,7 +100,7 @@ install -m 0755 %{SOURCE2} %{buildroot}%{python3_sitelib}/mockbuild/plugins/
 %pre
 getent group pesign >/dev/null || groupadd -r pesign
 getent passwd pesign >/dev/null || \
-	useradd -r -g pesign -d /var/run/pesign -s /sbin/nologin \
+	useradd -r -g pesign -d /run/pesign -s /sbin/nologin \
 		-c "Group for the pesign signing daemon" pesign
 exit 0
 
@@ -152,6 +151,11 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Fri Jun 12 2020 Peter Jones <pjones@redhat.com> - 113-3
+- Fix the signer name for fedora and some other minor nits
+  Related: rhbz#1708773
+  Related: rhbz#1678146
+
 * Thu Jun 11 2020 Peter Jones <pjones@redhat.com> - 113-2
 - Fix a signing protocol bug we introduced in 113 that makes the fedora
   kernel builders fail.
