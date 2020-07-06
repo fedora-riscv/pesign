@@ -1,30 +1,30 @@
-From 873345b4970a28c7c590ca0c4e04bf88dd19e3b5 Mon Sep 17 00:00:00 2001
+From 853167a32574ce175c7de2ee730afc1a835191f4 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 6 Jul 2020 13:54:35 -0400
-Subject: [PATCH] Move most of macros.pesign to pesign-rpmbuild-helper
+Subject: [PATCH 6/7] Move most of macros.pesign to pesign-rpmbuild-helper
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
  src/Makefile               |   1 +
- src/macros.pesign          |  71 +++++-------------
- src/pesign-rpmbuild-helper | 143 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 163 insertions(+), 52 deletions(-)
- create mode 100644 src/pesign-rpmbuild-helper
+ src/macros.pesign          |  72 +++++-------------
+ src/pesign-rpmbuild-helper | 152 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 173 insertions(+), 52 deletions(-)
+ create mode 100755 src/pesign-rpmbuild-helper
 
 diff --git a/src/Makefile b/src/Makefile
-index 74327ba13f3..af8bef6d9ff 100644
+index 74327ba13f3..c9e9cc6cd1b 100644
 --- a/src/Makefile
 +++ b/src/Makefile
 @@ -94,6 +94,7 @@ install :
  	$(INSTALL) -m 644 macros.pesign $(INSTALLROOT)/etc/rpm/
  	$(INSTALL) -d -m 755 $(INSTALLROOT)$(libexecdir)/pesign/
  	$(INSTALL) -m 750 pesign-authorize $(INSTALLROOT)$(libexecdir)/pesign/
-+	$(INSTALL) -m 750 pesign-rpmbuild-helper $(INSTALLROOT)$(libexecdir)/pesign/
++	$(INSTALL) -m 755 pesign-rpmbuild-helper $(INSTALLROOT)$(libexecdir)/pesign/
  	$(INSTALL) -d -m 700 $(INSTALLROOT)/etc/pesign
  	$(INSTALL) -m 600 pesign-users $(INSTALLROOT)/etc/pesign/users
  	$(INSTALL) -m 600 pesign-groups $(INSTALLROOT)/etc/pesign/groups
 diff --git a/src/macros.pesign b/src/macros.pesign
-index 5a6da1c6809..104586beca5 100644
+index 5a6da1c6809..4caf0ba9c8d 100644
 --- a/src/macros.pesign
 +++ b/src/macros.pesign
 @@ -6,7 +6,7 @@
@@ -36,7 +36,7 @@ index 5a6da1c6809..104586beca5 100644
  %__pesign_cert %{!?pe_signing_cert:"Red Hat Test Certificate"}%{?pe_signing_cert:"%{pe_signing_cert}"}
  
  %__pesign_client_token %{!?pe_signing_token:"OpenSC Card (Fedora Signer)"}%{?pe_signing_token:"%{pe_signing_token}"}
-@@ -24,54 +24,21 @@
+@@ -24,54 +24,22 @@
  # -a <input ca cert filename>		# rhel only
  # -s 					# perform signing
  %pesign(i:o:C:e:c:n:a:s)						\
@@ -108,13 +108,14 @@ index 5a6da1c6809..104586beca5 100644
 +    %{?-i*:--in "%{i*}"}						\\\
 +    %{?-o*:--out "%{o*}"}						\\\
 +    %{?-s:--sign}							\\\
++    ;									\
 +%{nil}
 diff --git a/src/pesign-rpmbuild-helper b/src/pesign-rpmbuild-helper
-new file mode 100644
-index 00000000000..69b430940ec
+new file mode 100755
+index 00000000000..24514aa0b5d
 --- /dev/null
 +++ b/src/pesign-rpmbuild-helper
-@@ -0,0 +1,143 @@
+@@ -0,0 +1,152 @@
 +#!/bin/sh
 +
 +set -eu
@@ -138,6 +139,8 @@ index 00000000000..69b430940ec
 +	local cert=() || :
 +	local rhelver=0 || :
 +	local sign="" || :
++
++	local username="$(id -un)"
 +
 +	while [[ $# -ge 2 ]] ; do
 +		case " ${1} " in
@@ -212,16 +215,23 @@ index 00000000000..69b430940ec
 +		return 0
 +	fi
 +
-+	if grep -q ID=fedora /etc/os-release &&
-+	   [ "${rhelver}" -lt 7 ] &&
-+	   [ "$(id -un)" = "kojibuilder" -o
-+	     "$(id -un)" = "mockbuilder" ] &&
-+	   ! [ -S /run/pesign/socket ]; then
-+		echo "Warning: no socket even though this is $(id -un)" 1>&2
-+		echo "Warning: if this is a non-scratch koji build, this is wrong" 1>&2
-+		ls -ld /run/pesign 1>&2
-+		ls -l /run/pesign/socket 1>&2
-+		getfacl /run/pesign /run/pesign/socket 1>&2
++	local socket="" || :
++	if grep -q ID=fedora /etc/os-release && [ "${rhelver}" -lt 7 ] &&
++	   [ "${username}" = "kojibuilder" -o "${username}" = "mockbuilder" ] ; then
++		if [ -S /run/pesign/socket ] ; then
++			socket=/run/pesign/socket
++		elif [ -S /var/run/pesign/socket ]; then
++			socket=/var/run/pesign/socket
++		else
++			echo "Warning: no pesign socket even though user is ${username}" 1>&2
++			echo "Warning: if this is a non-scratch koji build, this is wrong" 1>&2
++			ls -ld /run/pesign 1>&2
++			ls -l /run/pesign/socket 1>&2
++			getfacl /run/pesign /run/pesign/socket 1>&2
++			ls -ld /var/run/pesign 1>&2
++			ls -l /var/run/pesign/socket 1>&2
++			getfacl /var/run/pesign /var/run/pesign/socket 1>&2
++		fi
 +	fi
 +
 +	if [ "${rhelver}" -ge 7 ] ; then
@@ -238,7 +248,7 @@ index 00000000000..69b430940ec
 +			--certdir "${nssdir}" -c signer \
 +			${input[@]} ${output[@]}
 +		rm -rf "${sattrs}" "${sattrs}.sig" "${nssdir}"
-+	elif [ -S /run/pesign/socket ] ; then
++	elif [ -n "${socket}" ] ; then
 +		"${client}" ${client_token[@]} ${client_cert[@]}	\
 +			${sattrout[@]} ${certout[@]}			\
 +			${sign} ${input[@]} ${output[@]}
