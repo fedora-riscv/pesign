@@ -1,15 +1,15 @@
-From 8499f7b340e4f6fbb5701db21fbabc25b8883c54 Mon Sep 17 00:00:00 2001
+From 22658f290fcf66213ca6237e37ae97bba39a8a0b Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 6 Jul 2020 13:54:35 -0400
-Subject: [PATCH 6/7] Move most of macros.pesign to pesign-rpmbuild-helper
+Subject: [PATCH] Move most of macros.pesign to pesign-rpmbuild-helper
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
  src/Makefile               |   1 +
- src/macros.pesign          |  73 +++++-------------
- src/pesign-rpmbuild-helper | 153 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 174 insertions(+), 53 deletions(-)
- create mode 100755 src/pesign-rpmbuild-helper
+ src/macros.pesign          |  73 +++++------------
+ src/pesign-rpmbuild-helper | 163 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 184 insertions(+), 53 deletions(-)
+ create mode 100644 src/pesign-rpmbuild-helper
 
 diff --git a/src/Makefile b/src/Makefile
 index 74327ba13f3..c9e9cc6cd1b 100644
@@ -102,7 +102,7 @@ index 5a6da1c6809..e3a0de9c2f4 100644
 +    %{?__pesign_client_token:--client-token %{__pesign_client_token}}	\\\
 +    %{?__pesign_client_cert:--client-cert %{__pesign_client_cert}}	\\\
 +    %{?__pesign_token:%{__pesign_token}}				\\\
-+    %{?-n:--cert "%{-n*}"}%{?!-n:--cert "%{__pesign_cert}"}		\\\
++    %{?-n:--cert "\"%{-n*}\""}%{?!-n:--cert "\"%{__pesign_cert}\""}		\\\
 +    %{?_rhel:--rhelver "%{_rhel}"}					\\\
 +    %{?-a:--cafile "%{-a*}"}						\\\
 +    %{?-c:--certfile "%{-c*}"}						\\\
@@ -114,14 +114,15 @@ index 5a6da1c6809..e3a0de9c2f4 100644
 +    ;									\
 +%{nil}
 diff --git a/src/pesign-rpmbuild-helper b/src/pesign-rpmbuild-helper
-new file mode 100755
-index 00000000000..fd385d1625d
+new file mode 100644
+index 00000000000..f3d66320bcc
 --- /dev/null
 +++ b/src/pesign-rpmbuild-helper
-@@ -0,0 +1,153 @@
+@@ -0,0 +1,162 @@
 +#!/bin/sh
 +
 +set -eu
++set -x
 +
 +main() {
 +	local target_cpu="${1}" && shift
@@ -130,7 +131,6 @@ index 00000000000..fd385d1625d
 +
 +	local cafile="" || :
 +	local certfile="" || :
-+	local certname="" || :
 +
 +	local certout=() || :
 +	local sattrout=() || :
@@ -153,32 +153,41 @@ index 00000000000..fd385d1625d
 +		" --certfile ")
 +			certfile="${2}"
 +			;;
-+		" --certname ")
-+			certname="${2}"
-+			;;
 +		" --certout ")
-+			certout=(-C "${2}")
++			certout[0]=-C
++			certout[1]="${2}"
 +			;;
 +		" --sattrout ")
-+			sattrout=(-e "${2}")
++			sattrout[0]=-e
++			sattrout[1]="${2}"
 +			;;
 +		" --client-token ")
-+			client_token=(-t "${2}")
++			client_token[0]=-t
++			client_token[1]="${2}"
 +			;;
 +		" --client-cert ")
-+			client_cert=(-c "${2}")
++			client_cert[0]=-c
++			client_cert[1]="${2}"
 +			;;
 +		" --token ")
-+			token=(-t "${2}")
++			token[0]=-t
++			token="${2}"
 +			;;
 +		" --cert ")
-+			cert=(-c "${2}")
++			cert[0]=-c
++			cert[1]="${2}"
++			;;
++		" --certname ")
++			cert[0]=-c
++			cert[1]="${2}"
 +			;;
 +		" --in ")
-+			input=(-i "${2}")
++			input[0]=-i
++			input[1]="${2}"
 +			;;
 +		" --out ")
-+			output=(-o "${2}")
++			output[0]=-o
++			output[1]="${2}"
 +			;;
 +		" --rhelver ")
 +			rhelver="${2}"
@@ -196,8 +205,8 @@ index 00000000000..fd385d1625d
 +	fi
 +
 +	local nssdir=/etc/pki/pesign
-+	if [ "${certname}" == "Red Hat Test Certificate" ] ||
-+	   [ "${#cert[@]}" -eq 2 -a "${cert[1]}" == "Red Hat Test Certificate" ] ; then
++	if [ "${#cert[@]}" -eq 2 ] &&
++	   [ "${cert[1]}" == "Red Hat Test Certificate" ] ; then
 +		nssdir=/etc/pki/pesign-rh-test
 +	fi
 +
@@ -246,24 +255,24 @@ index 00000000000..fd385d1625d
 +		certutil -A -n "signer" -t "CTu,CTu,CTu" -i "${certfile}" -d ${nssdir}
 +		sattrs="$(mktemp -p $PWD --suffix=.der)"
 +		"${bin}" -E "${sattrs}" --certdir "${nssdir}" \
-+			${input[@]} --force
-+		rpm-sign --key "${certname}" --rsadgstsign "${sattrs}"
++			"${input[@]}" --force
++		rpm-sign --key "${cert[1]}" --rsadgstsign "${sattrs}"
 +		"${bin}" -R "${sattrs}.sig" -I "${sattrs}" \
 +			--certdir "${nssdir}" -c signer \
-+			${input[@]} ${output[@]}
++			"${input[@]}" "${output[@]}"
 +		rm -rf "${sattrs}" "${sattrs}.sig" "${nssdir}"
 +	elif [ -n "${socket}" ] ; then
-+		"${client}" ${client_token[@]} ${client_cert[@]}	\
-+			${sattrout[@]} ${certout[@]}			\
-+			${sign} ${input[@]} ${output[@]}
++		"${client}" "${client_token[@]}" "${client_cert[@]}"	\
++			"${sattrout[@]}" "${certout[@]}"		\
++			${sign} "${input[@]}" "${output[@]}"
 +	else
-+		"${bin}" --certdir "${nssdir}" ${token[@]} ${cert[@]}	\
-+			${sign} ${sattrout[@]} ${certout[@]}		\
-+			${input[@]} ${output[@]}
++		"${bin}" --certdir "${nssdir}" "${token[@]}"		\
++			"${cert[@]}" ${sign} "${sattrout[@]}"		\
++			"${certout[@]}"	"${input[@]}" "${output[@]}"
 +	fi
 +
 +	# if there's a 0-sized output file, delete it and error out
-+	if [ ! -s "${output[1]}" ] ; then
++	if [ "${#output[@]}" -eq 2 ] && ! [ -s "${output[1]}" ] ; then
 +		if [ -e "${output[1]}" ] ; then
 +			rm -f "${output[1]}"
 +		fi
