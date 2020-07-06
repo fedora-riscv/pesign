@@ -136,6 +136,7 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %dir %attr(0775,pesign,pesign) %{_sysconfdir}/pki/pesign-rh-test/
 %config(noreplace) %attr(0664,pesign,pesign) %{_sysconfdir}/pki/pesign-rh-test/*
 %{_libexecdir}/pesign/pesign-authorize
+%{_libexecdir}/pesign/pesign-rpmbuild-helper
 %config(noreplace)/%{_sysconfdir}/pesign/users
 %config(noreplace)/%{_sysconfdir}/pesign/groups
 %{_sysconfdir}/popt.d/pesign.popt
