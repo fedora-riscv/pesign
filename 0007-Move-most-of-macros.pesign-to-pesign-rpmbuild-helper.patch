@@ -118,7 +118,7 @@ new file mode 100644
 index 00000000000..f3d66320bcc
 --- /dev/null
 +++ b/src/pesign-rpmbuild-helper
-@@ -0,0 +1,162 @@
+@@ -0,0 +1,164 @@
 +#!/bin/sh
 +
 +set -eu
@@ -238,12 +238,14 @@ index 00000000000..f3d66320bcc
 +		else
 +			echo "Warning: no pesign socket even though user is ${username}" 1>&2
 +			echo "Warning: if this is a non-scratch koji build, this is wrong" 1>&2
-+			ls -ld /run/pesign 1>&2
-+			ls -l /run/pesign/socket 1>&2
-+			getfacl /run/pesign /run/pesign/socket 1>&2
-+			ls -ld /var/run/pesign 1>&2
-+			ls -l /var/run/pesign/socket 1>&2
-+			getfacl /var/run/pesign /var/run/pesign/socket 1>&2
++                       ls -ld /run/pesign 1>&2 ||:
++                       ls -l /run/pesign/socket 1>&2 ||:
++                       getfacl /run/pesign 1>&2 || :
++                       getfacl /run/pesign/socket 1>&2 ||:
++                       ls -ld /var/run/pesign 1>&2 ||:
++                       ls -l /var/run/pesign/socket 1>&2 ||:
++                       getfacl /var/run/pesign 1>&2 || :
++                       getfacl /var/run/pesign/socket 1>&2 || :
 +		fi
 +	fi
 +
