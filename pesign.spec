@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -46,6 +46,7 @@ Patch0002: 0002-pesigcheck-Fix-a-wrong-assignment.patch
 Patch0003: 0003-Make-0.112-client-and-server-work-with-the-113-proto.patch
 Patch0004: 0004-Rename-var-run-to-run.patch
 Patch0005: 0005-Apparently-opensc-got-updated-and-the-token-name-cha.patch
+Patch0006: 0006-Move-most-of-macros.pesign-to-pesign-rpmbuild-helper.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -151,6 +152,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Mon Jul 06 2020 Peter Jones <pjones@redhat.com> - 113-4
+- Attempt to fix kernel signing failures caused by -3...
+
 * Fri Jun 12 2020 Peter Jones <pjones@redhat.com> - 113-3
 - Fix the signer name for fedora and some other minor nits
   Related: rhbz#1708773
