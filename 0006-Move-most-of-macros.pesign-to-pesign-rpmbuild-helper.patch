@@ -1,4 +1,4 @@
-From 853167a32574ce175c7de2ee730afc1a835191f4 Mon Sep 17 00:00:00 2001
+From 8499f7b340e4f6fbb5701db21fbabc25b8883c54 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 6 Jul 2020 13:54:35 -0400
 Subject: [PATCH 6/7] Move most of macros.pesign to pesign-rpmbuild-helper
@@ -6,9 +6,9 @@ Subject: [PATCH 6/7] Move most of macros.pesign to pesign-rpmbuild-helper
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
  src/Makefile               |   1 +
- src/macros.pesign          |  72 +++++-------------
- src/pesign-rpmbuild-helper | 152 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 173 insertions(+), 52 deletions(-)
+ src/macros.pesign          |  73 +++++-------------
+ src/pesign-rpmbuild-helper | 153 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 174 insertions(+), 53 deletions(-)
  create mode 100755 src/pesign-rpmbuild-helper
 
 diff --git a/src/Makefile b/src/Makefile
@@ -24,19 +24,23 @@ index 74327ba13f3..c9e9cc6cd1b 100644
  	$(INSTALL) -m 600 pesign-users $(INSTALLROOT)/etc/pesign/users
  	$(INSTALL) -m 600 pesign-groups $(INSTALLROOT)/etc/pesign/groups
 diff --git a/src/macros.pesign b/src/macros.pesign
-index 5a6da1c6809..4caf0ba9c8d 100644
+index 5a6da1c6809..e3a0de9c2f4 100644
 --- a/src/macros.pesign
 +++ b/src/macros.pesign
-@@ -6,7 +6,7 @@
+@@ -6,10 +6,10 @@
  # %pesign -s -i shim.orig -o shim.efi
  # And magically get the right thing.
  
 -%__pesign_token %{nil}%{?pe_signing_token:-t "%{pe_signing_token}"}
-+%__pesign_token %{nil}%{?pe_signing_token:"%{pe_signing_token}"}
++%__pesign_token %{nil}%{?pe_signing_token:--token "%{pe_signing_token}"}
  %__pesign_cert %{!?pe_signing_cert:"Red Hat Test Certificate"}%{?pe_signing_cert:"%{pe_signing_cert}"}
  
- %__pesign_client_token %{!?pe_signing_token:"OpenSC Card (Fedora Signer)"}%{?pe_signing_token:"%{pe_signing_token}"}
-@@ -24,54 +24,22 @@
+-%__pesign_client_token %{!?pe_signing_token:"OpenSC Card (Fedora Signer)"}%{?pe_signing_token:"%{pe_signing_token}"}
++%__pesign_client_token --token %{!?pe_signing_token:"OpenSC Card (Fedora Signer)"}%{?pe_signing_token:"%{pe_signing_token}"}
+ %__pesign_client_cert %{!?pe_signing_cert:"/CN=Fedora Secure Boot Signer"}%{?pe_signing_cert:"%{pe_signing_cert}"}
+ 
+ %_pesign /usr/bin/pesign
+@@ -24,54 +24,21 @@
  # -a <input ca cert filename>		# rhel only
  # -s 					# perform signing
  %pesign(i:o:C:e:c:n:a:s)						\
@@ -95,24 +99,23 @@ index 5a6da1c6809..4caf0ba9c8d 100644
 +    "%{_target_cpu}"							\\\
 +    "%{_pesign}"							\\\
 +    "%{_pesign_client}"							\\\
-+    %{?__pesign_client_token?--client-token "%{__pesign_client_token}"}	\\\
-+    %{?__pesign_client_cert?--client-cert "%{__pesign_client_cert}"}	\\\
-+    %{?__pesign_token?--token "%{__pesign_token}"}			\\\
-+    %{?__pesign_cert?--cert "%{__pesign_cert}"}				\\\
++    %{?__pesign_client_token:--client-token %{__pesign_client_token}}	\\\
++    %{?__pesign_client_cert:--client-cert %{__pesign_client_cert}}	\\\
++    %{?__pesign_token:%{__pesign_token}}				\\\
++    %{?-n:--cert "%{-n*}"}%{?!-n:--cert "%{__pesign_cert}"}		\\\
 +    %{?_rhel:--rhelver "%{_rhel}"}					\\\
-+    %{?-a*:--cafile "%{-a*}"}						\\\
-+    %{?-c*:--certfile "%{-c*}"}						\\\
-+    %{?-n*:--certname "%{-n*}"}						\\\
-+    %{?-C*:--certout "%{-C*}"}						\\\
-+    %{?-e*:--sattrout "%{-e*}"}						\\\
-+    %{?-i*:--in "%{i*}"}						\\\
-+    %{?-o*:--out "%{o*}"}						\\\
++    %{?-a:--cafile "%{-a*}"}						\\\
++    %{?-c:--certfile "%{-c*}"}						\\\
++    %{?-C:--certout "%{-C*}"}						\\\
++    %{?-e:--sattrout "%{-e*}"}						\\\
++    %{?-i:--in "%{-i*}"}						\\\
++    %{?-o:--out "%{-o*}"}						\\\
 +    %{?-s:--sign}							\\\
 +    ;									\
 +%{nil}
 diff --git a/src/pesign-rpmbuild-helper b/src/pesign-rpmbuild-helper
 new file mode 100755
-index 00000000000..24514aa0b5d
+index 00000000000..fd385d1625d
 --- /dev/null
 +++ b/src/pesign-rpmbuild-helper
 @@ -0,0 +1,153 @@
