@@ -115,7 +115,7 @@ new file mode 100755
 index 00000000000..24514aa0b5d
 --- /dev/null
 +++ b/src/pesign-rpmbuild-helper
-@@ -0,0 +1,152 @@
+@@ -0,0 +1,153 @@
 +#!/bin/sh
 +
 +set -eu
@@ -193,7 +193,8 @@ index 00000000000..24514aa0b5d
 +	fi
 +
 +	local nssdir=/etc/pki/pesign
-+	if [ "${cert}" == "Red Hat Test Certificate" ] ; then
++	if [ "${certname}" == "Red Hat Test Certificate" ] ||
++	   [ "${#cert[@]}" -eq 2 -a "${cert[1]}" == "Red Hat Test Certificate" ] ; then
 +		nssdir=/etc/pki/pesign-rh-test
 +	fi
 +
