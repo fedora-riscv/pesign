@@ -35,8 +35,7 @@ index 5a6da1c6809..e3a0de9c2f4 100644
 +%__pesign_token %{nil}%{?pe_signing_token:--token "%{pe_signing_token}"}
  %__pesign_cert %{!?pe_signing_cert:"Red Hat Test Certificate"}%{?pe_signing_cert:"%{pe_signing_cert}"}
  
--%__pesign_client_token %{!?pe_signing_token:"OpenSC Card (Fedora Signer)"}%{?pe_signing_token:"%{pe_signing_token}"}
-+%__pesign_client_token --token %{!?pe_signing_token:"OpenSC Card (Fedora Signer)"}%{?pe_signing_token:"%{pe_signing_token}"}
+ %__pesign_client_token %{!?pe_signing_token:"OpenSC Card (Fedora Signer)"}%{?pe_signing_token:"%{pe_signing_token}"}
  %__pesign_client_cert %{!?pe_signing_cert:"/CN=Fedora Secure Boot Signer"}%{?pe_signing_cert:"%{pe_signing_cert}"}
  
  %_pesign /usr/bin/pesign

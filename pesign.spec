@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 7%{?dist}
+Release: 8~1%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -161,6 +161,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Tue Jul 07 2020 Peter Jones <pjones@redhat.com> - 113-8
+- More kernel build debugging...
+
 * Tue Jul 07 2020 Peter Jones <pjones@redhat.com> - 113-6
 - Disable the pesign-authorize call in posttrans, until we can figure out a
   better way to deal with that in the fedora kernel builder chroot setup
