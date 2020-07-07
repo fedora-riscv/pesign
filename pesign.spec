@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 8~1%{?dist}
+Release: 8%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -49,6 +49,7 @@ Patch0004: 0004-Rename-var-run-to-run.patch
 Patch0005: 0005-Apparently-opensc-got-updated-and-the-token-name-cha.patch
 Patch0006: 0006-client-try-run-and-var-run-for-the-socket-path.patch
 Patch0007: 0007-Move-most-of-macros.pesign-to-pesign-rpmbuild-helper.patch
+Patch0008: 0008-remove-debug-print.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
