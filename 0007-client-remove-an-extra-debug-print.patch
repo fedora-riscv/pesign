@@ -1,7 +1,7 @@
-From 722d60568a1aba99a39918c187b7331e2c368b29 Mon Sep 17 00:00:00 2001
+From ea81cec14d31cd0b0dbde5b42414bfae9daec9b8 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
-Date: Tue, 7 Jul 2020 15:23:36 -0400
-Subject: [PATCH] remove debug print
+Date: Tue, 14 Jul 2020 16:44:09 -0400
+Subject: [PATCH 07/11] client: remove an extra debug print
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

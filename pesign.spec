@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -48,8 +48,11 @@ Patch0003: 0003-Make-0.112-client-and-server-work-with-the-113-proto.patch
 Patch0004: 0004-Rename-var-run-to-run.patch
 Patch0005: 0005-Apparently-opensc-got-updated-and-the-token-name-cha.patch
 Patch0006: 0006-client-try-run-and-var-run-for-the-socket-path.patch
-Patch0007: 0007-Move-most-of-macros.pesign-to-pesign-rpmbuild-helper.patch
-Patch0008: 0008-remove-debug-print.patch
+Patch0007: 0007-client-remove-an-extra-debug-print.patch
+Patch0008: 0008-Move-most-of-macros.pesign-to-pesign-rpmbuild-helper.patch
+Patch0009: 0009-pesign-authorize-shellcheck.patch
+Patch0010: 0010-pesign-authorize-don-t-setfacl-etc-pki-pesign-foo.patch
+Patch0011: 0011-kernel-building-hack.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -162,6 +165,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Thu Jul 16 2020 Peter Jones <pjones@redhat.com> - 113-9
+- Even more kernel build debugging...
+
 * Tue Jul 07 2020 Peter Jones <pjones@redhat.com> - 113-8
 - More kernel build debugging...
 
