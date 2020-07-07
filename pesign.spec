@@ -28,6 +28,7 @@ BuildRequires: systemd-rpm-macros
 %endif
 Requires:      nspr
 Requires:      nss
+Requires:      nss-tools
 Requires:      nss-util
 Requires:      popt
 Requires:      rpm
@@ -154,6 +155,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Tue Jul 07 2020 Peter Jones <pjones@redhat.com>
+- Make pesign require nss-tools for the posttrans scriptlet
+
 * Mon Jul 06 2020 Peter Jones <pjones@redhat.com> - 113-4
 - Attempt to fix kernel signing failures caused by -3...
 
