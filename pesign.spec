@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 5%{?dist}
+Release: 7%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -119,7 +119,13 @@ exit 0
 
 %posttrans
 certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
-%{_libexecdir}/pesign/pesign-authorize
+
+# this is disabled currently because it breaks the fedora kernel build root
+# generation - because we don't currently have a good way of populating
+# /etc/pesign/{users,groups} before the buildroot is installed, or
+# populating them and re-running pesign-authorize afterwards but before the
+# package build of e.g. kernel
+#%%{_libexecdir}/pesign/pesign-authorize
 %endif
 
 %files
@@ -155,6 +161,10 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Tue Jul 07 2020 Peter Jones <pjones@redhat.com> - 113-6
+- Disable the pesign-authorize call in posttrans, until we can figure out a
+  better way to deal with that in the fedora kernel builder chroot setup
+
 * Tue Jul 07 2020 Peter Jones <pjones@redhat.com> - 113-5
 - Make pesign require nss-tools for the posttrans scriptlet
 - Move most of macros.pesign to /usr/libexec/pesign/pesign-rpmbuild-helper
