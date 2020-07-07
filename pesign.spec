@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 5~7%{?dist}
+Release: 5%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -28,7 +28,7 @@ BuildRequires: systemd-rpm-macros
 %endif
 Requires:      nspr
 Requires:      nss
-Requires:      nss-tools
+Requires:      nss-tools >= 3.53
 Requires:      nss-util
 Requires:      popt
 Requires:      rpm
@@ -155,8 +155,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
-* Tue Jul 07 2020 Peter Jones <pjones@redhat.com>
+* Tue Jul 07 2020 Peter Jones <pjones@redhat.com> - 113-5
 - Make pesign require nss-tools for the posttrans scriptlet
+- Move most of macros.pesign to /usr/libexec/pesign/pesign-rpmbuild-helper
 
 * Mon Jul 06 2020 Peter Jones <pjones@redhat.com> - 113-4
 - Attempt to fix kernel signing failures caused by -3...
