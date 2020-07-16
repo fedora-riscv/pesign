@@ -1,4 +1,4 @@
-From a2c286c5b420b0f398221fb777eab5932c728f02 Mon Sep 17 00:00:00 2001
+From 3107894285164a3d25ca215a76593ebb6d4bc84c Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 14 Jul 2020 15:07:32 -0400
 Subject: [PATCH 09/11] pesign-authorize: shellcheck

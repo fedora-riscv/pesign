@@ -1,4 +1,4 @@
-From 6cab63b9b01533f82067ac15b9cc426937c8e48b Mon Sep 17 00:00:00 2001
+From e05840efa8dc9d0a9ff3104b9fa6e5736e0ec549 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 6 Jul 2020 13:54:35 -0400
 Subject: [PATCH 08/11] Move most of macros.pesign to pesign-rpmbuild-helper
@@ -7,9 +7,9 @@ Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
  Make.defaults                 |   1 +
  src/Makefile                  |   8 +-
- src/macros.pesign             |  74 ++++--------
+ src/macros.pesign             |  76 ++++--------
  src/pesign-rpmbuild-helper.in | 222 ++++++++++++++++++++++++++++++++++
- 4 files changed, 252 insertions(+), 53 deletions(-)
+ 4 files changed, 253 insertions(+), 54 deletions(-)
  create mode 100644 src/pesign-rpmbuild-helper.in
 
 diff --git a/Make.defaults b/Make.defaults
@@ -58,10 +58,10 @@ index 74327ba13f3..a7ca89159c6 100644
  	$(INSTALL) -m 600 pesign-users $(INSTALLROOT)/etc/pesign/users
  	$(INSTALL) -m 600 pesign-groups $(INSTALLROOT)/etc/pesign/groups
 diff --git a/src/macros.pesign b/src/macros.pesign
-index 5a6da1c6809..2e984b4eeb3 100644
+index 5a6da1c6809..cb066b35f4a 100644
 --- a/src/macros.pesign
 +++ b/src/macros.pesign
-@@ -6,7 +6,7 @@
+@@ -6,11 +6,11 @@
  # %pesign -s -i shim.orig -o shim.efi
  # And magically get the right thing.
  
@@ -70,6 +70,11 @@ index 5a6da1c6809..2e984b4eeb3 100644
  %__pesign_cert %{!?pe_signing_cert:"Red Hat Test Certificate"}%{?pe_signing_cert:"%{pe_signing_cert}"}
  
  %__pesign_client_token %{!?pe_signing_token:"OpenSC Card (Fedora Signer)"}%{?pe_signing_token:"%{pe_signing_token}"}
+-%__pesign_client_cert %{!?pe_signing_cert:"/CN=Fedora Secure Boot Signer"}%{?pe_signing_cert:"%{pe_signing_cert}"}
++%__pesign_client_cert %{!?pe_signing_cert:"Fedora Secure Boot Signer"}%{?pe_signing_cert:"%{pe_signing_cert}"}
+ 
+ %_pesign /usr/bin/pesign
+ %_pesign_client /usr/bin/pesign-client
 @@ -24,54 +24,24 @@
  # -a <input ca cert filename>		# rhel only
  # -s 					# perform signing
