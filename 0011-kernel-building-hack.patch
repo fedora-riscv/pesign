@@ -1,18 +1,18 @@
-From 43d1c74b391485178da1d38722da0f28ece8b336 Mon Sep 17 00:00:00 2001
+From e1bcbd2040dbf9633771bf4330f7e046e77a2d20 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 14 Jul 2020 16:42:39 -0400
 Subject: [PATCH 11/11] kernel building hack
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
- src/pesign-rpmbuild-helper.in | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ src/pesign-rpmbuild-helper.in | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/src/pesign-rpmbuild-helper.in b/src/pesign-rpmbuild-helper.in
-index d9236035928..2666c74a9ba 100644
+index c5287c27e0c..1fd0c2fc117 100644
 --- a/src/pesign-rpmbuild-helper.in
 +++ b/src/pesign-rpmbuild-helper.in
-@@ -195,6 +195,23 @@ main() {
+@@ -202,6 +202,23 @@ main() {
  	    "${input[@]}" "${output[@]}"
  	rm -rf "${sattrs}" "${sattrs}.sig" "${nssdir}"
      elif [[ -n "${socket}" ]] ; then

@@ -26,7 +26,6 @@ BuildRequires: python3
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
 BuildRequires: systemd-rpm-macros
 %endif
-Requires:      hostname
 Requires:      nspr
 Requires:      nss
 Requires:      nss-tools >= 3.53

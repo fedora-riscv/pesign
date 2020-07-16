@@ -1,4 +1,4 @@
-From 25981d57c4d56c53128d561bbe29593a6a20b259 Mon Sep 17 00:00:00 2001
+From 6cab63b9b01533f82067ac15b9cc426937c8e48b Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 6 Jul 2020 13:54:35 -0400
 Subject: [PATCH 08/11] Move most of macros.pesign to pesign-rpmbuild-helper
@@ -7,13 +7,13 @@ Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
  Make.defaults                 |   1 +
  src/Makefile                  |   8 +-
- src/macros.pesign             |  73 ++++--------
- src/pesign-rpmbuild-helper.in | 216 ++++++++++++++++++++++++++++++++++
- 4 files changed, 245 insertions(+), 53 deletions(-)
+ src/macros.pesign             |  74 ++++--------
+ src/pesign-rpmbuild-helper.in | 222 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 252 insertions(+), 53 deletions(-)
  create mode 100644 src/pesign-rpmbuild-helper.in
 
 diff --git a/Make.defaults b/Make.defaults
-index 0bacafe0d01..302da50efb5 100644
+index 0bacafe0d01..d4cd626c11e 100644
 --- a/Make.defaults
 +++ b/Make.defaults
 @@ -16,6 +16,7 @@ INSTALLROOT = $(DESTDIR)
@@ -58,7 +58,7 @@ index 74327ba13f3..a7ca89159c6 100644
  	$(INSTALL) -m 600 pesign-users $(INSTALLROOT)/etc/pesign/users
  	$(INSTALL) -m 600 pesign-groups $(INSTALLROOT)/etc/pesign/groups
 diff --git a/src/macros.pesign b/src/macros.pesign
-index 5a6da1c6809..730d3bc449c 100644
+index 5a6da1c6809..2e984b4eeb3 100644
 --- a/src/macros.pesign
 +++ b/src/macros.pesign
 @@ -6,7 +6,7 @@
@@ -70,7 +70,7 @@ index 5a6da1c6809..730d3bc449c 100644
  %__pesign_cert %{!?pe_signing_cert:"Red Hat Test Certificate"}%{?pe_signing_cert:"%{pe_signing_cert}"}
  
  %__pesign_client_token %{!?pe_signing_token:"OpenSC Card (Fedora Signer)"}%{?pe_signing_token:"%{pe_signing_token}"}
-@@ -24,54 +24,23 @@
+@@ -24,54 +24,24 @@
  # -a <input ca cert filename>		# rhel only
  # -s 					# perform signing
  %pesign(i:o:C:e:c:n:a:s)						\
@@ -133,7 +133,8 @@ index 5a6da1c6809..730d3bc449c 100644
 +    %{?__pesign_client_cert:--client-cert %{__pesign_client_cert}}	\\\
 +    %{?__pesign_token:%{__pesign_token}}				\\\
 +    %{?__pesign_cert:--cert %{__pesign_cert}}				\\\
-+    %{?vendor:--vendor %{vendor}}					\\\
++    %{?_buildhost:--hostname "%{_buildhost}"}				\\\
++    %{?vendor:--vendor "%{vendor}"}					\\\
 +    %{?_rhel:--rhelver "%{_rhel}"}					\\\
 +    %{?-n:--rhelcert "%{-n*}"}%{?!-n:--rhelcert "%{__pesign_cert}"}	\\\
 +    %{?-a:--rhelcafile "%{-a*}"}					\\\
@@ -147,10 +148,10 @@ index 5a6da1c6809..730d3bc449c 100644
 +%{nil}
 diff --git a/src/pesign-rpmbuild-helper.in b/src/pesign-rpmbuild-helper.in
 new file mode 100644
-index 00000000000..cb53550121f
+index 00000000000..c5287c27e0c
 --- /dev/null
 +++ b/src/pesign-rpmbuild-helper.in
-@@ -0,0 +1,219 @@
+@@ -0,0 +1,222 @@
 +#!/bin/bash
 +# shellcheck shell=bash
 +
@@ -220,6 +221,7 @@ index 00000000000..cb53550121f
 +    local sign="" || :
 +    local arch="" || :
 +    local vendor="" || :
++    local HOSTNAME="" || :
 +
 +    while [[ $# -ge 2 ]] ; do
 +	case " ${1} " in
@@ -228,6 +230,9 @@ index 00000000000..cb53550121f
 +	    ;;
 +	" --rhelcertfile ")
 +	    rhelcertfile="${2}"
++	    ;;
++	" --hostname ")
++	    HOSTNAME="${2}"
 +	    ;;
 +	" --certout ")
 +	    certout[0]=-C
@@ -314,13 +319,12 @@ index 00000000000..cb53550121f
 +    fi
 +
 +    USERNAME="${USERNAME:-$(id -un)}"
-+    HOSTNAME="${HOSTNAME:-$(hostname)}"
 +
 +    local socket="" || :
 +    if grep -q ID=fedora /etc/os-release \
 +       && [[ "${rhelver}" -lt 7 ]] \
 +       && [[ "${USERNAME}" = "mockbuild" ]] \
-+       && [[ "${vendor}" == "Fedora Project" ]] \
++       && [[ "${vendor}" = "Fedora Project" ]] \
 +       && [[ "${HOSTNAME}" =~ bkernel.* ]]
 +    then
 +	if [[ -S /run/pesign/socket ]] ; then
