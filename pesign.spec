@@ -2,8 +2,8 @@
 
 Name:    pesign
 Summary: Signing utility for UEFI binaries
-Version: 0.112
-Release: 30%{?dist}
+Version: 113
+Release: 10%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -28,6 +28,7 @@ BuildRequires: systemd-rpm-macros
 %endif
 Requires:      nspr
 Requires:      nss
+Requires:      nss-tools >= 3.53
 Requires:      nss-util
 Requires:      popt
 Requires:      rpm
@@ -37,41 +38,22 @@ ExclusiveArch: %{ix86} x86_64 ia64 aarch64 %{arm}
 BuildRequires: rh-signing-tools >= 1.20-2
 %endif
 
-Source0: https://github.com/vathpela/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
+Source0: https://github.com/rhboot/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
 Source2: pesign.py
 
-Patch0001: 0001-cms-kill-generate_integer-it-doesn-t-build-on-i686-a.patch
-Patch0002: 0002-Fix-command-line-parsing.patch
-Patch0003: 0003-gcc-don-t-error-on-stuff-in-includes.patch
-Patch0004: 0004-Fix-certficate-argument-name.patch
-Patch0005: 0005-Fix-description-of-ascii-armor-option-in-manpage.patch
-Patch0006: 0006-Make-ascii-work-since-we-documented-it.patch
-Patch0007: 0007-Switch-pesign-client-to-also-accept-token-cert-macro.patch
-Patch0008: 0008-pesigcheck-Verify-with-the-cert-as-an-object-signer.patch
-Patch0009: 0009-pesigcheck-make-certfile-actually-work.patch
-Patch0010: 0010-signerInfos-make-sure-err-is-always-initialized.patch
-Patch0011: 0011-pesign-make-pesign-h-tell-you-the-file-name.patch
-Patch0012: 0012-Add-coverity-build-scripts.patch
-Patch0013: 0013-Document-implicit-fallthrough.patch
-Patch0014: 0014-Actually-setfacl-each-directory-of-our-key-storage.patch
-Patch0015: 0015-oid-add-SHIM_EKU_MODULE_SIGNING_ONLY-and-fix-our-arr.patch
-Patch0016: 0016-efikeygen-add-modsign.patch
-Patch0017: 0017-check_cert_db-try-even-harder-to-pick-a-reasonable-v.patch
-Patch0018: 0018-show-which-db-we-re-checking.patch
-Patch0019: 0019-more-about-the-time.patch
-Patch0020: 0020-try-to-say-why-something-fails.patch
-Patch0021: 0021-Fix-race-condition-in-SEC_GetPassword.patch
-Patch0022: 0022-sysvinit-Create-the-socket-directory-at-runtime.patch
-Patch0023: 0023-Better-authorization-scripts.-Again.patch
-Patch0024: 0024-Make-the-daemon-also-try-to-give-better-errors-on-EP.patch
-Patch0025: 0025-certdb-fix-PRTime-printfs-for-i686.patch
-Patch0026: 0026-Clean-up-gcc-command-lines-a-little.patch
-Patch0027: 0027-Make-pesign-users-groups-static-in-the-repo.patch
-Patch0028: 0028-rpm-Make-the-client-signer-use-the-fedora-values-unl.patch
-Patch0029: 0029-Make-macros.pesign-error-in-kojibuilder-if-we-don-t-.patch
-Patch0030: 0030-efikeygen-Fix-the-build-with-nss-3.44.patch
-Patch0031: 0031-pesigcheck-Fix-a-wrong-assignment.patch
+Patch0001: 0001-efikeygen-Fix-the-build-with-nss-3.44.patch
+Patch0002: 0002-pesigcheck-Fix-a-wrong-assignment.patch
+Patch0003: 0003-Make-0.112-client-and-server-work-with-the-113-proto.patch
+Patch0004: 0004-Rename-var-run-to-run.patch
+Patch0005: 0005-Apparently-opensc-got-updated-and-the-token-name-cha.patch
+Patch0006: 0006-client-try-run-and-var-run-for-the-socket-path.patch
+Patch0007: 0007-client-remove-an-extra-debug-print.patch
+Patch0008: 0008-Move-most-of-macros.pesign-to-pesign-rpmbuild-helper.patch
+Patch0009: 0009-pesign-authorize-shellcheck.patch
+Patch0010: 0010-pesign-authorize-don-t-setfacl-etc-pki-pesign-foo.patch
+Patch0011: 0011-kernel-building-hack.patch
+Patch0012: 0012-Use-run-not-var-run.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -88,9 +70,6 @@ git commit -a -q -m "%{version} baseline."
 git am %{patches} </dev/null
 git config --unset user.email
 git config --unset user.name
-
-# https://bugzilla.redhat.com/show_bug.cgi?id=1678146
-sed -i 's|/var/run/pesign|/run/pesign|' src/tmpfiles.conf
 
 %build
 make PREFIX=%{_prefix} LIBDIR=%{_libdir}
@@ -129,7 +108,7 @@ install -m 0755 %{SOURCE2} %{buildroot}%{python3_sitelib}/mockbuild/plugins/
 %pre
 getent group pesign >/dev/null || groupadd -r pesign
 getent passwd pesign >/dev/null || \
-	useradd -r -g pesign -d /var/run/pesign -s /sbin/nologin \
+	useradd -r -g pesign -d /run/pesign -s /sbin/nologin \
 		-c "Group for the pesign signing daemon" pesign
 exit 0
 
@@ -137,14 +116,21 @@ exit 0
 %post
 %systemd_post pesign.service
 
-#%%posttrans
-#%%{_libexecdir}/pesign/pesign-authorize
-
 %preun
 %systemd_preun pesign.service
 
 %postun
 %systemd_postun_with_restart pesign.service
+
+%posttrans
+certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
+
+# this is disabled currently because it breaks the fedora kernel build root
+# generation - because we don't currently have a good way of populating
+# /etc/pesign/{users,groups} before the buildroot is installed, or
+# populating them and re-running pesign-authorize afterwards but before the
+# package build of e.g. kernel
+#%%{_libexecdir}/pesign/pesign-authorize
 %endif
 
 %files
@@ -163,6 +149,7 @@ exit 0
 %dir %attr(0775,pesign,pesign) %{_sysconfdir}/pki/pesign-rh-test/
 %config(noreplace) %attr(0664,pesign,pesign) %{_sysconfdir}/pki/pesign-rh-test/*
 %{_libexecdir}/pesign/pesign-authorize
+%{_libexecdir}/pesign/pesign-rpmbuild-helper
 %config(noreplace)/%{_sysconfdir}/pesign/users
 %config(noreplace)/%{_sysconfdir}/pesign/groups
 %{_sysconfdir}/popt.d/pesign.popt
@@ -179,6 +166,9 @@ exit 0
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Thu Jul 16 2020 Peter Jones <pjones@redhat.com> - 113-10
+- Synchronize with master
+
 * Mon Feb 24 2020 Peter Jones <pjones@redhat.com> - 0.112-30
 - Make sure the patch for -29 is actually in the build in f32, and
   synchronize with master.
