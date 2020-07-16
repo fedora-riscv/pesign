@@ -155,9 +155,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{_sysconfdir}/popt.d/pesign.popt
 %{macrosdir}/macros.pesign
 %{_mandir}/man*/*
-%dir %attr(0770, pesign, pesign) %{_localstatedir}/run/%{name}
-%ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/socket
-%ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
+%dir %attr(0770, pesign, pesign) %{_rundir}/%{name}
+%ghost %attr(0660, -, -) %{_rundir}/%{name}/socket
+%ghost %attr(0660, -, -) %{_rundir}/%{name}/pesign.pid
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
 %{_tmpfilesdir}/pesign.conf
 %{_unitdir}/pesign.service
