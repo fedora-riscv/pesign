@@ -12,7 +12,7 @@ diff --git a/src/pesign-rpmbuild-helper.in b/src/pesign-rpmbuild-helper.in
 index d9236035928..2666c74a9ba 100644
 --- a/src/pesign-rpmbuild-helper.in
 +++ b/src/pesign-rpmbuild-helper.in
-@@ -195,6 +195,22 @@ main() {
+@@ -195,6 +195,23 @@ main() {
  	    "${input[@]}" "${output[@]}"
  	rm -rf "${sattrs}" "${sattrs}.sig" "${nssdir}"
      elif [[ -n "${socket}" ]] ; then
@@ -21,6 +21,7 @@ index d9236035928..2666c74a9ba 100644
 +	    if [[ "${input[1]}" =~ (/|^)vmlinuz($|[_.-]) ]] \
 +	       || [[ "${input[1]}" =~ (/|^)bzImage($|[_.-]) ]] ; then
 +		if [[ "${rhelcertfile}" =~ redhatsecureboot501.* ]] \
++		   || [[ "${rhelcertfile}" =~ redhatsecureboot401.* ]] ; then
 +		   || [[ "${rhelcertfile}" =~ centossecureboot201.* ]] ; then
 +		    client_token[1]=kernel-signer
 +		elif [[ "${rhelcertfile}" =~ redhatsecureboot502.* ]] \
