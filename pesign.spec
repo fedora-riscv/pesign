@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 10%{?dist}
+Release: 11%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -165,6 +165,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 113-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Thu Jul 16 2020 Peter Jones <pjones@redhat.com> - 113-10
 - I really cannot figure out why bkernel01 thinks the certificate nickname
   starts with /CN=, but it does, so I'm gonna stop fighting with the sand.
