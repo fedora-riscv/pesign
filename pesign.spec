@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 11%{?dist}
+Release: 12%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -53,6 +53,7 @@ Patch0008: 0008-Move-most-of-macros.pesign-to-pesign-rpmbuild-helper.patch
 Patch0009: 0009-pesign-authorize-shellcheck.patch
 Patch0010: 0010-pesign-authorize-don-t-setfacl-etc-pki-pesign-foo.patch
 Patch0011: 0011-kernel-building-hack.patch
+Patch0012: 0012-one-more-glorious-hack.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -165,6 +166,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Thu Jul 30 2020 Peter Jones <pjones@redhat.com> - 113-12
+- Try to make kernel and fwupd both work at the same time.
+
 * Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 113-11
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 

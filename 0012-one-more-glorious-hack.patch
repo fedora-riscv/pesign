@@ -1,0 +1,25 @@
+From ca1fb1982b237aad86ef0adfc2f1a7bc60606701 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 30 Jul 2020 22:44:11 -0400
+Subject: [PATCH] one more glorious hack
+
+---
+ src/macros.pesign | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/macros.pesign b/src/macros.pesign
+index 730d3bc449c..b4fa04a7192 100644
+--- a/src/macros.pesign
++++ b/src/macros.pesign
+@@ -34,7 +34,7 @@
+     %{?__pesign_cert:--cert %{__pesign_cert}}				\\\
+     %{?vendor:--vendor %{vendor}}					\\\
+     %{?_rhel:--rhelver "%{_rhel}"}					\\\
+-    %{?-n:--rhelcert "%{-n*}"}%{?!-n:--rhelcert "%{__pesign_cert}"}	\\\
++    %{?-n:--rhelcert %{-n*}}%{?!-n:--rhelcert %{__pesign_cert}}		\\\
+     %{?-a:--rhelcafile "%{-a*}"}					\\\
+     %{?-c:--rhelcertfile "%{-c*}"}					\\\
+     %{?-C:--certout "%{-C*}"}						\\\
+-- 
+2.26.2
+
