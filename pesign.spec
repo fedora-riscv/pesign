@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -53,6 +53,7 @@ Patch0008: 0008-Move-most-of-macros.pesign-to-pesign-rpmbuild-helper.patch
 Patch0009: 0009-pesign-authorize-shellcheck.patch
 Patch0010: 0010-pesign-authorize-don-t-setfacl-etc-pki-pesign-foo.patch
 Patch0011: 0011-kernel-building-hack.patch
+Patch0012: 0012-Use-run-not-var-run.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -154,9 +155,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{_sysconfdir}/popt.d/pesign.popt
 %{macrosdir}/macros.pesign
 %{_mandir}/man*/*
-%dir %attr(0770, pesign, pesign) %{_localstatedir}/run/%{name}
-%ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/socket
-%ghost %attr(0660, -, -) %{_localstatedir}/run/%{name}/pesign.pid
+%dir %attr(0770, pesign, pesign) %{_rundir}/%{name}
+%ghost %attr(0660, -, -) %{_rundir}/%{name}/socket
+%ghost %attr(0660, -, -) %{_rundir}/%{name}/pesign.pid
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
 %{_tmpfilesdir}/pesign.conf
 %{_unitdir}/pesign.service
@@ -165,6 +166,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Mon Aug 03 2020 Peter Jones <pjones@redhat.com> - 113-13
+- Add the rundir related stuff that was staged on my f32 checkout.
+
 * Mon Aug 03 2020 Peter Jones <pjones@redhat.com> - 113-12
 - Try to make kernel and fwupd both work at the same time.
 
