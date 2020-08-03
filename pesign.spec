@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 10%{?dist}
+Release: 12%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -166,6 +166,12 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Mon Aug 03 2020 Peter Jones <pjones@redhat.com> - 113-12
+- Try to make kernel and fwupd both work at the same time.
+
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 113-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Thu Jul 16 2020 Peter Jones <pjones@redhat.com> - 113-10
 - Synchronize with master
 
