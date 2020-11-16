@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 13%{?dist}
+Release: 14%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -54,6 +54,7 @@ Patch0009: 0009-pesign-authorize-shellcheck.patch
 Patch0010: 0010-pesign-authorize-don-t-setfacl-etc-pki-pesign-foo.patch
 Patch0011: 0011-kernel-building-hack.patch
 Patch0012: 0012-Use-run-not-var-run.patch
+Patch0013: 0013-Turn-off-free-nonheap-object.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -166,6 +167,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Mon Nov 16 2020 Jeff Law <law@redhat.com> - 113-14
+- Turn off -Wfree-nonheap-object
+
 * Mon Aug 03 2020 Peter Jones <pjones@redhat.com> - 113-13
 - Add the rundir related stuff that was staged on my f32 checkout.
 
