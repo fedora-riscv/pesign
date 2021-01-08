@@ -8,6 +8,7 @@ License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
 Obsoletes: pesign-rh-test-certs <= 0.111-7
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: git
 BuildRequires: nspr
