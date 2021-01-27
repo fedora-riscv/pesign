@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 14%{?dist}
+Release: 15%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -168,6 +168,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Wed Jan 27 2021 Fedora Release Engineering <releng@fedoraproject.org> - 113-15
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
 * Mon Nov 16 2020 Jeff Law <law@redhat.com> - 113-14
 - Turn off -Wfree-nonheap-object
 
