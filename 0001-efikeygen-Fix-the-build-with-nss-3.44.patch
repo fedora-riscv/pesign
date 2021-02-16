@@ -1,7 +1,7 @@
-From de6ca6f33090fb064488ae4a72985e8b21d1143e Mon Sep 17 00:00:00 2001
+From 2eb9f3fa837d5fac5fd4e543df25477cc3dbcb1a Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 14 May 2019 11:28:38 -0400
-Subject: [PATCH 01/12] efikeygen: Fix the build with nss 3.44
+Subject: [PATCH 01/42] efikeygen: Fix the build with nss 3.44
 
 NSS 3.44 adds some certificate types, which changes a type and makes
 some encoding stuff weird.  As a result, we get:

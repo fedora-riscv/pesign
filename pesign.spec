@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 12%{?dist}
+Release: 13%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -47,13 +47,43 @@ Patch0002: 0002-pesigcheck-Fix-a-wrong-assignment.patch
 Patch0003: 0003-Make-0.112-client-and-server-work-with-the-113-proto.patch
 Patch0004: 0004-Rename-var-run-to-run.patch
 Patch0005: 0005-Apparently-opensc-got-updated-and-the-token-name-cha.patch
-Patch0006: 0006-client-try-run-and-var-run-for-the-socket-path.patch
-Patch0007: 0007-client-remove-an-extra-debug-print.patch
-Patch0008: 0008-Move-most-of-macros.pesign-to-pesign-rpmbuild-helper.patch
-Patch0009: 0009-pesign-authorize-shellcheck.patch
-Patch0010: 0010-pesign-authorize-don-t-setfacl-etc-pki-pesign-foo.patch
-Patch0011: 0011-kernel-building-hack.patch
-Patch0012: 0012-Use-run-not-var-run.patch
+Patch0006: 0006-Add-some-more-utility-functions-and-fix-a-typo-in-AL.patch
+Patch0007: 0007-Add-hex-utilities.patch
+Patch0008: 0008-Add-some-text-parsing-helpers.patch
+Patch0009: 0009-libdpe-fix-some-minor-analyzer-discoveries.patch
+Patch0010: 0010-libdpe-check-for-NULL-pe-at-more-places.patch
+Patch0011: 0011-wincert-try-to-convince-the-gcc-analyzer-of-the-pain.patch
+Patch0012: 0012-Fix-a-missing-malloc-return-value-check.patch
+Patch0013: 0013-Fix-some-missed-OOM-error-path-fanalyzer-found.patch
+Patch0014: 0014-Don-t-allow-or-require-module-or-kernel-with-ca.patch
+Patch0015: 0015-Add-super-convenient-errno-guard-implementation.patch
+Patch0016: 0016-Make-save_port_err-saner-to-read.patch
+Patch0017: 0017-Make-for_each_cert-cl-iter-for-certificate-list-trav.patch
+Patch0018: 0018-file_pe-make-most-of-our-input-and-output-checkers-b.patch
+Patch0019: 0019-file_pe-user-err-errx-etc.patch
+Patch0020: 0020-pesign_kmod-user-err-errx-etc.patch
+Patch0021: 0021-share-input-output-checker-macros-between-pesign_kmo.patch
+Patch0022: 0022-Make-verbose-work-in-efisiglist.patch
+Patch0023: 0023-Make-verbose-and-debug-more-similar-across-tools.patch
+Patch0024: 0024-Work-around-some-NSS-SECOID_AddEntry-bugs.patch
+Patch0025: 0025-Rework-the-wildly-undocumented-NSS-password-file-goo.patch
+Patch0026: 0026-Minor-whitespace-housekeeping.patch
+Patch0027: 0027-libdpe-make-the-initial-read-buffer-always-big-enoug.patch
+Patch0028: 0028-Fix-some-memory-leaks.patch
+Patch0029: 0029-Improve-debug-output.patch
+Patch0030: 0030-support-uri-token-names.patch
+Patch0031: 0031-cms_common-add-some-more-ways-to-find-a-cert.patch
+Patch0032: 0032-client-try-run-and-var-run-for-the-socket-path.patch
+Patch0033: 0033-client-remove-an-extra-debug-print.patch
+Patch0034: 0034-Move-most-of-macros.pesign-to-pesign-rpmbuild-helper.patch
+Patch0035: 0035-pesign-authorize-shellcheck.patch
+Patch0036: 0036-pesign-authorize-don-t-setfacl-etc-pki-pesign-foo.patch
+Patch0037: 0037-kernel-building-hack.patch
+Patch0038: 0038-Use-run-not-var-run.patch
+Patch0039: 0039-efikeygen-return-error-on-AKID-encoding-failures.patch
+Patch0040: 0040-Rename-some-cms-error-functions.patch
+Patch0041: 0041-Make-cms_pe_common-bounds-check-errors-more-verbose.patch
+Patch0042: 0042-Fix-our-error-message-line-numbers-hopefully.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -158,6 +188,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Thu Feb 18 2021 Peter Jones <pjones@redhat.com> - 113-13
+- Backport a bunch of stuff the upstream development tree.
+
 * Mon Aug 03 2020 Peter Jones <pjones@redhat.com> - 113-12
 - Try to make kernel and fwupd both work at the same time.
 

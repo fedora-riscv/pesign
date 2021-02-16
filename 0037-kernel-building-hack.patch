@@ -1,7 +1,7 @@
-From 4cf648026769743f634dfe4d2a967ffe684f9f65 Mon Sep 17 00:00:00 2001
+From 59e539c55f22e838b7781efb3357da0d8f4de7db Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 14 Jul 2020 16:42:39 -0400
-Subject: [PATCH 11/12] kernel building hack
+Subject: [PATCH 37/42] kernel building hack
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

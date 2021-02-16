@@ -1,0 +1,567 @@
+From eaf8471d14e54aa17802ce4d131db2d2440a69f9 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 16 Feb 2021 12:00:50 -0500
+Subject: [PATCH 40/42] Rename some cms error functions
+
+Some of these were really not clear, and efikeygen was misusing them.
+This adds a couple more and disambiguates some of their names a bit.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/cms_common.c    | 141 +++++++++++++++++++-------------------------
+ src/cms_pe_common.c |   8 +--
+ src/cms_common.h    |  23 ++++++--
+ 3 files changed, 80 insertions(+), 92 deletions(-)
+
+diff --git a/src/cms_common.c b/src/cms_common.c
+index e274a8a50da..4bbd5f5cfa9 100644
+--- a/src/cms_common.c
++++ b/src/cms_common.c
+@@ -152,7 +152,7 @@ cms_context_init(cms_context *cms)
+ 
+ 	cms->arena = PORT_NewArena(DER_DEFAULT_CHUNKSIZE);
+ 	if (!cms->arena)
+-		cmsreterr(-1, cms, "could not create cryptographic arena");
++		cnreterr(-1, cms, "could not create cryptographic arena");
+ 
+ 	cms->selected_digest = -1;
+ 
+@@ -498,7 +498,7 @@ unlock_nss_token(cms_context *cms)
+ 	PK11SlotList *slots = NULL;
+ 	slots = PK11_GetAllTokens(CKM_RSA_PKCS, PR_FALSE, PR_TRUE, cms);
+ 	if (!slots)
+-		cmsreterr(-1, cms, "could not get pk11 token list");
++		cnreterr(-1, cms, "could not get pk11 token list");
+ 
+ 
+ 	PK11SlotListElement *psle = NULL;
+@@ -507,7 +507,7 @@ unlock_nss_token(cms_context *cms)
+ 		save_port_err() {
+ 			PK11_FreeSlotList(slots);
+ 		}
+-		cmsreterr(-1, cms, "could not get pk11 safe");
++		cnreterr(-1, cms, "could not get pk11 safe");
+ 	}
+ 
+ 	while (psle) {
+@@ -563,7 +563,7 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 	PK11SlotList *slots = NULL;
+ 	slots = PK11_GetAllTokens(CKM_RSA_PKCS, PR_FALSE, PR_TRUE, cms);
+ 	if (!slots)
+-		cmsreterr(-1, cms, "could not get pk11 token list");
++		cnreterr(-1, cms, "could not get pk11 token list");
+ 
+ 	PK11SlotListElement *psle = NULL;
+ 	psle = PK11_GetFirstSafe(slots);
+@@ -571,7 +571,7 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 		save_port_err() {
+ 			PK11_FreeSlotList(slots);
+ 		}
+-		cmsreterr(-1, cms, "could not get pk11 safe");
++		cnreterr(-1, cms, "could not get pk11 safe");
+ 	}
+ 
+ 	while (psle) {
+@@ -616,7 +616,7 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 			PK11_DestroySlotListElement(slots, &psle);
+ 			PK11_FreeSlotList(slots);
+ 		}
+-		cmsreterr(-1, cms, "could not get certificate list");
++		cnreterr(-1, cms, "could not get certificate list");
+ 	}
+ 
+ 	SECItem nickname = {
+@@ -673,7 +673,7 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 		cms->psle = NULL;
+ 	}
+ 	if (status != SECSuccess || cms->cert == NULL)
+-		cmsreterr(-1, cms, "could not find certificate");
++		cnreterr(-1, cms, "could not find certificate");
+ 
+ 	return 0;
+ }
+@@ -694,7 +694,7 @@ find_slot_for_token(cms_context *cms, PK11SlotInfo **slot)
+ 	PK11SlotList *slots = NULL;
+ 	slots = PK11_GetAllTokens(CKM_RSA_PKCS, PR_FALSE, PR_TRUE, cms);
+ 	if (!slots)
+-		cmsreterr(-1, cms, "could not get pk11 token list");
++		cnreterr(-1, cms, "could not get pk11 token list");
+ 
+ 	PK11SlotListElement *psle = NULL;
+ 	psle = PK11_GetFirstSafe(slots);
+@@ -702,7 +702,7 @@ find_slot_for_token(cms_context *cms, PK11SlotInfo **slot)
+ 		save_port_err() {
+ 			PK11_FreeSlotList(slots);
+ 		}
+-		cmsreterr(-1, cms, "could not get pk11 safe");
++		cnreterr(-1, cms, "could not get pk11 safe");
+ 	}
+ 
+ 	while (psle) {
+@@ -760,7 +760,7 @@ find_certificate_by_callback(cms_context *cms,
+ 	PK11SlotList *slots = NULL;
+ 	slots = PK11_GetAllTokens(CKM_RSA_PKCS, PR_FALSE, PR_TRUE, cms);
+ 	if (!slots)
+-		cmsreterr(-1, cms, "could not get pk11 token list");
++		cnreterr(-1, cms, "could not get pk11 token list");
+ 
+ 	PK11SlotListElement *psle = NULL;
+ 	psle = PK11_GetFirstSafe(slots);
+@@ -768,7 +768,7 @@ find_certificate_by_callback(cms_context *cms,
+ 		save_port_err() {
+ 			PK11_FreeSlotList(slots);
+ 		}
+-		cmsreterr(-1, cms, "could not get pk11 safe");
++		cnreterr(-1, cms, "could not get pk11 safe");
+ 	}
+ 
+ 	while (psle) {
+@@ -810,7 +810,7 @@ find_certificate_by_callback(cms_context *cms,
+ 			PK11_DestroySlotListElement(slots, &psle);
+ 			PK11_FreeSlotList(slots);
+ 		}
+-		cmsreterr(-1, cms, "could not get certificate list");
++		cnreterr(-1, cms, "could not get certificate list");
+ 	}
+ 
+ 	CERTCertListNode *node = NULL;
+@@ -837,7 +837,7 @@ find_certificate_by_callback(cms_context *cms,
+ 	}
+ 
+ 	if (!node)
+-		cmsreterr(-1, cms, "Could not find certificate");
++		cnreterr(-1, cms, "Could not find certificate");
+ 
+ 	*cert = CERT_DupCertificate(node->cert);
+ 
+@@ -865,7 +865,7 @@ int
+ find_named_certificate(cms_context *cms, char *name, CERTCertificate **cert)
+ {
+ 	if (!name)
+-		cmsreterr(-1, cms, "no subject name specified");
++		cnreterr(-1, cms, "no subject name specified");
+ 
+ 	return find_certificate_by_callback(cms, match_subject, name, cert);
+ }
+@@ -908,7 +908,7 @@ find_certificate_by_issuer_and_sn(cms_context *cms,
+ 				  CERTCertificate **cert)
+ {
+ 	if (!ias)
+-		cmsreterr(-1, cms, "invalid issuer and serial number");
++		cnreterr(-1, cms, "invalid issuer and serial number");
+ 
+ 	return find_certificate_by_callback(cms, match_issuer_and_serial, &ias, cert);
+ }
+@@ -926,7 +926,7 @@ generate_string(cms_context *cms, SECItem *der, char *str)
+ 	ret = SEC_ASN1EncodeItem(cms->arena, der, &input,
+ 						SEC_PrintableStringTemplate);
+ 	if (ret == NULL)
+-		cmsreterr(-1, cms, "could not encode string");
++		cnreterr(-1, cms, "could not encode string");
+ 	return 0;
+ }
+ 
+@@ -946,11 +946,11 @@ generate_time(cms_context *cms, SECItem *encoded, time_t when)
+ 		tm->tm_year % 100, tm->tm_mon + 1, tm->tm_mday,
+ 		tm->tm_hour, tm->tm_min, tm->tm_sec);
+ 	if (whenitem.len == 32)
+-		cmsreterr(-1, cms, "could not encode timestamp");
++		cnreterr(-1, cms, "could not encode timestamp");
+ 
+ 	if (SEC_ASN1EncodeItem(cms->arena, encoded, &whenitem,
+ 			SEC_UTCTimeTemplate) == NULL)
+-		cmsreterr(-1, cms, "could not encode timestamp");
++		cnreterr(-1, cms, "could not encode timestamp");
+ 	return 0;
+ }
+ 
+@@ -975,7 +975,7 @@ generate_empty_sequence(cms_context *cms, SECItem *encoded)
+ 	ret = SEC_ASN1EncodeItem(cms->arena, encoded, &empty,
+ 							EmptySequenceTemplate);
+ 	if (ret == NULL)
+-		cmsreterr(-1, cms, "could not encode empty sequence");
++		cnreterr(-1, cms, "could not encode empty sequence");
+ 	return 0;
+ }
+ 
+@@ -1000,7 +1000,7 @@ make_context_specific(cms_context *cms, int ctxt, SECItem *encoded,
+ 	rv = SEC_ASN1EncodeItem(cms->arena, encoded, original,
+ 				ContextSpecificSequence);
+ 	if (rv == NULL)
+-		cmsreterr(-1, cms, "could not encode context specific data");
++		cnreterr(-1, cms, "could not encode context specific data");
+ 	return 0;
+ }
+ 
+@@ -1022,12 +1022,12 @@ make_eku_oid(cms_context *cms, SECItem *encoded, SECOidTag oid_tag)
+ 
+ 	oid_data = SECOID_FindOIDByTag(oid_tag);
+ 	if (!oid_data)
+-		cmsreterr(-1, cms, "could not encode eku oid data");
++		cnreterr(-1, cms, "could not encode eku oid data");
+ 
+ 	rv = SEC_ASN1EncodeItem(cms->arena, encoded, &oid_data->oid,
+ 				EKUOidSequence);
+ 	if (rv == NULL)
+-		cmsreterr(-1, cms, "could not encode eku oid data");
++		cnreterr(-1, cms, "could not encode eku oid data");
+ 
+ 	encoded->type = siBuffer;
+ 	return 0;
+@@ -1042,7 +1042,7 @@ generate_octet_string(cms_context *cms, SECItem *encoded, SECItem *original)
+ 	}
+ 	if (SEC_ASN1EncodeItem(cms->arena, encoded, original,
+ 			SEC_OctetStringTemplate) == NULL)
+-		cmsreterr(-1, cms, "could not encode octet string");
++		cnreterr(-1, cms, "could not encode octet string");
+ 
+ 	return 0;
+ }
+@@ -1054,13 +1054,13 @@ generate_object_id(cms_context *cms, SECItem *der, SECOidTag tag)
+ 
+ 	oid = SECOID_FindOIDByTag(tag);
+ 	if (!oid)
+-		cmsreterr(-1, cms, "could not find OID");
++		cnreterr(-1, cms, "could not find OID");
+ 
+ 	void *ret;
+ 	ret = SEC_ASN1EncodeItem(cms->arena, der, &oid->oid,
+ 						SEC_ObjectIDTemplate);
+ 	if (ret == NULL)
+-		cmsreterr(-1, cms, "could not encode ODI");
++		cnreterr(-1, cms, "could not encode ODI");
+ 	return 0;
+ }
+ 
+@@ -1109,7 +1109,7 @@ encode_algorithm_id(cms_context *cms, SECItem *der, SECOidTag tag)
+ 	ret = SEC_ASN1EncodeItem(cms->arena, der, &id,
+ 						SECOID_AlgorithmIDTemplate);
+ 	if (ret == NULL)
+-		cmsreterr(-1, cms, "could not encode Algorithm ID");
++		cnreterr(-1, cms, "could not encode Algorithm ID");
+ 
+ 	return 0;
+ }
+@@ -1144,14 +1144,14 @@ generate_spc_string(cms_context *cms, SECItem *ssp, char *str, int len)
+ 	SECITEM_AllocItem(cms->arena, &ss.unicode, len);
+ 	if (len != 0) {
+ 		if (!ss.unicode.data)
+-			cmsreterr(-1, cms, "could not allocate memory");
++			cnreterr(-1, cms, "could not allocate memory");
+ 
+ 		memcpy(ss.unicode.data, str, len);
+ 	}
+ 	ss.unicode.type = siBMPString;
+ 
+ 	if (SEC_ASN1EncodeItem(cms->arena, ssp, &ss, SpcStringTemplate) == NULL)
+-		cmsreterr(-1, cms, "could not encode SpcString");
++		cnreterr(-1, cms, "could not encode SpcString");
+ 
+ 	return 0;
+ }
+@@ -1224,19 +1224,14 @@ generate_digest_begin(cms_context *cms)
+ 	} else {
+ 		digests = PORT_ZAlloc(n_digest_params * sizeof (*digests));
+ 		if (digests == NULL)
+-			cmsreterr(-1, cms, "could not allocate digest context");
++			cnreterr(-1, cms, "could not allocate digest context");
+ 	}
+ 
+ 	for (int i = 0; i < n_digest_params; i++) {
+ 		digests[i].pk11ctx = PK11_CreateDigestContext(
+ 						digest_params[i].digest_tag);
+-		if (!digests[i].pk11ctx) {
+-			cms->log(cms, LOG_ERR, "%s:%s:%d could not create "
+-				"digest context: %s",
+-				__FILE__, __func__, __LINE__,
+-				PORT_ErrorToString(PORT_GetError()));
+-			goto err;
+-		}
++		if (!digests[i].pk11ctx)
++			cngotoerr(err, cms, "could not create digest context");
+ 
+ 		PK11_DigestBegin(digests[i].pk11ctx);
+ 	}
+@@ -1268,22 +1263,14 @@ generate_digest_finish(cms_context *cms)
+ 
+ 	for (int i = 0; i < n_digest_params; i++) {
+ 		SECItem *digest = PORT_ArenaZAlloc(cms->arena,sizeof (SECItem));
+-		if (digest == NULL) {
+-			cms->log(cms, LOG_ERR, "%s:%s:%d could not allocate "
+-				"memory: %s", __FILE__, __func__, __LINE__,
+-				PORT_ErrorToString(PORT_GetError()));
+-			goto err;
+-		}
++		if (digest == NULL)
++			cngotoerr(err, cms, "could not allocate memory");
+ 
+ 		digest->type = siBuffer;
+ 		digest->len = digest_params[i].size;
+ 		digest->data = PORT_ArenaZAlloc(cms->arena, digest_params[i].size);
+-		if (digest->data == NULL) {
+-			cms->log(cms, LOG_ERR, "%s:%s:%d could not allocate "
+-				"memory: %s", __FILE__, __func__, __LINE__,
+-				PORT_ErrorToString(PORT_GetError()));
+-			goto err;
+-		}
++		if (digest->data == NULL)
++			cngotoerr(err, cms, "could not allocate memory");
+ 
+ 		PK11_DigestFinal(cms->digests[i].pk11ctx,
+ 			digest->data, &digest->len, digest_params[i].size);
+@@ -1319,29 +1306,23 @@ generate_signature(cms_context *cms)
+ {
+ 	int rc = 0;
+ 
+-	if (cms->digests[cms->selected_digest].pe_digest == NULL) {
+-		cms->log(cms, LOG_ERR, "%s:%s:%d PE digest has not been "
+-			"allocated", __FILE__, __func__, __LINE__);
+-		return -1;
+-	}
++	if (cms->digests[cms->selected_digest].pe_digest == NULL)
++		cnreterr(-1, cms, "PE digest has not been allocated");
+ 
+ 	if (content_is_empty(cms->digests[cms->selected_digest].pe_digest->data,
+-			cms->digests[cms->selected_digest].pe_digest->len)) {
+-		cms->log(cms, LOG_ERR, "%s:%s:%d PE binary has not been "
+-			"digested", __FILE__, __func__, __LINE__);
+-		return -1;
+-	}
++			cms->digests[cms->selected_digest].pe_digest->len))
++		cnreterr(-1, cms, "PE binary has not been digested");
+ 
+ 	SECItem sd_der;
+ 	memset(&sd_der, '\0', sizeof(sd_der));
+ 	rc = generate_spc_signed_data(cms, &sd_der);
+ 	if (rc < 0)
+-		cmsreterr(-1, cms, "could not create signed data");
++		cnreterr(-1, cms, "could not create signed data");
+ 
+ 	memcpy(&cms->newsig, &sd_der, sizeof (cms->newsig));
+ 	cms->newsig.data = malloc(sd_der.len);
+ 	if (!cms->newsig.data)
+-		cmsreterr(-1, cms, "could not allocate signed data");
++		cnreterr(-1, cms, "could not allocate signed data");
+ 	memcpy(cms->newsig.data, sd_der.data, sd_der.len);
+ 	return 0;
+ }
+@@ -1387,7 +1368,7 @@ generate_validity(cms_context *cms, SECItem *der, time_t start, time_t end)
+ 	void *ret;
+ 	ret = SEC_ASN1EncodeItem(cms->arena, der, &validity, ValidityTemplate);
+ 	if (ret == NULL)
+-		cmsreterr(-1, cms, "could not encode validity");
++		cnreterr(-1, cms, "could not encode validity");
+ 	return 0;
+ }
+ 
+@@ -1405,7 +1386,7 @@ wrap_in_set(cms_context *cms, SECItem *der, SECItem **items)
+ 
+ 	ret = SEC_ASN1EncodeItem(cms->arena, der, &items, &SetTemplate);
+ 	if (ret == NULL)
+-		cmsreterr(-1, cms, "could not encode set");
++		cnreterr(-1, cms, "could not encode set");
+ 	return 0;
+ }
+ 
+@@ -1447,7 +1428,7 @@ wrap_in_seq(cms_context *cms, SECItem *der, SECItem *items, int num_items)
+ 		save_port_err() {
+ 			PORT_ArenaRelease(cms->arena, mark);
+ 		}
+-		cmsreterr(-1, cms, "could not encode set");
++		cnreterr(-1, cms, "could not encode set");
+ 	}
+ 	PORT_ArenaUnmark(cms->arena, mark);
+ 	return rc;
+@@ -1494,7 +1475,7 @@ generate_common_name(cms_context *cms, SECItem *der, char *cn_str)
+ 	void *ret;
+ 	ret = SEC_ASN1EncodeItem(cms->arena, &cn_item, &cn, CommonNameTemplate);
+ 	if (ret == NULL)
+-		cmsreterr(-1, cms, "could not encode common name");
++		cnreterr(-1, cms, "could not encode common name");
+ 
+ 	SECItem cn_set;
+ 	SECItem *items[2] = {&cn_item, NULL};
+@@ -1542,7 +1523,7 @@ generate_ava(cms_context *cms, SECItem *der, CERTAVA *certava)
+ 
+ 	void *arena = PORT_NewArena(DER_DEFAULT_CHUNKSIZE);
+ 	if (arena == NULL)
+-		cmsreterr(-1, cms, "could not create arena");
++		cnreterr(-1, cms, "could not create arena");
+ 
+ 	void *real_arena = cms->arena;
+ 	cms->arena = arena;
+@@ -1553,7 +1534,7 @@ generate_ava(cms_context *cms, SECItem *der, CERTAVA *certava)
+ 			PORT_FreeArena(arena, PR_TRUE);
+ 		}
+ 		cms->arena = real_arena;
+-		cmsreterr(-1, cms, "could not find OID");
++		cnreterr(-1, cms, "could not find OID");
+ 	}
+ 
+ 	int rc = generate_object_id(cms, &ava.type, oid->offset);
+@@ -1573,7 +1554,7 @@ generate_ava(cms_context *cms, SECItem *der, CERTAVA *certava)
+ 			PORT_FreeArena(arena, PR_TRUE);
+ 		}
+ 		cms->arena = real_arena;
+-		cmsreterr(-1, cms, "could not encode AVA");
++		cnreterr(-1, cms, "could not encode AVA");
+ 	}
+ 
+ 	der->type = tmp.type;
+@@ -1584,7 +1565,7 @@ generate_ava(cms_context *cms, SECItem *der, CERTAVA *certava)
+ 			PORT_FreeArena(arena, PR_TRUE);
+ 		}
+ 		cms->arena = real_arena;
+-		cmsreterr(-1, cms, "could not allocate AVA");
++		cnreterr(-1, cms, "could not allocate AVA");
+ 	}
+ 	memcpy(der->data, tmp.data, tmp.len);
+ 	PORT_FreeArena(arena, PR_TRUE);
+@@ -1612,7 +1593,7 @@ generate_name(cms_context *cms, SECItem *der, CERTName *certname)
+ 
+ 	if (num_items == 0) {
+ 		PORT_ArenaRelease(cms->arena, marka);
+-		cmsreterr(-1, cms, "No name items to encode");
++		cnreterr(-1, cms, "No name items to encode");
+ 	}
+ 
+ 	SECItem items[num_items];
+@@ -1698,7 +1679,7 @@ generate_auth_info(cms_context *cms, SECItem *der, char *url)
+ 
+ 	SECOidData *oid = SECOID_FindOIDByTag(SEC_OID_PKIX_CA_ISSUERS);
+ 	if (!oid)
+-		cmsreterr(-1, cms, "could not get CA issuers OID");
++		cnreterr(-1, cms, "could not get CA issuers OID");
+ 
+ 	memcpy(&ai.oid, &oid->oid, sizeof (ai.oid));
+ 
+@@ -1715,7 +1696,7 @@ generate_auth_info(cms_context *cms, SECItem *der, char *url)
+ 	SECItem unwrapped;
+ 	ret = SEC_ASN1EncodeItem(cms->arena, &unwrapped, &ai, AuthInfoTemplate);
+ 	if (ret == NULL)
+-		cmsreterr(-1, cms, "could not encode CA Issuers");
++		cnreterr(-1, cms, "could not encode CA Issuers");
+ 
+ 	rc = wrap_in_seq(cms, der, &unwrapped, 1);
+ 	if (rc < 0)
+@@ -1725,19 +1706,17 @@ generate_auth_info(cms_context *cms, SECItem *der, char *url)
+ 	/* I've no idea how to get SEC_ASN1EncodeItem to spit out the thing
+ 	 * we actually want here.  So once again, just force the data to
+ 	 * look correct :( */
+-	if (unwrapped.len < 12) {
+-		cms->log(cms, LOG_ERR, "%s:%s:%d generated CA Issuers Info "
+-			"cannot possibly be valid",
+-			__FILE__, __func__, __LINE__);
+-		return -1;
+-	}
++	if (unwrapped.len < 12)
++		cnreterr(-1, cms,
++			 "generated CA Issuers Info cannot possibly be valid");
++
+ 	unwrapped.data[12] = 0x86;
+ 	unwrapped.type = siBuffer;
+ 
+ 	AuthInfo wrapper;
+ 	oid = SECOID_FindOIDByTag(SEC_OID_X509_AUTH_INFO_ACCESS);
+ 	if (!oid)
+-		cmsreterr(-1, cms, "could not find Auth Info Access OID");
++		cnreterr(-1, cms, "could not find Auth Info Access OID");
+ 
+ 	memcpy(&wrapper.oid, &oid->oid, sizeof (ai.oid));
+ 
+@@ -1746,7 +1725,7 @@ generate_auth_info(cms_context *cms, SECItem *der, char *url)
+ 	ret = SEC_ASN1EncodeItem(cms->arena, der, &wrapper,
+ 					AuthInfoWrapperTemplate);
+ 	if (ret == NULL)
+-		cmsreterr(-1, cms, "could not encode CA Issuers OID");
++		cnreterr(-1, cms, "could not encode CA Issuers OID");
+ 
+ 	return 0;
+ }
+@@ -1763,14 +1742,14 @@ generate_keys(cms_context *cms, PK11SlotInfo *slot,
+ 	SECStatus rv;
+ 	rv = PK11_Authenticate(slot, PR_TRUE, cms);
+ 	if (rv != SECSuccess)
+-		cmsreterr(-1, cms, "could not authenticate with pk11 service");
++		cnreterr(-1, cms, "could not authenticate with pk11 service");
+ 
+ 	void *params = &rsaparams;
+ 	*privkey = PK11_GenerateKeyPair(slot, CKM_RSA_PKCS_KEY_PAIR_GEN,
+ 					params, pubkey, PR_TRUE, PR_TRUE,
+ 					cms);
+ 	if (!*privkey)
+-		cmsreterr(-1, cms, "could not generate RSA keypair");
++		cnreterr(-1, cms, "could not generate RSA keypair");
+ 	return 0;
+ }
+ 
+diff --git a/src/cms_pe_common.c b/src/cms_pe_common.c
+index e5a33eb6fe1..f6c5cffc6a9 100644
+--- a/src/cms_pe_common.c
++++ b/src/cms_pe_common.c
+@@ -165,7 +165,7 @@ generate_digest(cms_context *cms, Pe *pe, int padded)
+ 	 * 2. Initialize SHA hash context. */
+ 	map = pe_rawfile(pe, &map_size);
+ 	if (!map)
+-		pereterr(-1, "could not get raw output file address");
++		cmsreterr(-1, cms, "could not get raw output file address");
+ 
+ 	/* 3. Calculate the distance from the base of the image header to the
+ 	 * image checksum.
+@@ -174,10 +174,8 @@ generate_digest(cms_context *cms, Pe *pe, int padded)
+ 	hash_base = map;
+ 
+ 	opthdr = pe_getopthdr(pe);
+-	if (opthdr == NULL) {
+-		cms->log(cms, LOG_ERR, "%s:%s:%d PE header is invalid", __FILE__, __func__, __LINE__);
+-		goto error;
+-	}
++	if (opthdr == NULL)
++		cmsgotoerr(error, cms, "PE header is invalid");
+ 
+ 	switch (pe_kind(pe)) {
+ 	case PE_K_PE_EXE: {
+diff --git a/src/cms_common.h b/src/cms_common.h
+index 04974035f0c..1bffdcd034b 100644
+--- a/src/cms_common.h
++++ b/src/cms_common.h
+@@ -41,19 +41,30 @@
+ #define for_each_cert(cl, node) \
+ 	for (CERTCertListNode *node = CERT_LIST_HEAD(cl); !CERT_LIST_END(node, cl); node = CERT_LIST_NEXT(node))
+ 
+-#define cmserr(rv, cms, fmt, args...) ({				\
+-		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt ": %s",	\
+-			__FILE__, __func__, __LINE__, ## args,		\
+-			PORT_ErrorToString(PORT_GetError()));		\
+-		exit(rv);						\
++#define cmsreterr(rv, cms, fmt, args...) ({			\
++		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt,	\
++			__FILE__, __func__, __LINE__, ## args);	\
++		return rv;					\
+ 	})
+-#define cmsreterr(rv, cms, fmt, args...) ({				\
++#define cmsgotoerr(errlabel, cms, fmt, args...) ({		\
++		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt,	\
++			__FILE__, __func__, __LINE__, ## args);	\
++		goto errlabel;					\
++	})
++#define cnreterr(rv, cms, fmt, args...) ({				\
+ 		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt ":%s:%s",	\
+ 			__FILE__, __func__, __LINE__, ## args,		\
+ 			PORT_ErrorToName(PORT_GetError()),		\
+ 			PORT_ErrorToString(PORT_GetError()));		\
+ 		return rv;						\
+ 	})
++#define cngotoerr(errlabel, cms, fmt, args...) ({			\
++		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt ":%s:%s",	\
++			__FILE__, __func__, __LINE__, ## args,		\
++			PORT_ErrorToName(PORT_GetError()),		\
++			PORT_ErrorToString(PORT_GetError()));		\
++		goto errlabel;						\
++	})
+ 
+ struct digest {
+ 	PK11Context *pk11ctx;
+-- 
+2.29.2
+

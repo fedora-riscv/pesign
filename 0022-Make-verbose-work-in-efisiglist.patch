@@ -1,0 +1,66 @@
+From 1ec1a523216aa9b63120fa36c3732de3c4cbf546 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 16 Feb 2021 13:24:54 -0500
+Subject: [PATCH 22/42] Make verbose work in efisiglist
+
+Signed-off-by: Peter Jones <rpm-build>
+---
+ src/efisiglist.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+
+diff --git a/src/efisiglist.c b/src/efisiglist.c
+index b91e15bfb7b..48ff89c5661 100644
+--- a/src/efisiglist.c
++++ b/src/efisiglist.c
+@@ -114,6 +114,15 @@ out_of_range:
+ 	return ret;
+ }
+ 
++static long *verbose;
++
++long verbosity(void)
++{
++	if (!verbose)
++		return 0;
++	return *verbose;
++}
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -128,9 +137,12 @@ main(int argc, char *argv[])
+ 	int certfd = -1;
+ 	void *cert_data = NULL;
+ 	size_t cert_size = 0;
++	long esl_verbose = 0;
+ 
+ 	int add = 1;
+ 
++	verbose = &esl_verbose;
++
+ 	struct poptOption options[] = {
+ 		{.argInfo = POPT_ARG_INTL_DOMAIN,
+ 		 .arg = "pesign" },
+@@ -175,6 +187,19 @@ main(int argc, char *argv[])
+ 		 .arg = &certfile,
+ 		 .descrip = "certificate to add",
+ 		 .argDescrip = "<certfile>" },
++		{.longName = "verbose",
++		 .shortName = 'v',
++		 .argInfo = POPT_ARG_VAL|POPT_ARG_LONG|POPT_ARGFLAG_OPTIONAL,
++		 .arg = &esl_verbose,
++		 .val = 1,
++		 .descrip = "be more verbose" },
++		{.longName = "debug",
++		 .shortName = '\0',
++		 .argInfo = POPT_ARG_VAL|POPT_ARG_LONG|POPT_ARGFLAG_OPTIONAL,
++		 .arg = &esl_verbose,
++		 .val = 2,
++		 .descrip = "be very verbose" },
++
+ 		POPT_AUTOALIAS
+ 		POPT_AUTOHELP
+ 		POPT_TABLEEND
+-- 
+2.29.2
+

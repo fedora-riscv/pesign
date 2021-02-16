@@ -1,0 +1,331 @@
+From af3e0b8857825d68dde9661b74c382279e90c512 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 17 May 2019 13:47:14 -0400
+Subject: [PATCH 15/42] Add super convenient errno-guard implementation.
+
+This confuses the gcc analyzer either less or far more than
+save_errno()'s fire-once loop.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/certdb.c      | 32 ++++++++++++++---------
+ src/cms_common.c  |  4 ++-
+ src/efikeygen.c   |  1 +
+ src/errno-guard.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++
+ src/errno-guard.h | 26 +++++++++++++++++++
+ src/pesigcheck.h  |  1 +
+ src/pesign.h      |  2 ++
+ src/util.h        | 19 ++++----------
+ src/Makefile      |  9 +++++--
+ 9 files changed, 131 insertions(+), 29 deletions(-)
+ create mode 100644 src/errno-guard.c
+ create mode 100644 src/errno-guard.h
+
+diff --git a/src/certdb.c b/src/certdb.c
+index 9a4aae45f1d..f1eee3bf490 100644
+--- a/src/certdb.c
++++ b/src/certdb.c
+@@ -40,21 +40,23 @@ add_db_file(pesigcheck_context *ctx, db_specifier which, const char *dbfile,
+ 	    db_f_type type)
+ {
+ 	dblist *db = calloc(1, sizeof (dblist));
++	int errno_guard;
+ 
+ 	if (!db)
+ 		return -1;
+ 
+ 	db->type = type;
+ 	db->fd = open(dbfile, O_RDONLY);
++	set_errno_guard_with_override(&errno_guard);
+ 	if (db->fd < 0) {
+-		save_errno(free(db));
++		free(db);
+ 		return -1;
+ 	}
+ 
+ 	char *path = strdup(dbfile);
+ 	if (!path) {
+-		save_errno(close(db->fd);
+-			   free(db));
++		override_errno_guard(&errno_guard, errno);
++		free(db);
+ 		return -1;
+ 	}
+ 
+@@ -62,17 +64,19 @@ add_db_file(pesigcheck_context *ctx, db_specifier which, const char *dbfile,
+ 	db->path = strdup(db->path);
+ 	free(path);
+ 	if (!db->path) {
+-		save_errno(close(db->fd);
+-			   free(db));
++		override_errno_guard(&errno_guard, errno);
++		close(db->fd);
++		free(db);
+ 		return -1;
+ 	}
+ 
+ 	struct stat sb;
+ 	int rc = fstat(db->fd, &sb);
+ 	if (rc < 0) {
+-		save_errno(close(db->fd);
+-			   free(db->path);
+-			   free(db));
++		override_errno_guard(&errno_guard, errno);
++		close(db->fd);
++		free(db->path);
++		free(db);
+ 		return -1;
+ 	}
+ 	db->size = sb.st_size;
+@@ -83,9 +87,10 @@ add_db_file(pesigcheck_context *ctx, db_specifier which, const char *dbfile,
+ 		size_t sz = 0;
+ 		rc = read_file(db->fd, (char **)&db->map, &sz);
+ 		if (rc < 0) {
+-			save_errno(close(db->fd);
+-				   free(db->path);
+-				   free(db));
++			override_errno_guard(&errno_guard, errno);
++			close(db->fd);
++			free(db->path);
++			free(db);
+ 			return -1;
+ 		}
+ 	}
+@@ -108,8 +113,10 @@ add_db_file(pesigcheck_context *ctx, db_specifier which, const char *dbfile,
+ 		db->datalen = db->size + sizeof(EFI_SIGNATURE_LIST) +
+ 			      sizeof(efi_guid_t);
+ 		db->data = calloc(1, db->datalen);
+-		if (!db->data)
++		if (!db->data) {
++			override_errno_guard(&errno_guard, errno);
+ 			return -1;
++		}
+ 
+ 		certlist = (EFI_SIGNATURE_LIST *)db->data;
+ 		memcpy((void *)&certlist->SignatureType, &efi_x509, sizeof(efi_guid_t));
+@@ -129,6 +136,7 @@ add_db_file(pesigcheck_context *ctx, db_specifier which, const char *dbfile,
+ 	db->next = *tmp;
+ 	*tmp = db;
+ 
++	override_errno_guard(&errno_guard, 0);
+ 	return 0;
+ }
+ 
+diff --git a/src/cms_common.c b/src/cms_common.c
+index d13b2cb0f33..17f7bf252c7 100644
+--- a/src/cms_common.c
++++ b/src/cms_common.c
+@@ -241,7 +241,9 @@ cms_context_alloc(cms_context **cmsp)
+ 
+ 	int rc = cms_context_init(cms);
+ 	if (rc < 0) {
+-		save_errno(free(cms));
++		set_errno_guard();
++		xfree(cms);
++		cms = NULL;
+ 		return -1;
+ 	}
+ 	*cmsp = cms;
+diff --git a/src/efikeygen.c b/src/efikeygen.c
+index b8b0c961739..ac2ce45a420 100644
+--- a/src/efikeygen.c
++++ b/src/efikeygen.c
+@@ -52,6 +52,7 @@
+ 
+ #include "util.h"
+ #include "cms_common.h"
++#include "errno-guard.h"
+ #include "oid.h"
+ 
+ enum {
+diff --git a/src/errno-guard.c b/src/errno-guard.c
+new file mode 100644
+index 00000000000..331692d8d70
+--- /dev/null
++++ b/src/errno-guard.c
+@@ -0,0 +1,66 @@
++/*
++ * errno-guard.c
++ * Copyright 2019 Peter Jones <pjones@redhat.com>
++ *
++ */
++#ifndef _GNU_SOURCE
++#define _GNU_SOURCE
++#endif
++
++#include <errno.h>
++#include <stdio.h>
++
++#include "compiler.h"
++#include "errno-guard.h"
++
++__thread int errno_guards_[ERRNO_GUARD_ENTRIES_];
++__thread int errno_guard_no_ = -1;
++
++void
++clean_up_errno_guard_(int *handle)
++{
++	if (*handle < 0
++	    || *handle >= ERRNO_GUARD_ENTRIES_
++	    || *handle > errno_guard_no_)
++		return;
++
++	if (errno_guards_[*handle] >= 0) {
++		errno = errno_guards_[*handle];
++		errno_guard_no_ = *handle - 1;
++	}
++	*handle = -1;
++}
++
++int
++set_up_errno_guard_(int *handle)
++{
++	int guard_var = ++errno_guard_no_;
++
++	if (guard_var < ERRNO_GUARD_ENTRIES_)
++		errno_guards_[guard_var] = errno;
++
++	if (handle)
++		*handle = guard_var;
++	return guard_var;
++}
++
++int
++override_errno_guard(int *handle, int error)
++{
++	if (handle == NULL
++	    || *handle < 0
++	    || *handle >= ERRNO_GUARD_ENTRIES_)
++		return -1;
++
++	if (*handle > errno_guard_no_) {
++		*handle = -1;
++		return -1;
++	}
++
++	errno = error;
++	errno_guard_no_ = *handle;
++
++	return *handle;
++}
++
++// vim:fenc=utf-8:tw=75:noet
+diff --git a/src/errno-guard.h b/src/errno-guard.h
+new file mode 100644
+index 00000000000..e413cec95a4
+--- /dev/null
++++ b/src/errno-guard.h
+@@ -0,0 +1,26 @@
++/*
++ * errno-guard.h
++ * Copyright 2019 Peter Jones <pjones@redhat.com>
++ */
++
++#ifndef ERRNO_GUARD_H_
++#define ERRNO_GUARD_H_
++
++#define ERRNO_GUARD_ENTRIES_ ((int)(4096 / sizeof(int)))
++
++extern __thread int errno_guards_[ERRNO_GUARD_ENTRIES_];
++extern __thread int errno_guard_no_;
++
++extern void clean_up_errno_guard_(int *handle);
++extern int set_up_errno_guard_(int *handle);
++
++#define guard_errno_(handle, guard_var) \
++	CLEANUP_FUNC(clean_up_errno_guard_) UNUSED int guard_var = set_up_errno_guard_(handle)
++#define errno_guard_var_ CAT(CAT(CAT(CAT(errno_guard_,__LINE__),_),__COUNTER__),_)
++
++extern int override_errno_guard(int *handle, int error);
++#define set_errno_guard() guard_errno_(NULL, errno_guard_var_)
++#define set_errno_guard_with_override(handle) guard_errno_(handle, errno_guard_var_)
++
++#endif /* !ERRNO_GUARD_H_ */
++// vim:fenc=utf-8:tw=75:noet
+diff --git a/src/pesigcheck.h b/src/pesigcheck.h
+index 20e8040cc06..e4dbe54c59a 100644
+--- a/src/pesigcheck.h
++++ b/src/pesigcheck.h
+@@ -29,6 +29,7 @@
+ #include "certdb.h"
+ 
+ #include "endian.h"
++#include "errno-guard.h"
+ #include "oid.h"
+ #include "wincert.h"
+ #include "content_info.h"
+diff --git a/src/pesign.h b/src/pesign.h
+index 1b404223d31..91d30b57c02 100644
+--- a/src/pesign.h
++++ b/src/pesign.h
+@@ -32,7 +32,9 @@
+ #include "daemon.h"
+ #include "efitypes.h"
+ #include "actions.h"
++#include "errno-guard.h"
+ #include "endian.h"
++#include "errno-guard.h"
+ #include "oid.h"
+ #include "wincert.h"
+ #include "content_info.h"
+diff --git a/src/util.h b/src/util.h
+index 362c3559293..1b115a993f6 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -23,9 +23,8 @@
+ #include <errno.h>
+ #include <string.h>
+ #include <stdio.h>
+-#include <unistd.h>
+ #include <stdlib.h>
+-#include <errno.h>
++#include <unistd.h>
+ 
+ #include <libdpe/pe.h>
+ 
+@@ -40,18 +39,10 @@
+ #define xstrdup(s) ({ void *p_ = strdup(s); if (!p_) liberr(1, "Could not allocate memory"); p_; })
+ #define xpfstat(path, fd, sb) ({ int rc_ = fstat(fd, sb); if (rc_ < 0) liberr(1, "Could not stat \"%s\"", path); })
+ 
+-#define save_errno(x)					\
+-	({						\
+-		typeof (errno) __saved_errno = errno;	\
+-		x;					\
+-		errno = __saved_errno;			\
+-	})
+-#define save_pe_errno(x)					\
+-	({							\
+-		typeof (errno) __saved_errno = pe_errno();	\
+-		x;						\
+-		__libpe_seterrno(__saved_errno);		\
+-	})
++#define saved_errno_0_ CONCATENATE(CONCATENATE(error_,__LINE__),_0_)
++#define saved_errno_1_ CONCATENATE(CONCATENATE(error_,__LINE__),_1_)
++#define save_pe_errno() \
++	for (int saved_errno_0_ = 0, saved_errno_1_ = pe_errno(); saved_errno_0_ < 1; saved_errno_0_++, __libdpe_seterrno(saved_errno_1_))
+ 
+ #define conderr(cond, val, fmt, args...) ({				\
+ 		if (cond)						\
+diff --git a/src/Makefile b/src/Makefile
+index dfdc7c5e4c5..bc3e5931456 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -11,8 +11,13 @@ TARGETS=$(BINTARGETS) $(SVCTARGETS)
+ 
+ all : deps $(TARGETS)
+ 
+-COMMON_SOURCES = cms_common.c content_info.c oid.c password.c \
+-	signed_data.c signer_info.c text.c ucs2.c
++COMMON_SOURCES = cms_common.c content_info.c \
++		 errno-guard.c \
++		 oid.c \
++		 password.c \
++		 signed_data.c signer_info.c \
++		 text.c \
++		 ucs2.c
+ COMMON_PE_SOURCES = wincert.c cms_pe_common.c
+ AUTHVAR_SOURCES = authvar.c authvar_context.c
+ CLIENT_SOURCES = pesign_context.c actions.c client.c
+-- 
+2.29.2
+

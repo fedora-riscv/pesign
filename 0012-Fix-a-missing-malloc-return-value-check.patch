@@ -1,0 +1,26 @@
+From 998e825efd44d3f5098022537f7967c24d208841 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 5 Jun 2020 10:20:30 -0400
+Subject: [PATCH 12/42] Fix a missing malloc() return value check.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/pesigcheck.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/pesigcheck.c b/src/pesigcheck.c
+index 8fa0f1ad03d..961a32a6ad7 100644
+--- a/src/pesigcheck.c
++++ b/src/pesigcheck.c
+@@ -116,6 +116,8 @@ cert_matches_digest(pesigcheck_context *ctx, void *data, ssize_t datalen,
+ 	digest = content->data + content->len - pe_digest->len;
+ 	if (digest_out) {
+ 		digest_out->data = malloc(pe_digest->len);
++		if (!digest_out->data)
++			goto out;
+ 		digest_out->len = pe_digest->len;
+ 		digest_out->type = pe_digest->type;
+ 		memcpy(digest_out->data, digest, pe_digest->len);
+-- 
+2.29.2
+

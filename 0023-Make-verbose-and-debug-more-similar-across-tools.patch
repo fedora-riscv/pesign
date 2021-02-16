@@ -1,0 +1,321 @@
+From 8fc539b9712c0e736abfdd3b493d97f7107e91ec Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 28 Apr 2020 10:08:03 -0400
+Subject: [PATCH 23/42] Make --verbose and --debug more similar across tools
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/authvar.c            | 21 +++++++++++++++++++++
+ src/client.c             | 18 ++++++++++++++++++
+ src/cms_pe_common.c      |  6 ------
+ src/efikeygen.c          | 21 +++++++++++++++++++++
+ src/pesigcheck.c         | 18 +++++++++++++++++-
+ src/pesign.c             | 19 ++++++++++++++++++-
+ src/authvar_context.h    |  2 ++
+ src/pesigcheck_context.h |  2 +-
+ src/pesign_context.h     |  2 +-
+ src/util.h               | 14 +++++++++++++-
+ 10 files changed, 112 insertions(+), 11 deletions(-)
+
+diff --git a/src/authvar.c b/src/authvar.c
+index f9a7dcef9f7..a6c3970e4dc 100644
+--- a/src/authvar.c
++++ b/src/authvar.c
+@@ -260,6 +260,15 @@ show_signature_support(void)
+ 	return 0;
+ }
+ 
++static long *verbose;
++
++long verbosity(void)
++{
++	if (!verbose)
++		return 0;
++	return *verbose;
++}
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -370,6 +379,18 @@ main(int argc, char *argv[])
+ 		 .arg = &ctx.cms_ctx->certname,
+ 		 .descrip = "sign variable with certificate <nickname>",
+ 		 .argDescrip = "<nickname>" },
++		{.longName = "verbose",
++		 .shortName = 'v',
++		 .argInfo = POPT_ARG_VAL|POPT_ARG_LONG|POPT_ARGFLAG_OPTIONAL,
++		 .arg = &ctxp->verbose,
++		 .val = 1,
++		 .descrip = "be more verbose" },
++		{.longName = "debug",
++		 .shortName = '\0',
++		 .argInfo = POPT_ARG_VAL|POPT_ARG_LONG|POPT_ARGFLAG_OPTIONAL,
++		 .arg = &ctxp->verbose,
++		 .val = 2,
++		 .descrip = "be very verbose" },
+ 		POPT_AUTOALIAS
+ 		POPT_AUTOHELP
+ 		POPT_TABLEEND
+diff --git a/src/client.c b/src/client.c
+index a4f1d1dbbe7..a00b20f5dde 100644
+--- a/src/client.c
++++ b/src/client.c
+@@ -600,6 +600,12 @@ oom:
+ 	return;
+ }
+ 
++static long verbose;
++long verbosity(void)
++{
++        return verbose;
++}
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -687,6 +693,18 @@ main(int argc, char *argv[])
+ 		 .arg = &pinfile,
+ 		 .descrip = "read named file for pin information",
+ 		 .argDescrip = "<pin file name>" },
++		{.longName = "verbose",
++		 .shortName = 'v',
++		 .argInfo = POPT_ARG_VAL,
++		 .arg = &verbose,
++		 .val = 1,
++		 .descrip = "be more verbose" },
++		{.longName = "debug",
++		 .shortName = '\0',
++		 .argInfo = POPT_ARG_VAL|POPT_ARG_LONG|POPT_ARGFLAG_OPTIONAL,
++		 .arg = &verbose,
++		 .val = 2,
++		 .descrip = "be very verbose" },
+ 		POPT_AUTOALIAS
+ 		POPT_AUTOHELP
+ 		POPT_TABLEEND
+diff --git a/src/cms_pe_common.c b/src/cms_pe_common.c
+index 05f72e4431a..00061804a78 100644
+--- a/src/cms_pe_common.c
++++ b/src/cms_pe_common.c
+@@ -42,12 +42,6 @@
+ #include <secerr.h>
+ #include <certt.h>
+ 
+-#if 1
+-#define dprintf(fmt, ...)
+-#else
+-#define dprintf(fmt, args...) printf(fmt, ## args)
+-#endif
+-
+ static int
+ check_pointer_and_size(Pe *pe, void *ptr, size_t size)
+ {
+diff --git a/src/efikeygen.c b/src/efikeygen.c
+index ac2ce45a420..b1cac4705e8 100644
+--- a/src/efikeygen.c
++++ b/src/efikeygen.c
+@@ -492,6 +492,13 @@ SEC_ASN1EncodeLongLong(PRArenaPool *poolp, SECItem *dest,
+ 	return dest;
+ }
+ 
++static long verbose = 0;
++
++long verbosity(void)
++{
++	return verbose;
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	int is_ca = 0;
+@@ -586,6 +593,18 @@ int main(int argc, char *argv[])
+ 		 .arg = &serial_str,
+ 		 .descrip = "Serial number (default: random)",
+ 		 .argDescrip = "<serial>" },
++		{.longName = "verbose",
++		 .shortName = 'v',
++		 .argInfo = POPT_ARG_VAL,
++		 .arg = &verbose,
++		 .val = 1,
++		 .descrip = "Be more verbose" },
++		{.longName = "debug",
++		 .shortName = '\0',
++		 .argInfo = POPT_ARG_VAL|POPT_ARG_LONG|POPT_ARGFLAG_OPTIONAL,
++		 .arg = &verbose,
++		 .val = 2,
++		 .descrip = "Be very verbose" },
+ 
+ 		/* hidden things */
+ 		{.longName = "pubkey",
+@@ -870,3 +889,5 @@ int main(int argc, char *argv[])
+ 	NSS_Shutdown();
+ 	return 0;
+ }
++
++// vim:fenc=utf-8:tw=75:noet
+diff --git a/src/pesigcheck.c b/src/pesigcheck.c
+index 961a32a6ad7..87d4960a9a9 100644
+--- a/src/pesigcheck.c
++++ b/src/pesigcheck.c
+@@ -386,6 +386,15 @@ callback(poptContext con UNUSED,
+ 	}
+ }
+ 
++static long *verbose;
++
++long verbosity(void)
++{
++	if (!verbose)
++		return 0;
++	return *verbose;
++}
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -436,10 +445,16 @@ main(int argc, char *argv[])
+ 		 .descrip = "return only; no text output." },
+ 		{.longName = "verbose",
+ 		 .shortName = 'v',
+-		 .argInfo = POPT_BIT_SET,
++		 .argInfo = POPT_ARG_VAL|POPT_ARG_LONG|POPT_ARGFLAG_OPTIONAL,
+ 		 .arg = &ctx.verbose,
+ 		 .val = 1,
+ 		 .descrip = "print reasons for success and failure." },
++		{.longName = "debug",
++		 .shortName = '\0',
++		 .argInfo = POPT_ARG_VAL|POPT_ARG_LONG|POPT_ARGFLAG_OPTIONAL,
++		 .arg = &ctxp->verbose,
++		 .val = 2,
++		 .descrip = "be very verbose" },
+ 		{.longName = "no-system-db",
+ 		 .shortName = 'n',
+ 		 .argInfo = POPT_ARG_INT,
+@@ -475,6 +490,7 @@ main(int argc, char *argv[])
+ 		fprintf(stderr, "pesigcheck: Could not initialize context: %m\n");
+ 		exit(1);
+ 	}
++	verbose = &ctxp->verbose;
+ 
+ 	optCon = poptGetContext("pesigcheck", argc, (const char **)argv,
+ 				options,0);
+diff --git a/src/pesign.c b/src/pesign.c
+index d2f3f221df0..854120c15c5 100644
+--- a/src/pesign.c
++++ b/src/pesign.c
+@@ -64,6 +64,15 @@ print_flag_name(FILE *f, int flag)
+ 	}
+ }
+ 
++static long *verbose;
++
++long verbosity(void)
++{
++	if (!verbose)
++		return 0;
++	return *verbose;
++}
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -94,6 +103,7 @@ main(int argc, char *argv[])
+ 		fprintf(stderr, "Could not initialize context: %m\n");
+ 		exit(1);
+ 	}
++	verbose = &ctxp->verbose;
+ 
+ 	poptContext optCon;
+ 	struct poptOption options[] = {
+@@ -234,10 +244,17 @@ main(int argc, char *argv[])
+ 		 .descrip = "don't fork when daemonizing" },
+ 		{.longName = "verbose",
+ 		 .shortName = 'v',
+-		 .argInfo = POPT_ARG_VAL,
++		 .argInfo = POPT_ARG_VAL|POPT_ARG_LONG|POPT_ARGFLAG_OPTIONAL,
+ 		 .arg = &ctxp->verbose,
+ 		 .val = 1,
++		 .descrip = "be more verbose" },
++		{.longName = "debug",
++		 .shortName = '\0',
++		 .argInfo = POPT_ARG_VAL|POPT_ARG_LONG|POPT_ARGFLAG_OPTIONAL,
++		 .arg = &ctxp->verbose,
++		 .val = 2,
+ 		 .descrip = "be very verbose" },
++
+ 		{.longName = "padding",
+ 		 .shortName = 'P',
+ 		 .argInfo = POPT_ARG_VAL,
+diff --git a/src/authvar_context.h b/src/authvar_context.h
+index e9250dd250f..13c18a988f4 100644
+--- a/src/authvar_context.h
++++ b/src/authvar_context.h
+@@ -20,6 +20,8 @@
+ #define AUTHVAR_CONTEXT_H 1
+ 
+ typedef struct {
++	long verbose;
++
+ 	char *namespace;
+ 	efi_guid_t guid;
+ 	char *name;
+diff --git a/src/pesigcheck_context.h b/src/pesigcheck_context.h
+index aec415e0cbe..fa72439c875 100644
+--- a/src/pesigcheck_context.h
++++ b/src/pesigcheck_context.h
+@@ -61,7 +61,7 @@ typedef struct pesigcheck_context {
+ 	Pe *inpe;
+ 
+ 	int quiet;
+-	int verbose;
++	long verbose;
+ 
+ 	hashlist *hashes;
+ 
+diff --git a/src/pesign_context.h b/src/pesign_context.h
+index 45d6831aa7f..0af044d92b4 100644
+--- a/src/pesign_context.h
++++ b/src/pesign_context.h
+@@ -52,7 +52,7 @@ typedef struct {
+ 	mode_t outmode;
+ 
+ 	int force;
+-	int verbose;
++	long verbose;
+ 
+ 	char *rawsig;
+ 	int rawsigfd;
+diff --git a/src/util.h b/src/util.h
+index 9b34f7b8886..21a846c10ee 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -24,8 +24,9 @@
+ #include <string.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+-#include <sys/types.h>
+ #include <sys/stat.h>
++#include <sys/time.h>
++#include <sys/types.h>
+ #include <unistd.h>
+ 
+ #include <libdpe/pe.h>
+@@ -271,5 +272,16 @@ proxy_fd_mode(int fd, char *infile, mode_t *outmode, size_t *inlength)
+ 		*inlength = statbuf.st_size;
+ }
+ 
++extern long verbosity(void);
++
++#define dprintf_(tv, file, func, line, fmt, args...) ({struct timeval tv; gettimeofday(&tv, NULL); warnx("%ld.%lu %s:%s():%d: " fmt, tv.tv_sec, tv.tv_usec, file, func, line, ##args); })
++#if defined(PESIGN_DEBUG)
++#define dprintf(fmt, args...) dprintf_(CAT(CAT(CAT(tv_,__COUNTER__),__LINE__),_), __FILE__, __func__, __LINE__, fmt, ##args)
++#else
++#define dprintf(fmt, args...) ({ if (verbosity() > 1) dprintf_(CAT(CAT(CAT(tv_,__COUNTER__),__LINE__),_), __FILE__, __func__, __LINE__, fmt, ##args); 0; })
++#endif
++#define ingress() dprintf("ingress");
++#define egress() dprintf("egress");
++
+ #endif /* PESIGN_UTIL_H */
+ // vim:fenc=utf-8:tw=75:noet
+-- 
+2.29.2
+

@@ -1,7 +1,7 @@
-From d2365c50af8aee2701e1a96dff96696353b9a027 Mon Sep 17 00:00:00 2001
+From 36a87a0471f79346dc245ba62bdaaddf1e9c908e Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 16 Jul 2020 16:28:26 -0400
-Subject: [PATCH 12/12] Use /run not /var/run
+Subject: [PATCH 38/42] Use /run not /var/run
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -28,10 +28,10 @@ index 0368dc9256c..5fcd97ea717 100644
  static inline uint32_t UNUSED
  pesignd_string_size(char *buffer)
 diff --git a/src/Makefile b/src/Makefile
-index a7ca89159c6..f7fb5fc9ee5 100644
+index 82c2dfdec3f..e24bd600af0 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -78,7 +78,7 @@ install_sysvinit: pesign.sysvinit
+@@ -83,7 +83,7 @@ install_sysvinit: pesign.sysvinit
  install :
  	$(INSTALL) -d -m 700 $(INSTALLROOT)/etc/pki/pesign/
  	$(INSTALL) -d -m 700 $(INSTALLROOT)/etc/pki/pesign-rh-test/

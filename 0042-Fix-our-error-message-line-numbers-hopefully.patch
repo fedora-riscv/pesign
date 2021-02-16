@@ -1,0 +1,152 @@
+From 25bc2f4ce9215cd39fb448ada642824a5d20205f Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 16 Feb 2021 11:47:00 -0500
+Subject: [PATCH 42/42] Fix our error message line numbers, hopefully.
+
+Most of these seem to be off by a line or two; it's pretty obvious why.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/cms_common.h | 10 ++++++----
+ src/compiler.h   |  5 ++++-
+ src/util.h       | 32 +++++++++++++++++++++++---------
+ 3 files changed, 33 insertions(+), 14 deletions(-)
+
+diff --git a/src/cms_common.h b/src/cms_common.h
+index 1bffdcd034b..6cc31d5c6f0 100644
+--- a/src/cms_common.h
++++ b/src/cms_common.h
+@@ -43,24 +43,26 @@
+ 
+ #define cmsreterr(rv, cms, fmt, args...) ({			\
+ 		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt,	\
+-			__FILE__, __func__, __LINE__, ## args);	\
++			__FILE__, __func__, __LINE__ - 2,	\
++			## args);				\
+ 		return rv;					\
+ 	})
+ #define cmsgotoerr(errlabel, cms, fmt, args...) ({		\
+ 		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt,	\
+-			__FILE__, __func__, __LINE__, ## args);	\
++			__FILE__, __func__, __LINE__ - 2,	\
++			## args);				\
+ 		goto errlabel;					\
+ 	})
+ #define cnreterr(rv, cms, fmt, args...) ({				\
+ 		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt ":%s:%s",	\
+-			__FILE__, __func__, __LINE__, ## args,		\
++			__FILE__, __func__, __LINE__ - 2, ## args,	\
+ 			PORT_ErrorToName(PORT_GetError()),		\
+ 			PORT_ErrorToString(PORT_GetError()));		\
+ 		return rv;						\
+ 	})
+ #define cngotoerr(errlabel, cms, fmt, args...) ({			\
+ 		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt ":%s:%s",	\
+-			__FILE__, __func__, __LINE__, ## args,		\
++			__FILE__, __func__, __LINE__ - 2, ## args,	\
+ 			PORT_ErrorToName(PORT_GetError()),		\
+ 			PORT_ErrorToString(PORT_GetError()));		\
+ 		goto errlabel;						\
+diff --git a/src/compiler.h b/src/compiler.h
+index 31379ef9b33..5d979c9d977 100644
+--- a/src/compiler.h
++++ b/src/compiler.h
+@@ -23,6 +23,9 @@
+ #define ALIGNED(n) __attribute__((__aligned__(n)))
+ #define CLEANUP_FUNC(x) __attribute__((__cleanup__(x)))
+ 
++#ifndef __CONCAT
++#define __CONCAT(a, b) a ## b
++#endif
+ #define __CONCAT3(a, b, c) a ## b ## c
+ #define CONCATENATE(a, b) __CONCAT(a, b)
+ #define CAT(a, b) __CONCAT(a, b)
+@@ -71,7 +74,7 @@
+  * compiler has support to do so.
+  */
+ #define compiletime_assert(condition, msg) \
+-	_compiletime_assert(condition, msg, __compiletime_assert_, __LINE__)
++	_compiletime_assert(condition, msg, __compiletime_assert_, __LINE__ - 1)
+ 
+ /**
+  * BUILD_BUG_ON_MSG - break compile if a condition is true & emit supplied
+diff --git a/src/util.h b/src/util.h
+index 21a846c10ee..e2893b71c39 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -67,7 +67,7 @@
+ 
+ #define nsserr(rv, fmt, args...) ({					\
+ 		errx((rv), "%s:%s:%d: " fmt ": %s",			\
+-			__FILE__, __func__, __LINE__, ##args,		\
++			__FILE__, __func__, __LINE__ - 2, ##args,	\
+ 			PORT_ErrorToString(PORT_GetError()));		\
+ 	})
+ #define condnsserr(cond, rv, fmt, args...) ({				\
+@@ -76,7 +76,7 @@
+ 	})
+ #define nssreterr(rv, fmt, args...) ({					\
+ 		fprintf(stderr, "%s:%s:%d: " fmt ": %s\n",		\
+-			__FILE__, __func__, __LINE__, ##args,		\
++			__FILE__, __func__, __LINE__ - 2, ##args,	\
+ 			PORT_ErrorToString(PORT_GetError()));		\
+ 		return rv;						\
+ 	})
+@@ -86,21 +86,21 @@
+ 	})
+ #define liberr(rv, fmt, args...) ({					\
+ 		err((rv), "%s:%s:%d: " fmt,				\
+-			__FILE__, __func__, __LINE__, ##args);		\
++			__FILE__, __func__, __LINE__ - 2, ##args);	\
+ 	})
+ #define libreterr(rv, fmt, args...) ({					\
+ 		fprintf(stderr, "%s:%s:%d: " fmt ": %m\n",		\
+-			__FILE__, __func__, __LINE__, ##args);		\
++			__FILE__, __func__, __LINE__ - 2, ##args);	\
+ 		return rv;						\
+ 	})
+ #define peerr(rv, fmt, args...) ({					\
+ 		errx((rv), "%s:%s:%d: " fmt ": %s",			\
+-			__FILE__, __func__, __LINE__, ##args,		\
++			__FILE__, __func__, __LINE__ - 2, ##args,	\
+ 			pe_errmsg(pe_errno()));				\
+ 	})
+ #define pereterr(rv, fmt, args...) ({					\
+ 		fprintf(stderr, "%s:%s:%d: " fmt ": %s\n",		\
+-			__FILE__, __func__, __LINE__, ##args,		\
++			__FILE__, __func__, __LINE__ - 2, ##args,	\
+ 			pe_errmsg(pe_errno()));				\
+ 		return rv;						\
+ 	})
+@@ -274,11 +274,25 @@ proxy_fd_mode(int fd, char *infile, mode_t *outmode, size_t *inlength)
+ 
+ extern long verbosity(void);
+ 
+-#define dprintf_(tv, file, func, line, fmt, args...) ({struct timeval tv; gettimeofday(&tv, NULL); warnx("%ld.%lu %s:%s():%d: " fmt, tv.tv_sec, tv.tv_usec, file, func, line, ##args); })
++#define dprintf_(tv, file, func, line, fmt, args...) ({	\
++		struct timeval tv;			\
++		gettimeofday(&tv, NULL);		\
++		warnx("%ld.%lu %s:%s():%d: " fmt,	\
++		      tv.tv_sec, tv.tv_usec,		\
++		      file, func, line, ##args);	\
++	})
+ #if defined(PESIGN_DEBUG)
+-#define dprintf(fmt, args...) dprintf_(CAT(CAT(CAT(tv_,__COUNTER__),__LINE__),_), __FILE__, __func__, __LINE__, fmt, ##args)
++#define dprintf(fmt, args...)					\
++	dprintf_(CAT(CAT(CAT(tv_,__COUNTER__),__LINE__),_),	\
++		 __FILE__, __func__, __LINE__ - 2, fmt, ##args)
+ #else
+-#define dprintf(fmt, args...) ({ if (verbosity() > 1) dprintf_(CAT(CAT(CAT(tv_,__COUNTER__),__LINE__),_), __FILE__, __func__, __LINE__, fmt, ##args); 0; })
++#define dprintf(fmt, args...) ({						\
++		if (verbosity() > 1)						\
++			dprintf_(CAT(CAT(CAT(tv_,__COUNTER__),__LINE__),_),	\
++				 __FILE__, __func__, __LINE__ - 3,		\
++				 fmt, ##args);					\
++		0;								\
++	})
+ #endif
+ #define ingress() dprintf("ingress");
+ #define egress() dprintf("egress");
+-- 
+2.29.2
+

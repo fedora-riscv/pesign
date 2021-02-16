@@ -1,0 +1,113 @@
+From d6787fbed0a1f993af6418c758c781361d553219 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 29 Apr 2020 18:23:30 -0400
+Subject: [PATCH 09/42] libdpe: fix some minor analyzer discoveries.
+
+I don't think we can meaningfully hit any of these in any use that
+actually matters, but may as well fix them.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ libdpe/pe_begin.c       |  3 +++
+ libdpe/pe_getdatadir.c  |  2 +-
+ libdpe/pe_opthdr.c      | 12 ++++++------
+ include/libdpe/libdpe.h |  4 ++--
+ 4 files changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/libdpe/pe_begin.c b/libdpe/pe_begin.c
+index 51189f8069c..3bcc2c70c61 100644
+--- a/libdpe/pe_begin.c
++++ b/libdpe/pe_begin.c
+@@ -156,6 +156,9 @@ __libpe_read_mmapped_file(int fildes, void *map_address, size_t maxsize,
+ 		case PE_K_PE_EXE:
+ 			return file_read_pe_exe(fildes, map_address, p_ident,
+ 						maxsize, cmd, parent);
++		case PE_K_MZ:
++			errno = ENOSYS;
++			return NULL;
+ 		default:
+ 			break;
+ 	}
+diff --git a/libdpe/pe_getdatadir.c b/libdpe/pe_getdatadir.c
+index 08f46787304..f080f3a9998 100644
+--- a/libdpe/pe_getdatadir.c
++++ b/libdpe/pe_getdatadir.c
+@@ -24,7 +24,7 @@ pe_getdatadir(Pe *pe, data_directory **dd)
+ {
+ 	int rc = -1;
+ 
+-	if (!dd) {
++	if (!pe || !dd) {
+ 		__libpe_seterrno(PE_E_INVALID_INDEX);
+ 		return rc;
+ 	}
+diff --git a/libdpe/pe_opthdr.c b/libdpe/pe_opthdr.c
+index 02075e5cd49..ae74a897500 100644
+--- a/libdpe/pe_opthdr.c
++++ b/libdpe/pe_opthdr.c
+@@ -32,7 +32,7 @@ pe_getopthdr(Pe *pe)
+ 	}
+ }
+ 
+-uint32_t
++int32_t
+ pe_get_file_alignment(Pe *pe)
+ {
+ 	struct pe32_opt_hdr *pe32opthdr = NULL;
+@@ -42,12 +42,12 @@ pe_get_file_alignment(Pe *pe)
+ 	case PE_K_PE_EXE: {
+ 		void *opthdr = pe_getopthdr(pe);
+ 		pe32opthdr = opthdr;
+-		return pe32opthdr->file_align;
++		return pe32opthdr ? (int32_t)pe32opthdr->file_align : -1;
+ 	}
+ 	case PE_K_PE64_EXE: {
+ 		void *opthdr = pe_getopthdr(pe);
+ 		pe64opthdr = opthdr;
+-		return pe64opthdr->file_align;
++		return pe64opthdr ? (int32_t)pe64opthdr->file_align : -1;
+ 		break;
+ 	}
+ 	default:
+@@ -56,7 +56,7 @@ pe_get_file_alignment(Pe *pe)
+ 	return -1;
+ }
+ 
+-uint32_t
++int32_t
+ pe_get_scn_alignment(Pe *pe)
+ {
+ 	struct pe32_opt_hdr *pe32opthdr = NULL;
+@@ -66,12 +66,12 @@ pe_get_scn_alignment(Pe *pe)
+ 	case PE_K_PE_EXE: {
+ 		void *opthdr = pe_getopthdr(pe);
+ 		pe32opthdr = opthdr;
+-		return pe32opthdr->section_align;
++		return pe32opthdr ? (int32_t)pe32opthdr->section_align : -1;
+ 	}
+ 	case PE_K_PE64_EXE: {
+ 		void *opthdr = pe_getopthdr(pe);
+ 		pe64opthdr = opthdr;
+-		return pe64opthdr->section_align;
++		return pe64opthdr ? (int32_t)pe64opthdr->section_align : -1;
+ 		break;
+ 	}
+ 	default:
+diff --git a/include/libdpe/libdpe.h b/include/libdpe/libdpe.h
+index 09f56a2a05e..895a208fe7d 100644
+--- a/include/libdpe/libdpe.h
++++ b/include/libdpe/libdpe.h
+@@ -87,8 +87,8 @@ extern struct pe_hdr *pe_getpehdr(Pe *pe, struct pe_hdr *pehdr);
+ extern char *pe_rawfile(Pe *pe, size_t *ptr);
+ extern int pe_getdatadir(Pe *pe, data_directory **dd);
+ extern void *pe_getopthdr(Pe *pe);
+-extern uint32_t pe_get_file_alignment(Pe *pe);
+-extern uint32_t pe_get_scn_alignment(Pe *pe);
++extern int32_t pe_get_file_alignment(Pe *pe);
++extern int32_t pe_get_scn_alignment(Pe *pe);
+ extern int pe_set_image_size(Pe *pe);
+ 
+ extern int pe_extend_file(Pe *pe, size_t size, uint32_t *new_space, int align);
+-- 
+2.29.2
+

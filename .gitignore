@@ -5,3 +5,4 @@ clog
 /certs.tar.xz
 .build*.log
 /pesign-*/
+/results_pesign/

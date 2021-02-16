@@ -1,0 +1,56 @@
+From e89e23ff5970e9a2194bcb393fa579c123e37bd1 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 28 Apr 2020 10:34:31 -0400
+Subject: [PATCH 26/42] Minor whitespace housekeeping
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/cms_pe_common.c | 2 +-
+ src/pesigcheck.c    | 2 ++
+ src/cms_common.h    | 3 +--
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/cms_pe_common.c b/src/cms_pe_common.c
+index bd96fe91d69..b5ef2b73058 100644
+--- a/src/cms_pe_common.c
++++ b/src/cms_pe_common.c
+@@ -331,4 +331,4 @@ error:
+ 	return -1;
+ }
+ 
+-/* vim:fenc=utf-8:sw=8:sts=8:noet */
++// vim:fenc=utf-8:tw=75:noet
+diff --git a/src/pesigcheck.c b/src/pesigcheck.c
+index 87d4960a9a9..ada042e2f7e 100644
+--- a/src/pesigcheck.c
++++ b/src/pesigcheck.c
+@@ -544,3 +544,5 @@ main(int argc, char *argv[])
+ 
+ 	return (rc < 0);
+ }
++
++// vim:fenc=utf-8:tw=75:noet
+diff --git a/src/cms_common.h b/src/cms_common.h
+index 34ab6551ddd..a8c66cd3f9f 100644
+--- a/src/cms_common.h
++++ b/src/cms_common.h
+@@ -41,7 +41,7 @@
+ #define for_each_cert(cl, node) \
+ 	for (CERTCertListNode *node = CERT_LIST_HEAD(cl); !CERT_LIST_END(node, cl); node = CERT_LIST_NEXT(node))
+ 
+-#define cmserr(rv, cms, fmt, args...) ({					\
++#define cmserr(rv, cms, fmt, args...) ({				\
+ 		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt ": %s",	\
+ 			__FILE__, __func__, __LINE__, ## args,		\
+ 			PORT_ErrorToString(PORT_GetError()));		\
+@@ -54,7 +54,6 @@
+ 		return rv;						\
+ 	})
+ 
+-
+ struct digest {
+ 	PK11Context *pk11ctx;
+ 	SECItem *pe_digest;
+-- 
+2.29.2
+

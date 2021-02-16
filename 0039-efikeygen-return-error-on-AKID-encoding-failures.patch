@@ -1,0 +1,43 @@
+From 854b9ea4fe5b743f643f8622e5a1ec26dd1eb2dc Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 16 Feb 2021 11:38:27 -0500
+Subject: [PATCH 39/42] efikeygen: return error on AKID encoding failures
+
+Clearly some of these exiting with nonsense error codes and some of them
+returning error values is not how it's supposed to be.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/efikeygen.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/efikeygen.c b/src/efikeygen.c
+index b1cac4705e8..8bf67c2ec20 100644
+--- a/src/efikeygen.c
++++ b/src/efikeygen.c
+@@ -156,11 +156,11 @@ add_auth_key_id(cms_context *cms, void *extHandle, SECKEYPublicKey *pubkey)
+ {
+ 	SECItem *pubkey_der = PK11_DEREncodePublicKey(pubkey);
+ 	if (!pubkey_der)
+-		cmserr(-1, cms, "could not encode CA Key ID extension");
++		cmsreterr(-1, cms, "could not encode CA Key ID extension");
+ 
+ 	SECItem *encoded = PK11_MakeIDFromPubKey(pubkey_der);
+ 	if (!encoded)
+-		cmserr(-1, cms, "could not encode CA Key ID extension");
++		cmsreterr(-1, cms, "could not encode CA Key ID extension");
+ 
+ 	SECItem cspecific = { 0 };
+ 	int rc = make_context_specific(cms, 0, &cspecific, encoded);
+@@ -178,7 +178,7 @@ add_auth_key_id(cms_context *cms, void *extHandle, SECKEYPublicKey *pubkey)
+ 	status = CERT_AddExtension(extHandle, SEC_OID_X509_AUTH_KEY_ID,
+ 					&wrapped, PR_FALSE, PR_TRUE);
+ 	if (status != SECSuccess)
+-		cmserr(-1, cms, "could not encode CA Key ID extension");
++		cmsreterr(-1, cms, "could not encode CA Key ID extension");
+ 	return 0;
+ }
+ 
+-- 
+2.29.2
+

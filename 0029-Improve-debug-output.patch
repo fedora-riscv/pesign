@@ -1,0 +1,494 @@
+From 5347765052981b323622c9a5684577778fc7cbab Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 16 Jun 2020 10:43:32 -0400
+Subject: [PATCH 29/42] Improve debug output
+
+---
+ src/cms_common.c    | 78 ++++++++++++++++++++++++++++++++++++++-------
+ src/cms_pe_common.c | 20 ++++++------
+ src/file_kmod.c     |  5 +--
+ src/file_pe.c       |  7 ++++
+ src/password.c      | 36 +++++++++++++++------
+ src/pesign.c        | 10 ++++++
+ src/cms_common.h    |  3 +-
+ 7 files changed, 125 insertions(+), 34 deletions(-)
+
+diff --git a/src/cms_common.c b/src/cms_common.c
+index 7cd98bc994f..e2ca5c097d4 100644
+--- a/src/cms_common.c
++++ b/src/cms_common.c
+@@ -339,9 +339,19 @@ is_valid_cert(CERTCertificate *cert, void *data)
+ 	struct validity_cbdata *cbd = (struct validity_cbdata *)data;
+ 	PK11SlotInfo *slot = cbd->slot;
+ 	SECKEYPrivateKey *privkey = NULL;
++	int errnum;
+ 
+-	if (cert == NULL)
++	errnum = PORT_GetError();
++	if (errnum == SEC_ERROR_EXTENSION_NOT_FOUND) {
++		dprintf("Got SEC_ERROR_EXTENSION_NOT_FOUND; clearing");
++		PORT_SetError(0);
++		errnum = 0;
++	}
++	if (cert == NULL) {
++		if (!errnum)
++			PORT_SetError(SEC_ERROR_UNKNOWN_CERT);
+ 		return SECFailure;
++	}
+ 
+ 	privkey = PK11_FindPrivateKeyFromCert(slot, cert, cbd->cms);
+ 	if (privkey != NULL) {
+@@ -350,6 +360,7 @@ is_valid_cert(CERTCertificate *cert, void *data)
+ 		cbd->cert = CERT_DupCertificate(cert);
+ 		CERT_DestroyCertificate(cert);
+ 		SECKEY_DestroyPrivateKey(privkey);
++		PORT_SetError(0);
+ 		return SECSuccess;
+ 	}
+ 	return SECFailure;
+@@ -361,9 +372,20 @@ is_valid_cert_without_private_key(CERTCertificate *cert, void *data)
+ 	struct validity_cbdata *cbd = (struct validity_cbdata *)data;
+ 	PK11SlotInfo *slot = cbd->slot;
+ 	SECKEYPrivateKey *privkey = NULL;
++	int errnum;
+ 
+-	if (cert == NULL)
++	errnum = PORT_GetError();
++	if (errnum == SEC_ERROR_EXTENSION_NOT_FOUND) {
++		dprintf("Got SEC_ERROR_EXTENSION_NOT_FOUND; clearing");
++		PORT_SetError(0);
++		errnum = 0;
++	}
++	if (cert == NULL) {
++		if (!errnum)
++			PORT_SetError(SEC_ERROR_UNKNOWN_CERT);
+ 		return SECFailure;
++	}
++
+ 	privkey = PK11_FindPrivateKeyFromCert(slot, cert, cbd->cms);
+ 	if (privkey == NULL) {
+ 		if (cbd->cert)
+@@ -402,6 +424,7 @@ PK11_DestroySlotListElement(PK11SlotList *slots, PK11SlotListElement **psle)
+ int
+ unlock_nss_token(cms_context *cms)
+ {
++	dprintf("setting password function to %s", cms->func ? "cms->func" : "SECU_GetModulePassword");
+ 	PK11_SetPasswordFunc(cms->func ? cms->func : SECU_GetModulePassword);
+ 
+ 	PK11SlotList *slots = NULL;
+@@ -438,11 +461,12 @@ unlock_nss_token(cms_context *cms)
+ 		status = PK11_Authenticate(psle->slot, PR_TRUE, cms);
+ 		if (status != SECSuccess) {
+ 			save_port_err() {
++				int err = PORT_GetError();
+ 				PK11_DestroySlotListElement(slots, &psle);
+ 				PK11_FreeSlotList(slots);
+ 				cms->log(cms, LOG_ERR,
+-					 "authentication failed for token \"%s\"",
+-					 cms->tokenname);
++					 "authentication failed for token \"%s\": %s",
++					 cms->tokenname, PORT_ErrorToString(err));
+ 			}
+ 			return -1;
+ 		}
+@@ -462,6 +486,7 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 		return -1;
+ 	}
+ 
++	dprintf("setting password function to %s", cms->func ? "cms->func" : "SECU_GetModulePassword");
+ 	PK11_SetPasswordFunc(cms->func ? cms->func : SECU_GetModulePassword);
+ 
+ 	PK11SlotList *slots = NULL;
+@@ -479,8 +504,12 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 	}
+ 
+ 	while (psle) {
+-		if (!strcmp(cms->tokenname, PK11_GetTokenName(psle->slot)))
++		dprintf("looking for token \"%s\", got \"%s\"",
++			cms->tokenname, PK11_GetTokenName(psle->slot));
++		if (!strcmp(cms->tokenname, PK11_GetTokenName(psle->slot))) {
++			dprintf("found token \"%s\"", cms->tokenname);
+ 			break;
++		}
+ 
+ 		psle = PK11_GetNextSafe(slots, psle, PR_FALSE);
+ 	}
+@@ -492,16 +521,18 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 		nssreterr(-1, "Could not find token \"%s\"", cms->tokenname);
+ 	}
+ 
++	int errnum;
+ 	SECStatus status;
+ 	if (PK11_NeedLogin(psle->slot) && !PK11_IsLoggedIn(psle->slot, cms)) {
+ 		status = PK11_Authenticate(psle->slot, PR_TRUE, cms);
+ 		if (status != SECSuccess) {
+ 			save_port_err() {
++				errnum = PORT_GetError();
+ 				PK11_DestroySlotListElement(slots, &psle);
+ 				PK11_FreeSlotList(slots);
+ 				cms->log(cms, LOG_ERR,
+-					 "authentication failed for token \"%s\"",
+-					 cms->tokenname);
++					 "authentication failed for token \"%s\": %s",
++					 cms->tokenname, PORT_ErrorToString(errnum));
+ 			}
+ 			return -1;
+ 		}
+@@ -530,29 +561,48 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 	cbd.slot = psle->slot;
+ 	cbd.cert = NULL;
+ 
++	PORT_SetError(SEC_ERROR_UNKNOWN_CERT);
+ 	if (needs_private_key) {
+ 		status = PK11_TraverseCertsForNicknameInSlot(&nickname,
+ 					psle->slot, is_valid_cert, &cbd);
++		errnum = PORT_GetError();
++		if (errnum)
++			dprintf("PK11_TraverseCertsForNicknameInSlot():%s:%s",
++				PORT_ErrorToName(errnum), PORT_ErrorToString(errnum));
+ 	} else {
+ 		status = PK11_TraverseCertsForNicknameInSlot(&nickname,
+ 					psle->slot,
+ 					is_valid_cert_without_private_key,
+ 					&cbd);
++		errnum = PORT_GetError();
++		if (errnum)
++			dprintf("PK11_TraverseCertsForNicknameInSlot():%s:%s",
++				PORT_ErrorToName(errnum), PORT_ErrorToString(errnum));
+ 	}
++	dprintf("status:%d cbd.cert:%p", status, cbd.cert);
+ 	if (status == SECSuccess && cbd.cert != NULL) {
+ 		if (cms->cert)
+ 			CERT_DestroyCertificate(cms->cert);
+ 		cms->cert = CERT_DupCertificate(cbd.cert);
++	} else {
++		errnum = PORT_GetError();
++		dprintf("token traversal %s; cert %sfound:%s:%s",
++			status == SECSuccess ? "succeeded" : "failed",
++			cbd.cert == NULL ? "not" : "",
++			PORT_ErrorToName(errnum), PORT_ErrorToString(errnum));
+ 	}
+ 
+ 	save_port_err() {
++		dprintf("Destroying cert list");
+ 		CERT_DestroyCertList(certlist);
++		dprintf("Destroying slot list element");
+ 		PK11_DestroySlotListElement(slots, &psle);
++		dprintf("Destroying slot list");
+ 		PK11_FreeSlotList(slots);
+ 		cms->psle = NULL;
+ 	}
+ 	if (status != SECSuccess || cms->cert == NULL)
+-		cmsreterr(-1, cms, "could not find certificate in list");
++		cmsreterr(-1, cms, "could not find certificate");
+ 
+ 	return 0;
+ }
+@@ -565,6 +615,7 @@ find_slot_for_token(cms_context *cms, PK11SlotInfo **slot)
+ 		return -1;
+ 	}
+ 
++	dprintf("setting password function to %s", cms->func ? "cms->func" : "SECU_GetModulePassword");
+ 	PK11_SetPasswordFunc(cms->func ? cms->func : SECU_GetModulePassword);
+ 
+ 	PK11SlotList *slots = NULL;
+@@ -600,11 +651,12 @@ find_slot_for_token(cms_context *cms, PK11SlotInfo **slot)
+ 		status = PK11_Authenticate(psle->slot, PR_TRUE, cms);
+ 		if (status != SECSuccess) {
+ 			save_port_err() {
++				int err = PORT_GetError();
+ 				PK11_DestroySlotListElement(slots, &psle);
+ 				PK11_FreeSlotList(slots);
+ 				cms->log(cms, LOG_ERR,
+-					 "authentication failed for token \"%s\"",
+-					 cms->tokenname);
++					 "authentication failed for token \"%s\": %s",
++					 cms->tokenname, PORT_ErrorToString(err));
+ 			}
+ 			return -1;
+ 		}
+@@ -621,6 +673,7 @@ find_named_certificate(cms_context *cms, char *name, CERTCertificate **cert)
+ 		return -1;
+ 	}
+ 
++	dprintf("setting password function to %s", cms->func ? "cms->func" : "SECU_GetModulePassword");
+ 	PK11_SetPasswordFunc(cms->func ? cms->func : SECU_GetModulePassword);
+ 
+ 	PK11SlotList *slots = NULL;
+@@ -658,11 +711,12 @@ find_named_certificate(cms_context *cms, char *name, CERTCertificate **cert)
+ 		status = PK11_Authenticate(psle->slot, PR_TRUE, cms);
+ 		if (status != SECSuccess) {
+ 			save_port_err() {
++				int err = PORT_GetError();
+ 				PK11_DestroySlotListElement(slots, &psle);
+ 				PK11_FreeSlotList(slots);
+ 				cms->log(cms, LOG_ERR,
+-					 "authentication failed for token \"%s\"",
+-					 cms->tokenname);
++					 "authentication failed for token \"%s\": %s",
++					 cms->tokenname, PORT_ErrorToString(err));
+ 			}
+ 			return -1;
+ 		}
+diff --git a/src/cms_pe_common.c b/src/cms_pe_common.c
+index b5ef2b73058..e5a33eb6fe1 100644
+--- a/src/cms_pe_common.c
++++ b/src/cms_pe_common.c
+@@ -198,8 +198,8 @@ generate_digest(cms_context *cms, Pe *pe, int padded)
+ 			__FILE__, __func__, __LINE__);
+ 		goto error;
+ 	}
+-	dprintf("beginning of hash\n");
+-	dprintf("digesting %lx + %lx\n", hash_base - map, hash_size);
++	dprintf("beginning of hash");
++	dprintf("digesting %lx + %lx", hash_base - map, hash_size);
+ 	generate_digest_step(cms, hash_base, hash_size);
+ 
+ 	/* 5. Skip over the image checksum
+@@ -224,7 +224,7 @@ generate_digest(cms_context *cms, Pe *pe, int padded)
+ 		goto error;
+ 	}
+ 	generate_digest_step(cms, hash_base, hash_size);
+-	dprintf("digesting %lx + %lx\n", hash_base - map, hash_size);
++	dprintf("digesting %lx + %lx", hash_base - map, hash_size);
+ 
+ 	/* 8. Skip over the crt dir
+ 	 * 9. Hash everything up to the end of the image header. */
+@@ -239,7 +239,7 @@ generate_digest(cms_context *cms, Pe *pe, int padded)
+ 		goto error;
+ 	}
+ 	generate_digest_step(cms, hash_base, hash_size);
+-	dprintf("digesting %lx + %lx\n", hash_base - map, hash_size);
++	dprintf("digesting %lx + %lx", hash_base - map, hash_size);
+ 
+ 	/* 10. Set SUM_OF_BYTES_HASHED to the size of the header. */
+ 	hashed_bytes = pe32opthdr ? pe32opthdr->header_size
+@@ -275,16 +275,16 @@ generate_digest(cms_context *cms, Pe *pe, int padded)
+ 			char *name = shdrs[i].name;
+ 			if (name && name[0] == '/')
+ 				name = get_str(pe, name + 1);
+-			dprintf("section:\"%s\"\n", name ? name : "(null)");
++			dprintf("section:\"%s\"", name ? name : "(null)");
+ 			if (name && !strcmp(name, ".vendor_cert")) {
+-				dprintf("skipping .vendor_cert section\n");
++				dprintf("skipping .vendor_cert section");
+ 				hashed_bytes += hash_size;
+ 				continue;
+ 			}
+ 		}
+ 
+ 		generate_digest_step(cms, hash_base, hash_size);
+-		dprintf("digesting %lx + %lx\n", hash_base - map, hash_size);
++		dprintf("digesting %lx + %lx", hash_base - map, hash_size);
+ 
+ 		hashed_bytes += hash_size;
+ 	}
+@@ -305,13 +305,13 @@ generate_digest(cms_context *cms, Pe *pe, int padded)
+ 			memset(tmp_array, '\0', tmp_size);
+ 			memcpy(tmp_array, hash_base, hash_size);
+ 			generate_digest_step(cms, tmp_array, tmp_size);
+-			dprintf("digesting %lx + %lx\n", (unsigned long)tmp_array, tmp_size);
++			dprintf("digesting %lx + %lx", (unsigned long)tmp_array, tmp_size);
+ 		} else {
+ 			generate_digest_step(cms, hash_base, hash_size);
+-			dprintf("digesting %lx + %lx\n", hash_base - map, hash_size);
++			dprintf("digesting %lx + %lx", hash_base - map, hash_size);
+ 		}
+ 	}
+-	dprintf("end of hash\n");
++	dprintf("end of hash");
+ 
+ 	rc = generate_digest_finish(cms);
+ 	if (rc < 0)
+diff --git a/src/file_kmod.c b/src/file_kmod.c
+index 077f0579e77..994e5639e71 100644
+--- a/src/file_kmod.c
++++ b/src/file_kmod.c
+@@ -84,8 +84,9 @@ kmod_write_signature(cms_context *cms, int outfd)
+ 					  digest_get_digest_oid(cms),
+ 					  digest, NULL, NULL);
+ 	if (!cinfo) {
+-		cms->log(cms, LOG_ERR, "failed to create signed data: %s",
+-			 PORT_ErrorToString(PORT_GetError()));
++		cms->log(cms, LOG_ERR, "failed to create signed data: %s (%s)",
++			 PORT_ErrorToString(PORT_GetError()),
++			 PORT_ErrorToName(PORT_GetError()));
+ 		return -1;
+ 	}
+ 
+diff --git a/src/file_pe.c b/src/file_pe.c
+index 31672c68f79..5b6ac21763a 100644
+--- a/src/file_pe.c
++++ b/src/file_pe.c
+@@ -22,6 +22,7 @@
+ #include <fcntl.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
++#include <prerror.h>
+ 
+ #include "pesign.h"
+ #include "pesign_standalone.h"
+@@ -144,6 +145,7 @@ void
+ pe_handle_action(pesign_context *ctxp, int action, int padding)
+ {
+ 	ssize_t sigspace = 0;
++	int err;
+ 	int rc;
+ 
+ 	switch (action) {
+@@ -265,6 +267,9 @@ pe_handle_action(pesign_context *ctxp, int action, int padding)
+ 			break;
+ 		/* generate a signature and save it in a separate file */
+ 		case EXPORT_SIGNATURE|GENERATE_SIGNATURE:
++			err = PORT_GetError();
++			dprintf("PORT_GetError():%s:%s", PORT_ErrorToName(err), PORT_ErrorToString(err));
++			PORT_SetError(0);
+ 			rc = find_certificate(ctxp->cms_ctx, 1);
+ 			conderrx(rc < 0, 1, "Could not find certificate %s",
+ 				 ctxp->cms_ctx->certname);
+@@ -277,6 +282,8 @@ pe_handle_action(pesign_context *ctxp, int action, int padding)
+ 		/* generate a signature and embed it in the binary */
+ 		case IMPORT_SIGNATURE|GENERATE_SIGNATURE:
+ 			check_inputs(ctxp);
++			err = PORT_GetError();
++			dprintf("PORT_GetError():%s:%s", PORT_ErrorToName(err), PORT_ErrorToString(err));
+ 			rc = find_certificate(ctxp->cms_ctx, 1);
+ 			conderrx(rc < 0, 1, "Could not find certificate %s",
+ 				 ctxp->cms_ctx->certname);
+diff --git a/src/password.c b/src/password.c
+index 0a4ef411ff7..13bd9b12320 100644
+--- a/src/password.c
++++ b/src/password.c
+@@ -58,15 +58,19 @@ print_prompt(FILE *in, FILE *out, char *prompt)
+ 	int infd = fileno(in);
+ 	struct termios tio;
+ 
++	ingress();
+ 	if (!isatty(infd))
+ 		return;
+ 
+-	fprintf(out, "%s", prompt);
+-	fflush(out);
++	if (out) {
++		fprintf(out, "%s", prompt);
++		fflush(out);
++	}
+ 
+ 	tcgetattr(infd, &tio);
+ 	tio.c_lflag &= ~ECHO;
+ 	tcsetattr(infd, TCSAFLUSH, &tio);
++	egress();
+ }
+ 
+ static inline char *
+@@ -87,11 +91,14 @@ read_password(FILE *in, FILE *out, char *buf, size_t bufsz)
+ 	struct termios tio;
+ 	char *ret;
+ 
++	ingress();
+ 	ret = fgets(buf, bufsz, in);
+ 
+ 	if (isatty(infd)) {
+-		fprintf(out, "\n");
+-		fflush(out);
++		if (out) {
++			fprintf(out, "\n");
++			fflush(out);
++		}
+ 
+ 		tcgetattr(infd, &tio);
+ 		tio.c_lflag |= ECHO;
+@@ -101,6 +108,7 @@ read_password(FILE *in, FILE *out, char *buf, size_t bufsz)
+ 		return -1;
+ 
+ 	buf[strlen(buf)-1] = '\0';
++	egress();
+ 	return 0;
+ }
+ 
+@@ -109,15 +117,23 @@ check_password(char *cp)
+ {
+ 	unsigned int i;
+ 
+-	if (cp == NULL)
++	ingress();
++	if (cp == NULL) {
++		egress();
+ 		return PR_FALSE;
++	}
+ 
+ 	for (i = 0; cp[i] != 0; i++) {
+-		if (!isprint(cp[i]))
++		if (!isprint(cp[i])) {
++			egress();
+ 			return PR_FALSE;
++		}
+ 	}
+-	if (i == 0)
++	if (i == 0) {
++		egress();
+ 		return PR_FALSE;
++	}
++	egress();
+ 	return PR_TRUE;
+ }
+ 
+@@ -134,7 +150,8 @@ get_password(FILE *input, FILE *output, char *prompt, PRBool (*ok)(char *))
+ 	while(true) {
+ 		int rc;
+ 
+-		print_prompt(input, output, prompt);
++		if (prompt)
++			print_prompt(input, output, prompt);
+ 		rc = read_password(input, output, phrase, size);
+ 		if (rc < 0)
+ 			return NULL;
+@@ -160,7 +177,8 @@ SECU_GetPasswordString(void *arg UNUSED, char *prompt)
+ {
+ 	char *ret;
+ 	ingress();
+-	ret = get_password(stdin, stdout, prompt, check_password);
++	ret = get_password(stdin, stdout, prompt, NULL);
++	dprintf("password:\"%s\"", ret ? ret : "(null)");
+ 	egress();
+ 	return ret;
+ }
+diff --git a/src/pesign.c b/src/pesign.c
+index 0e7ce3d0a4e..b5c9823e1d4 100644
+--- a/src/pesign.c
++++ b/src/pesign.c
+@@ -434,6 +434,16 @@ main(int argc, char *argv[])
+ 			        "NSS says \"%s\" errno says \"%m\"\n",
+ 			     PORT_ErrorToString(PORT_GetError()));
+ 		}
++		/*
++		 * At this point there is *often* an error set, but we
++		 * should not get here if it was really an error; one
++		 * example is PR_LOAD_LIBRARY_ERROR is often set by PKCS11
++		 * modules that aren't present or whose physical token
++		 * devices aren't available.
++		 *
++		 * Clear it.
++		 */
++		PORT_SetError(0);
+ 
+ 		status = register_oids(ctxp->cms_ctx);
+ 		if (status != SECSuccess) {
+diff --git a/src/cms_common.h b/src/cms_common.h
+index a8c66cd3f9f..ee06f812a77 100644
+--- a/src/cms_common.h
++++ b/src/cms_common.h
+@@ -48,8 +48,9 @@
+ 		exit(rv);						\
+ 	})
+ #define cmsreterr(rv, cms, fmt, args...) ({				\
+-		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt ": %s",	\
++		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt ":%s:%s",	\
+ 			__FILE__, __func__, __LINE__, ## args,		\
++			PORT_ErrorToName(PORT_GetError()),		\
+ 			PORT_ErrorToString(PORT_GetError()));		\
+ 		return rv;						\
+ 	})
+-- 
+2.29.2
+

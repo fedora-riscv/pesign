@@ -1,0 +1,46 @@
+From fe2c0facc37f01bdcca8362cc4db7dbd701b6959 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 28 Apr 2020 10:18:08 -0400
+Subject: [PATCH 24/42] Work around some NSS SECOID_AddEntry() bugs
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/oid.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/src/oid.c b/src/oid.c
+index 4d95ede4046..a2e63093c00 100644
+--- a/src/oid.c
++++ b/src/oid.c
+@@ -72,17 +72,25 @@ static struct {
+ SECStatus
+ register_oids(cms_context *cms)
+ {
++	int err = PORT_GetError();
++	PORT_SetError(0);
+ 	for (int i = 0; oids[i].oid != END_OID_LIST; i++) {
+ 		SECOidTag rc;
+ 		rc = SECOID_AddEntry(&oids[i].sod);
+ 		oids[i].sod.offset = rc;
+ 		if (rc == SEC_OID_UNKNOWN) {
+-			cms->log(cms, LOG_ERR, "SECOid_AddEntry() failed: %s",
+-				PORT_ErrorToString(PORT_GetError()));
+-			return SECFailure;
++			cmsreterr(SECFailure, cms,
++				  "SECOid_AddEntry() failed: %s",
++				  PORT_ErrorToString(PORT_GetError()));
++		} else {
+ 		}
+ 	}
+ 
++	/*
++	 * SECOID_AddEntry() leaves the error status that it
++	 * used to look it up set.  This is very annoying.
++	 */
++	PORT_SetError(err);
+ 	return SECSuccess;
+ }
+ 
+-- 
+2.29.2
+

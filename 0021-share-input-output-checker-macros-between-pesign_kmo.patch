@@ -1,0 +1,411 @@
+From 9209c1e45ca7fa0c821f0da57dd6e1ff746de267 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 21 May 2019 14:29:24 -0400
+Subject: [PATCH 21/42] share input/output checker macros between pesign_kmod
+ and file_pe
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/file_pe.c        |  48 ---------------
+ src/pesign.c         |   2 +
+ src/pesign_kmod.c    | 142 ++++++++-----------------------------------
+ src/pesign_context.h |  20 ++++--
+ src/util.h           |  65 ++++++++++++++++++++
+ 5 files changed, 110 insertions(+), 167 deletions(-)
+
+diff --git a/src/file_pe.c b/src/file_pe.c
+index ad076eba961..31672c68f79 100644
+--- a/src/file_pe.c
++++ b/src/file_pe.c
+@@ -104,54 +104,6 @@ open_output(pesign_context *ctx)
+ 	pe_clearcert(ctx->outpe);
+ }
+ 
+-#define define_input_file(fname, name, descr)                           \
+-        static void                                                     \
+-        CAT3(open_, fname, _input)(pesign_context *ctx)                 \
+-        {                                                               \
+-                conderrx(!ctx->name, 1,                                 \
+-                         "No input file specified for %s",              \
+-                         descr);                                        \
+-                ctx->CAT(name, fd) =                                    \
+-                        open(ctx->name, O_RDONLY|O_CLOEXEC);            \
+-                conderr(ctx->CAT(name, fd) < 0, 1,                      \
+-                        "Error opening %s file \"%s\" for input",       \
+-                        descr, ctx->name);                              \
+-        }                                                               \
+-        static void                                                     \
+-        CAT3(close_, fname, _input)(pesign_context *ctx)                \
+-        {                                                               \
+-                close(ctx->CAT(name, fd));                              \
+-                ctx->CAT(name, fd) = -1;                                \
+-        }
+-
+-#define define_output_file(fname, name, descr)                          \
+-        static void                                                     \
+-        CAT3(open_, fname, _output)(pesign_context *ctx)                \
+-        {                                                               \
+-                conderrx(!ctx->name, 1,                                 \
+-                         "No output file specified for %s.",            \
+-                         descr);                                        \
+-                                                                        \
+-                if (access(ctx->name, F_OK) == 0 && ctx->force == 0)    \
+-                        errx(1,                                         \
+-                             "\"%s\" exists and --force was not given.",\
+-                             ctx->name);                                \
+-                                                                        \
+-                ctx->CAT(name, fd) =                                    \
+-                        open(ctx->name,                                 \
+-                             O_RDWR|O_CREAT|O_TRUNC|O_CLOEXEC,          \
+-                             ctx->outmode);                             \
+-                conderr(ctx->CAT(name, fd) < 0, 1,                      \
+-                        "Error opening %s file \"%s\" for output",      \
+-                        descr, ctx->name);                              \
+-        }                                                               \
+-        static void                                                     \
+-        CAT3(close_, fname, _output)(pesign_context *ctx)               \
+-        {                                                               \
+-                close(ctx->CAT(name,fd));                               \
+-                ctx->CAT(name,fd) = -1;                                 \
+-        }
+-
+ define_input_file(rawsig, rawsig, "raw signature");
+ define_input_file(sattr, insattrs, "signed attributes");
+ define_output_file(sattr, outsattrs, "signed attributes");
+diff --git a/src/pesign.c b/src/pesign.c
+index 95a832df9e4..d2f3f221df0 100644
+--- a/src/pesign.c
++++ b/src/pesign.c
+@@ -462,3 +462,5 @@ main(int argc, char *argv[])
+ 
+ 	return (rc < 0);
+ }
++
++// vim:fenc=utf-8:tw=75:noet
+diff --git a/src/pesign_kmod.c b/src/pesign_kmod.c
+index 916ae52ebe2..a9799b83fa8 100644
+--- a/src/pesign_kmod.c
++++ b/src/pesign_kmod.c
+@@ -26,96 +26,10 @@
+ #include "pesign_standalone.h"
+ #include "file_kmod.h"
+ 
+-static void
+-open_input(pesign_context *ctx)
+-{
+-	struct stat statbuf;
+-
+-	if (!ctx->infile) {
+-		fprintf(stderr, "pesign: No input file specified.\n");
+-		exit(1);
+-	}
+-
+-	ctx->infd = open(ctx->infile, O_RDONLY|O_CLOEXEC);
+-	if (ctx->infd < 0) {
+-		fprintf(stderr, "pesign: Error opening input: %m\n");
+-		exit(1);
+-	}
+-
+-	if (fstat(ctx->infd, &statbuf)) {
+-		fprintf(stderr, "pesign: Error on stat input: %m\n");
+-		exit(1);
+-	}
+-
+-	ctx->outmode = statbuf.st_mode;
+-	ctx->inlength = statbuf.st_size;
+-}
+-
+-static void
+-close_input(pesign_context *ctx)
+-{
+-	close(ctx->infd);
+-	ctx->infd = -1;
+-}
+-
+-static void
+-open_output(pesign_context *ctx)
+-{
+-	if (!ctx->outfile) {
+-		fprintf(stderr, "pesign: No output file specified.\n");
+-		exit(1);
+-	}
+-
+-	if (access(ctx->outfile, F_OK) == 0 && ctx->force == 0) {
+-		fprintf(stderr, "pesign: \"%s\" exists and --force was "
+-				"not given.\n", ctx->outfile);
+-		exit(1);
+-	}
+-
+-	ctx->outfd = open(ctx->outfile, O_RDWR|O_CREAT|O_TRUNC|O_CLOEXEC,
+-			ctx->outmode);
+-	if (ctx->outfd < 0) {
+-		fprintf(stderr, "pesign: Error opening output: %m\n");
+-		exit(1);
+-	}
+-}
+-
+-static void
+-close_output(pesign_context *ctx)
+-{
+-	close(ctx->outfd);
+-	ctx->outfd = -1;
+-}
+-
+-static void
+-open_sig_output(pesign_context *ctx)
+-{
+-	if (!ctx->outsig) {
+-		fprintf(stderr, "pesign: No output file specified.\n");
+-		exit(1);
+-	}
+-
+-	if (access(ctx->outsig, F_OK) == 0 && ctx->force == 0) {
+-		fprintf(stderr, "pesign: \"%s\" exists and --force "
+-				"was not given.\n", ctx->outsig);
+-		exit(1);
+-	}
+-
+-	ctx->outsigfd = open(ctx->outsig, O_RDWR|O_CREAT|O_TRUNC|O_CLOEXEC,
+-				ctx->outmode);
+-	if (ctx->outsigfd < 0) {
+-		fprintf(stderr, "pesign: Error opening signature for output: "
+-				"%m\n");
+-		exit(1);
+-	}
+-}
+-
+-static void
+-close_sig_output(pesign_context *ctx)
+-{
+-	close(ctx->outsigfd);
+-	ctx->outsigfd = -1;
+-}
++define_input_file(kmod, inkmod, "kmod");
++define_output_file(kmod, outkmod, "kmod");
++define_output_file(sig, outsig, "signature");
++define_input_file(sig, insig, "signature");
+ 
+ static void
+ import_sig_input(pesign_context *ctx)
+@@ -124,17 +38,7 @@ import_sig_input(pesign_context *ctx)
+ 	struct stat statbuf;
+ 	int rc;
+ 
+-	if (!ctx->insig) {
+-		fprintf(stderr, "pesign: No input file specified.\n");
+-		exit(1);
+-	}
+-
+-	ctx->insigfd = open(ctx->insig, O_RDONLY|O_CLOEXEC);
+-	if (ctx->insigfd < 0) {
+-		fprintf(stderr, "pesign: Error opening signature for input: "
+-				"%m\n");
+-		exit(1);
+-	}
++	open_sig_input(ctx);
+ 
+ 	rc = fstat(ctx->insigfd, &statbuf);
+ 	conderr(rc < 0, 1, "Could not fstat signature file \"%s\"",
+@@ -143,10 +47,10 @@ import_sig_input(pesign_context *ctx)
+ 	/* Copy original module data */
+ 
+ 	map = mmap(NULL, ctx->inlength, PROT_READ, MAP_PRIVATE, ctx->infd, 0);
+-	conderr(map == MAP_FAILED, 1, "Could not map kmod input");
++	conderr(map == MAP_FAILED, 1, "Could not map kmod input file \"%s\"", ctx->inkmod);
+ 
+ 	rc = write_file(ctx->outfd, map, ctx->inlength);
+-	conderr(rc < 0, 1, "Failed to write module data");
++	conderr(rc < 0, 1, "Failed to write module data to \"%s\"", ctx->outkmod);
+ 
+ 	munmap(map, ctx->inlength);
+ 
+@@ -171,7 +75,7 @@ handle_signing(pesign_context *ctx, int outfd, int attached)
+ 	ssize_t sig_len;
+ 
+ 	inmap = mmap(NULL, ctx->inlength, PROT_READ, MAP_PRIVATE, ctx->infd, 0);
+-	conderrx(inmap == MAP_FAILED, 1, "Error mapping input kmod");
++	conderr(inmap == MAP_FAILED, 1, "Could not map input kmod file \"%s\"", ctx->inkmod);
+ 
+ 	rc = kmod_generate_digest(ctx->cms_ctx, inmap, ctx->inlength);
+ 	if (rc < 0)
+@@ -179,7 +83,7 @@ handle_signing(pesign_context *ctx, int outfd, int attached)
+ 
+ 	if (attached) {
+ 		rc = write_file(outfd, inmap, ctx->inlength);
+-		conderr(rc < 0, 1, "Failed to write module data");
++		conderr(rc < 0, 1, "Failed to write module data to \"%s\"", ctx->outkmod);
+ 	}
+ 	munmap(inmap, ctx->inlength);
+ 
+@@ -205,11 +109,13 @@ kmod_handle_action(pesign_context *ctxp, int action)
+ 			conderrx(ctxp->signum > ctxp->cms_ctx->num_signatures + 1,
+ 				 1, "Invalid signature number.");
+ 
+-			open_input(ctxp);
+-			open_output(ctxp);
++			open_kmod_input(ctxp);
++			proxy_fd_mode(ctxp->inkmodfd, ctxp->inkmod,
++				      &ctxp->outmode, &ctxp->inlength);
++			open_kmod_output(ctxp);
+ 			handle_signing(ctxp, ctxp->outfd, 1);
+-			close_output(ctxp);
+-			close_input(ctxp);
++			close_kmod_output(ctxp);
++			close_kmod_input(ctxp);
+ 			break;
+ 
+ 		/* generate a signature and save it in a separate file */
+@@ -220,22 +126,26 @@ kmod_handle_action(pesign_context *ctxp, int action)
+ 			conderrx(ctxp->signum > ctxp->cms_ctx->num_signatures + 1,
+ 				 1, "Invalid signature number.");
+ 
+-			open_input(ctxp);
++			open_kmod_input(ctxp);
++			proxy_fd_mode(ctxp->inkmodfd, ctxp->inkmod,
++				      &ctxp->outmode, &ctxp->inlength);
+ 			open_sig_output(ctxp);
+ 			handle_signing(ctxp, ctxp->outsigfd, 0);
+ 			close_sig_output(ctxp);
+-			close_input(ctxp);
++			close_kmod_input(ctxp);
+ 			break;
+ 
+ 		/* add a signature from a file */
+ 		case IMPORT_SIGNATURE:
+ 			conderrx(ctxp->signum > ctxp->cms_ctx->num_signatures + 1,
+ 				 1, "Invalid signature number.");
+-			open_input(ctxp);
+-			open_output(ctxp);
++			open_kmod_input(ctxp);
++			proxy_fd_mode(ctxp->inkmodfd, ctxp->inkmod,
++				      &ctxp->outmode, &ctxp->inlength);
++			open_kmod_output(ctxp);
+ 			import_sig_input(ctxp);
+-			close_input(ctxp);
+-			close_output(ctxp);
++			close_kmod_input(ctxp);
++			close_kmod_output(ctxp);
+ 			break;
+ 
+ 		default:
+@@ -249,3 +159,5 @@ kmod_handle_action(pesign_context *ctxp, int action)
+ 			exit(1);
+ 	}
+ }
++
++// vim:fenc=utf-8:tw=75:noet
+diff --git a/src/pesign_context.h b/src/pesign_context.h
+index 8d8dfbd294e..45d6831aa7f 100644
+--- a/src/pesign_context.h
++++ b/src/pesign_context.h
+@@ -32,10 +32,22 @@ typedef enum {
+ } file_format;
+ 
+ typedef struct {
+-	int infd;
+-	int outfd;
+-	char *infile;
+-	char *outfile;
++	union {
++		int infd;
++		int inkmodfd;
++	};
++	union {
++		int outfd;
++		int outkmodfd;
++	};
++	union {
++		char *infile;
++		char *inkmod;
++	};
++	union {
++		char *outfile;
++		char *outkmod;
++	};
+ 	size_t inlength;
+ 	mode_t outmode;
+ 
+diff --git a/src/util.h b/src/util.h
+index 1b115a993f6..9b34f7b8886 100644
+--- a/src/util.h
++++ b/src/util.h
+@@ -24,6 +24,8 @@
+ #include <string.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <sys/types.h>
++#include <sys/stat.h>
+ #include <unistd.h>
+ 
+ #include <libdpe/pe.h>
+@@ -207,4 +209,67 @@ content_is_empty(uint8_t *data, ssize_t len)
+ 	return 1;
+ }
+ 
++#define define_input_file(fname, name, descr)                           \
++        static void                                                     \
++        CAT3(open_, fname, _input)(pesign_context *ctx)                 \
++        {                                                               \
++                conderrx(!ctx->name, 1,                                 \
++                         "No input file specified for %s",              \
++                         descr);                                        \
++                ctx->CAT(name, fd) =                                    \
++                        open(ctx->name, O_RDONLY|O_CLOEXEC);            \
++                conderr(ctx->CAT(name, fd) < 0, 1,                      \
++                        "Error opening %s file \"%s\" for input",       \
++                        descr, ctx->name);                              \
++        }                                                               \
++        static void                                                     \
++        CAT3(close_, fname, _input)(pesign_context *ctx)                \
++        {                                                               \
++                close(ctx->CAT(name, fd));                              \
++                ctx->CAT(name, fd) = -1;                                \
++        }
++
++#define define_output_file(fname, name, descr)                          \
++        static void                                                     \
++        CAT3(open_, fname, _output)(pesign_context *ctx)                \
++        {                                                               \
++                conderrx(!ctx->name, 1,                                 \
++                         "No output file specified for %s.",            \
++                         descr);                                        \
++                                                                        \
++                if (access(ctx->name, F_OK) == 0 && ctx->force == 0)    \
++                        errx(1,                                         \
++                             "\"%s\" exists and --force was not given.",\
++                             ctx->name);                                \
++                                                                        \
++                ctx->CAT(name, fd) =                                    \
++                        open(ctx->name,                                 \
++                             O_RDWR|O_CREAT|O_TRUNC|O_CLOEXEC,          \
++                             ctx->outmode);                             \
++                conderr(ctx->CAT(name, fd) < 0, 1,                      \
++                        "Error opening %s file \"%s\" for output",      \
++                        descr, ctx->name);                              \
++        }                                                               \
++        static void                                                     \
++        CAT3(close_, fname, _output)(pesign_context *ctx)               \
++        {                                                               \
++                close(ctx->CAT(name,fd));                               \
++                ctx->CAT(name,fd) = -1;                                 \
++        }
++
++static inline void
++proxy_fd_mode(int fd, char *infile, mode_t *outmode, size_t *inlength)
++{
++	struct stat statbuf;
++	int rc;
++
++	rc = fstat(fd, &statbuf);
++	conderr(rc < 0, 1, "Could not fstat \"%s\"", infile);
++	if (outmode)
++		*outmode = statbuf.st_mode;
++	if (inlength)
++		*inlength = statbuf.st_size;
++}
++
+ #endif /* PESIGN_UTIL_H */
++// vim:fenc=utf-8:tw=75:noet
+-- 
+2.29.2
+

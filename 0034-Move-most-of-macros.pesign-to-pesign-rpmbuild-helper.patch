@@ -1,7 +1,7 @@
-From fff0474cec240576352cebb3dc379f957e68536b Mon Sep 17 00:00:00 2001
+From 8fd6066496fc148945570371863597769b8ffe1d Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 6 Jul 2020 13:54:35 -0400
-Subject: [PATCH 08/12] Move most of macros.pesign to pesign-rpmbuild-helper
+Subject: [PATCH 34/42] Move most of macros.pesign to pesign-rpmbuild-helper
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -25,7 +25,7 @@ index 0bacafe0d01..d4cd626c11e 100644
  PKG_CONFIG = $(CROSS_COMPILE)pkg-config
  CC	:= $(if $(filter default,$(origin CC)),$(CROSS_COMPILE)gcc,$(CC))
 diff --git a/src/Makefile b/src/Makefile
-index 74327ba13f3..a7ca89159c6 100644
+index bc3e5931456..82c2dfdec3f 100644
 --- a/src/Makefile
 +++ b/src/Makefile
 @@ -5,7 +5,7 @@ include $(TOPDIR)/Make.version
@@ -37,7 +37,7 @@ index 74327ba13f3..a7ca89159c6 100644
  SVCTARGETS=pesign.sysvinit pesign.service
  TARGETS=$(BINTARGETS) $(SVCTARGETS)
  
-@@ -49,6 +49,11 @@ pesign : $(call objects-of,$(PESIGN_SOURCES) $(COMMON_SOURCES) $(COMMON_PE_SOURC
+@@ -54,6 +54,11 @@ pesign : $(call objects-of,$(PESIGN_SOURCES) $(COMMON_SOURCES) $(COMMON_PE_SOURC
  pesign : LDLIBS+=$(TOPDIR)/libdpe/libdpe.a
  pesign : PKGS=efivar nss nspr popt
  
@@ -49,7 +49,7 @@ index 74327ba13f3..a7ca89159c6 100644
  deps : PKGS=efivar nss nspr popt uuid
  deps : $(ALL_SOURCES)
  	$(MAKE) -f $(TOPDIR)/Make.deps \
-@@ -94,6 +99,7 @@ install :
+@@ -99,6 +104,7 @@ install :
  	$(INSTALL) -m 644 macros.pesign $(INSTALLROOT)/etc/rpm/
  	$(INSTALL) -d -m 755 $(INSTALLROOT)$(libexecdir)/pesign/
  	$(INSTALL) -m 750 pesign-authorize $(INSTALLROOT)$(libexecdir)/pesign/

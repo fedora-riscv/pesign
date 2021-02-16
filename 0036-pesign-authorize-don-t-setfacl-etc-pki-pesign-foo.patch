@@ -1,7 +1,7 @@
-From d9bb31e204d4d3b64ba7168f934aea4cb4249110 Mon Sep 17 00:00:00 2001
+From 16b80efae3c932d2b966b0ee0095de367aa31c3a Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 14 Jul 2020 15:08:15 -0400
-Subject: [PATCH 10/12] pesign-authorize: don't setfacl /etc/pki/pesign-foo/
+Subject: [PATCH 36/42] pesign-authorize: don't setfacl /etc/pki/pesign-foo/
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---

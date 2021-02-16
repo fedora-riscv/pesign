@@ -1,0 +1,189 @@
+From d14dce18a8fa31e2097d99a717d87b23539b9098 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 15 May 2019 15:55:17 -0400
+Subject: [PATCH 14/42] Don't allow (or require) --module or --kernel with
+ --ca.
+
+If you're doing a CA/signer split setup, the CA shouldn't be allowed to
+sign things other than other certificates.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/efikeygen.c | 55 ++++++++++++++++++++++++++++++++-----------------
+ src/efikeygen.1 |  6 ++++--
+ 2 files changed, 40 insertions(+), 21 deletions(-)
+
+diff --git a/src/efikeygen.c b/src/efikeygen.c
+index 848480a9b01..b8b0c961739 100644
+--- a/src/efikeygen.c
++++ b/src/efikeygen.c
+@@ -54,6 +54,13 @@
+ #include "cms_common.h"
+ #include "oid.h"
+ 
++enum {
++	MODSIGN_EKU_NONE,
++	MODSIGN_EKU_KERNEL,
++	MODSIGN_EKU_MODULE,
++	MODSIGN_EKU_CA
++};
++
+ typedef struct {
+ 	SECItem data;
+ 	SECAlgorithmID keytype;
+@@ -183,8 +190,7 @@ add_key_usage(cms_context *cms, void *extHandle, int is_ca)
+ 
+ 	if (is_ca) {
+ 		usage = KU_KEY_CERT_SIGN |
+-			KU_CRL_SIGN |
+-			KU_DIGITAL_SIGNATURE;
++			KU_CRL_SIGN;
+ 	} else {
+ 		usage = KU_KEY_ENCIPHERMENT |
+ 			KU_DATA_ENCIPHERMENT |
+@@ -252,7 +258,7 @@ add_basic_constraints(cms_context *cms, void *extHandle)
+ }
+ 
+ static int
+-add_extended_key_usage(cms_context *cms, int modsign_only, void *extHandle)
++add_extended_key_usage(cms_context *cms, int modsign_eku, void *extHandle)
+ {
+ 	SECItem values[2];
+ 	SECItem wrapped = { 0 };
+@@ -260,7 +266,11 @@ add_extended_key_usage(cms_context *cms, int modsign_only, void *extHandle)
+ 	SECOidTag tag;
+ 	int rc;
+ 
+-	if (modsign_only < 1 || modsign_only > 2)
++	if (modsign_eku == MODSIGN_EKU_CA)
++		return 0;
++
++	if (modsign_eku != MODSIGN_EKU_KERNEL
++	    && modsign_eku != MODSIGN_EKU_MODULE)
+ 		cmsreterr(-1, cms, "could not encode extended key usage");
+ 
+ 	rc = make_eku_oid(cms, &values[0], SEC_OID_EXT_KEY_USAGE_CODE_SIGN);
+@@ -273,11 +283,10 @@ add_extended_key_usage(cms_context *cms, int modsign_only, void *extHandle)
+ 	if (rc < 0)
+ 		cmsreterr(-1, cms, "could not encode extended key usage");
+ 
+-	rc = wrap_in_seq(cms, &wrapped, values, modsign_only);
++	rc = wrap_in_seq(cms, &wrapped, values, modsign_eku);
+ 	if (rc < 0)
+ 		cmsreterr(-1, cms, "could not encode extended key usage");
+ 
+-
+ 	status = CERT_AddExtension(extHandle, SEC_OID_X509_EXT_KEY_USAGE,
+ 					&wrapped, PR_FALSE, PR_TRUE);
+ 	if (status != SECSuccess)
+@@ -311,7 +320,7 @@ static int
+ add_extensions_to_crq(cms_context *cms, CERTCertificateRequest *crq,
+ 			int is_ca, int is_self_signed, SECKEYPublicKey *pubkey,
+ 			SECKEYPublicKey *spubkey,
+-			char *url, int modsign_only)
++			char *url, int modsign_eku)
+ {
+ 	void *mark = PORT_ArenaMark(cms->arena);
+ 
+@@ -336,7 +345,7 @@ add_extensions_to_crq(cms_context *cms, CERTCertificateRequest *crq,
+ 	if (rc < 0)
+ 		cmsreterr(-1, cms, "could not generate certificate extensions");
+ 
+-	rc = add_extended_key_usage(cms, modsign_only, extHandle);
++	rc = add_extended_key_usage(cms, modsign_eku, extHandle);
+ 	if (rc < 0)
+ 		cmsreterr(-1, cms, "could not generate certificate extensions");
+ 
+@@ -486,7 +495,7 @@ int main(int argc, char *argv[])
+ {
+ 	int is_ca = 0;
+ 	int is_self_signed = -1;
+-	int modsign_only = 0;
++	int modsign_eku = MODSIGN_EKU_NONE;
+ 	char *tokenname = "NSS Certificate DB";
+ 	char *signer = NULL;
+ 	char *nickname = NULL;
+@@ -543,14 +552,14 @@ int main(int argc, char *argv[])
+ 		{.longName = "kernel",
+ 		 .shortName = 'k',
+ 		 .argInfo = POPT_ARG_VAL|POPT_ARGFLAG_OR,
+-		 .arg = &modsign_only,
+-		 .val = 1,
++		 .arg = &modsign_eku,
++		 .val = MODSIGN_EKU_KERNEL,
+ 		 .descrip = "Generate a kernel-signing certificate" },
+ 		{.longName = "module",
+ 		 .shortName = 'm',
+ 		 .argInfo = POPT_ARG_VAL|POPT_ARGFLAG_OR,
+-		 .arg = &modsign_only,
+-		 .val = 2,
++		 .arg = &modsign_eku,
++		 .val = MODSIGN_EKU_MODULE,
+ 		 .descrip = "Generate a module-signing certificate" },
+ 		{.longName = "nickname",
+ 		 .shortName = 'n',
+@@ -622,10 +631,12 @@ int main(int argc, char *argv[])
+ 	/*
+ 	 * Scenarios that are okay (x == valid combination)
+ 	 *
+-	 *         is_ca        is_self_signed       pubkey
+-	 * i_c     x            x                    x
+-	 * i_s_s   x            x                    o
+-	 * pubkey  x            o                    o
++	 *		is_ca   is_self_signed  pubkey	modules	kernel
++	 * i_c		x       x               x	o	o
++	 * i_s_s	x       x               o	o	o
++	 * pubkey	x       o               x	x	x
++	 * modules	o	x		x	x	x
++	 * kernel	o	x		x	x	x
+ 	 */
+ 
+ 	if (is_self_signed == -1)
+@@ -660,8 +671,14 @@ int main(int argc, char *argv[])
+ 			liberr(1, "could not allocate cms context");
+ 	}
+ 
+-	if (modsign_only < 1 || modsign_only > 2)
++	if (is_ca) {
++		if (modsign_eku != MODSIGN_EKU_NONE)
++			errx(1, "CA certificates cannot have kernel or module signing credentials.");
++		modsign_eku = MODSIGN_EKU_CA;
++	} else if (modsign_eku != MODSIGN_EKU_KERNEL
++		   && modsign_eku != MODSIGN_EKU_MODULE) {
+ 		errx(1, "either --kernel or --module must be used");
++	}
+ 
+ 	SECStatus status = NSS_InitReadWrite(dbdir);
+ 	if (status != SECSuccess)
+@@ -752,7 +769,7 @@ int main(int argc, char *argv[])
+ 	crq = CERT_CreateCertificateRequest(name, spki, &attributes);
+ 
+ 	rc = add_extensions_to_crq(cms, crq, is_ca, is_self_signed, pubkey,
+-					spubkey, url, modsign_only);
++					spubkey, url, modsign_eku);
+ 	if (rc < 0)
+ 		exit(1);
+ 
+diff --git a/src/efikeygen.1 b/src/efikeygen.1
+index 255fadc3979..88ee7c2f7c0 100644
+--- a/src/efikeygen.1
++++ b/src/efikeygen.1
+@@ -33,11 +33,13 @@ Nickname of certificate to be used to sign the generated certificate.
+ 
+ .TP
+ \fB-\-kernel\fR
+-The generated certificate is to be used to sign kernels.
++The generated certificate is to be used to sign kernels.  Not to be used for CA
++certificates.
+ 
+ .TP
+ \fB-\-module\fR
+-The generated certificate is to be used to sign kernel modules.
++The generated certificate is to be used to sign kernel modules.  Not to be used
++for CA certificates.
+ 
+ .TP
+ \fB-\-token\fR=\fItoken\fR
+-- 
+2.29.2
+

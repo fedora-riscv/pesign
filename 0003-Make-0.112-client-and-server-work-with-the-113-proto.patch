@@ -1,7 +1,7 @@
-From 72b21d7172ed6bdae88a5bcdadb7cc6b79f9d4f6 Mon Sep 17 00:00:00 2001
+From 3c525aa069dd52d85e3504e6179886a74aa14cd2 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 11 Jun 2020 16:23:14 -0400
-Subject: [PATCH 03/12] Make 0.112 client and server work with the 113 protocol
+Subject: [PATCH 03/42] Make 0.112 client and server work with the 113 protocol
  and vise versa
 
 This makes the version of the sign API that takes a file type optional,

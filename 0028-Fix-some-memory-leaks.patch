@@ -1,0 +1,88 @@
+From df954024f6e89d4b5947f1016f2e4e95505b45b1 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Tue, 16 Jun 2020 10:34:19 -0400
+Subject: [PATCH 28/42] Fix some memory leaks
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/cms_common.c | 10 ++++++++++
+ src/pesign.c     |  7 +++++++
+ 2 files changed, 17 insertions(+)
+
+diff --git a/src/cms_common.c b/src/cms_common.c
+index c2f34e515a2..7cd98bc994f 100644
+--- a/src/cms_common.c
++++ b/src/cms_common.c
+@@ -345,7 +345,10 @@ is_valid_cert(CERTCertificate *cert, void *data)
+ 
+ 	privkey = PK11_FindPrivateKeyFromCert(slot, cert, cbd->cms);
+ 	if (privkey != NULL) {
++		if (cbd->cert)
++			CERT_DestroyCertificate(cbd->cert);
+ 		cbd->cert = CERT_DupCertificate(cert);
++		CERT_DestroyCertificate(cert);
+ 		SECKEY_DestroyPrivateKey(privkey);
+ 		return SECSuccess;
+ 	}
+@@ -363,8 +366,15 @@ is_valid_cert_without_private_key(CERTCertificate *cert, void *data)
+ 		return SECFailure;
+ 	privkey = PK11_FindPrivateKeyFromCert(slot, cert, cbd->cms);
+ 	if (privkey == NULL) {
++		if (cbd->cert)
++			CERT_DestroyCertificate(cbd->cert);
++		PORT_SetError(0);
+ 		cbd->cert = CERT_DupCertificate(cert);
++		CERT_DestroyCertificate(cert);
+ 		return SECSuccess;
++	} else {
++		SECKEY_DestroyPrivateKey(privkey);
++		CERT_DestroyCertificate(cert);
+ 	}
+ 	return SECFailure;
+ }
+diff --git a/src/pesign.c b/src/pesign.c
+index e68a141b935..0e7ce3d0a4e 100644
+--- a/src/pesign.c
++++ b/src/pesign.c
+@@ -94,10 +94,12 @@ main(int argc, char *argv[])
+ 	int check_vendor_cert = 1;
+ 
+ 	char *digest_name = "sha256";
++	char *orig_digest_name = digest_name;
+ 	char *tokenname = "NSS Certificate DB";
+ 	char *origtoken = tokenname;
+ 	char *certname = NULL;
+ 	char *certdir = "/etc/pki/pesign";
++	char *orig_certdir = certdir;
+ 	char *signum = NULL;
+ 
+ 	secuPWData pwdata;
+@@ -349,6 +351,7 @@ main(int argc, char *argv[])
+ 			fprintf(stderr, "invalid signature number: %m\n");
+ 			exit(1);
+ 		}
++		free(signum);
+ 	}
+ 
+ 	int action = 0;
+@@ -473,6 +476,8 @@ main(int argc, char *argv[])
+ 	}
+ 	if (certname)
+ 		free(certname);
++	if (digest_name && digest_name != orig_digest_name)
++		free(digest_name);
+ 
+ 
+ 	if (ctxp->sign) {
+@@ -507,6 +512,8 @@ main(int argc, char *argv[])
+ 					break;
+ 			}
+ 	}
++	if (certdir && certdir != orig_certdir)
++		free(certdir);
+ 	pesign_context_free(ctxp);
+ 
+ 	if (!daemon) {
+-- 
+2.29.2
+

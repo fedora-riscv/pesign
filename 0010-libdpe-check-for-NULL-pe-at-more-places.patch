@@ -1,0 +1,132 @@
+From 8677eea21fc9b634b6b97e132a8c4295f2a9aa15 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 21 May 2020 14:27:01 -0400
+Subject: [PATCH 10/42] libdpe: check for NULL pe at more places.
+
+This isn't so much to fix a bug as to make "gcc -Wanalyze-..." output
+smaller where these things are called.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ libdpe/pe_addcert.c    | 17 +++++++++++++++++
+ libdpe/pe_allocspace.c | 19 +++++++++++++++++++
+ libdpe/libdpe_priv.h   |  2 ++
+ 3 files changed, 38 insertions(+)
+
+diff --git a/libdpe/pe_addcert.c b/libdpe/pe_addcert.c
+index 803ed61f7f0..b1251992ade 100644
+--- a/libdpe/pe_addcert.c
++++ b/libdpe/pe_addcert.c
+@@ -17,6 +17,7 @@
+  * Author(s): Peter Jones <pjones@redhat.com>
+  */
+ #include <unistd.h>
++
+ #include "libdpe_priv.h"
+ 
+ int
+@@ -25,6 +26,11 @@ pe_clearcert(Pe *pe)
+ 	int rc;
+ 	data_directory *dd = NULL;
+ 
++	if (!pe) {
++		errno = EINVAL;
++		return -1;
++	}
++
+ 	rc = pe_getdatadir(pe, &dd);
+ 	if (rc < 0)
+ 		return rc;
+@@ -43,6 +49,11 @@ pe_alloccert(Pe *pe, size_t size)
+ 	int rc;
+ 	data_directory *dd = NULL;
+ 
++	if (!pe) {
++		errno = EINVAL;
++		return -1;
++	}
++
+ 	pe_clearcert(pe);
+ 
+ 	uint32_t new_space = 0;
+@@ -69,6 +80,12 @@ pe_populatecert(Pe *pe, void *cert, size_t size)
+ {
+ 	int rc;
+ 	data_directory *dd = NULL;
++
++	if (!pe) {
++		errno = EINVAL;
++		return -1;
++	}
++
+ 	rc = pe_getdatadir(pe, &dd);
+ 	if (rc < 0)
+ 		return rc;
+diff --git a/libdpe/pe_allocspace.c b/libdpe/pe_allocspace.c
+index a2898f6d446..be704c52cf8 100644
+--- a/libdpe/pe_allocspace.c
++++ b/libdpe/pe_allocspace.c
+@@ -56,6 +56,11 @@ pe_fix_addresses(Pe *pe, int64_t offset)
+ int
+ pe_set_image_size(Pe *pe)
+ {
++	if (!pe) {
++		errno = EINVAL;
++		return -1;
++	}
++
+ 	uint32_t image_size = 0;
+ 	struct pe_hdr *pehdr = pe->state.pe.pehdr;
+ 	struct pe32plus_opt_hdr *opthdr = pe->state.pe32plus_exe.opthdr;
+@@ -86,6 +91,11 @@ pe_set_image_size(Pe *pe)
+ int
+ pe_extend_file(Pe *pe, size_t size, uint32_t *new_space, int align)
+ {
++	if (!pe) {
++		errno = EINVAL;
++		return -1;
++	}
++
+ 	void *new = NULL;
+ 
+ 	if (align)
+@@ -120,6 +130,10 @@ pe_shorten_file(Pe *pe, size_t size)
+ {
+ 	void *new = NULL;
+ 
++	if (!pe) {
++		errno = EINVAL;
++		return -1;
++	}
+ 	new = mremap(pe->map_address, pe->maximum_size,
+ 		pe->maximum_size - size, 0);
+ 	if (new == MAP_FAILED) {
+@@ -138,6 +152,11 @@ pe_shorten_file(Pe *pe, size_t size)
+ int
+ pe_freespace(Pe *pe, uint32_t offset, size_t size)
+ {
++	if (!pe) {
++		errno = EINVAL;
++		return -1;
++	}
++
+ 	void *addr = compute_mem_addr(pe, offset);
+ 	memset(addr, '\0', size);
+ 
+diff --git a/libdpe/libdpe_priv.h b/libdpe/libdpe_priv.h
+index 26e50498c1d..e207772097a 100644
+--- a/libdpe/libdpe_priv.h
++++ b/libdpe/libdpe_priv.h
+@@ -19,7 +19,9 @@
+ #ifndef LIBDPE_PRIV_H
+ #define LIBDPE_PRIV_H 1
+ 
++#include <errno.h>
+ #include <libdpe/libdpe.h>
++
+ #include "compiler.h"
+ #include "endian.h"
+ 
+-- 
+2.29.2
+

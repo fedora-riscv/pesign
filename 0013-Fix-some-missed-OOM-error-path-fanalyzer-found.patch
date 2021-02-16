@@ -1,0 +1,67 @@
+From 1f81f3ec196365d6bdf490d05776ba7a4e0257b0 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 21 May 2020 15:23:54 -0400
+Subject: [PATCH 13/42] Fix some missed OOM error path -fanalyzer found.
+
+Amazingly, it seems to find more *real* problems (surprisingly) *and*
+present them more readably (not surprisingly at all) without -flto.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/actions.c | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/src/actions.c b/src/actions.c
+index 69f9e3e1c1a..d0f538e81d4 100644
+--- a/src/actions.c
++++ b/src/actions.c
+@@ -68,8 +68,8 @@ insert_signature(cms_context *cms, int signum)
+ 		sizeof (SECItem *) * (cms->num_signatures + 1));
+ 	if (!signatures) {
+ err:
+-		cms->log(cms, LOG_ERR, "insert signature: could not allocate "
+-					"memory: %m");
++		cms->log(cms, LOG_ERR,
++			 "insert signature: could not allocate memory: %m");
+ 		exit(1);
+ 	}
+ 	cms->signatures = signatures;
+@@ -80,6 +80,9 @@ err:
+ 	}
+ 
+ 	SECItem *newsig = malloc(sizeof (*newsig));
++	if (!newsig)
++		goto err;
++
+ 	memcpy(newsig, sig, sizeof (*newsig));
+ 	newsig->data = malloc(sig->len);
+ 	if (!newsig->data)
+@@ -293,10 +296,8 @@ parse_signature(pesign_context *ctx)
+ 	size_t siglen;
+ 
+ 	rc = read_file(ctx->insigfd, &sig, &siglen);
+-	if (rc < 0) {
+-		fprintf(stderr, "pesign: could not read signature.\n");
+-		exit(1);
+-	}
++	if (rc < 0)
++		liberr(1, "pesign: could not read signature");
+ 
+ 	unsigned char *der;
+ 	unsigned int derlen;
+@@ -306,10 +307,8 @@ parse_signature(pesign_context *ctx)
+ 	if (base64) {
+ 		base64 += strlen(sig_begin_marker);
+ 		char *end = strstr(base64, sig_end_marker);
+-		if (!end) {
+-			fprintf(stderr, "pesign: Invalid signature.\n");
+-			exit(1);
+-		}
++		if (!end)
++			liberr(1, "pesign: Invalid signature");
+ 
+ 		derlen = end - base64;
+ 		base64[derlen] = '\0';
+-- 
+2.29.2
+

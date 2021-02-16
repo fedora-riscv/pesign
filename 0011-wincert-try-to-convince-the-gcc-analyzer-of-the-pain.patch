@@ -1,0 +1,36 @@
+From b4de3e4891be5f4de2c9a19740fc48c3bc28c68f Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Thu, 21 May 2020 15:23:11 -0400
+Subject: [PATCH 11/42] wincert: try to convince the gcc analyzer of the
+ painfully obvious.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/wincert.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/src/wincert.c b/src/wincert.c
+index 4ccf528efad..7c802d22025 100644
+--- a/src/wincert.c
++++ b/src/wincert.c
+@@ -364,9 +364,16 @@ err:
+ 	if (signatures) {
+ 		for (i = 0; i < nsigs; i++) {
+ 			if (signatures[i]) {
+-				if (signatures[i]->data)
++				if (signatures[i]->data) /* <-- see below */
+ 					free(signatures[i]->data);
+ 				free(signatures[i]);
++				/*
++				 * in gcc-10.1.1-1.fc32 , -fanalyzer believes the test
++				 * above is a use-after free.  I really don't see how,
++				 * but this somehow convinces it there's nothing wrong
++				 * there.
++				 */
++				signatures[i] = NULL;
+ 			}
+ 		}
+ 		free(signatures);
+-- 
+2.29.2
+

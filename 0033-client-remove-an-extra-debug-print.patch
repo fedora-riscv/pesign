@@ -1,7 +1,7 @@
-From e06c88a9bb1a21e052dc1b471e2361574a8045cc Mon Sep 17 00:00:00 2001
+From 8ce83e63dd221beb775378981090deacd17e2166 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 14 Jul 2020 16:44:09 -0400
-Subject: [PATCH 07/12] client: remove an extra debug print
+Subject: [PATCH 33/42] client: remove an extra debug print
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Peter Jones <pjones@redhat.com>
  1 file changed, 1 deletion(-)
 
 diff --git a/src/client.c b/src/client.c
-index 0082be1f597..c9966295e5f 100644
+index 914f2c8bd55..48fdeaba6a4 100644
 --- a/src/client.c
 +++ b/src/client.c
 @@ -536,7 +536,6 @@ oom:

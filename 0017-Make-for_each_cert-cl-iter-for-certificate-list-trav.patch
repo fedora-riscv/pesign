@@ -1,0 +1,71 @@
+From 03e2f49111fb846254f73ba9a2cce29ea13d3a99 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 17 May 2019 14:06:04 -0400
+Subject: [PATCH 17/42] Make for_each_cert(cl, iter) for certificate list
+ traversal.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/cms_common.c | 18 ++++++++----------
+ src/cms_common.h |  3 +++
+ 2 files changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/src/cms_common.c b/src/cms_common.c
+index 9218f69ef9e..75a95f053a2 100644
+--- a/src/cms_common.c
++++ b/src/cms_common.c
+@@ -614,20 +614,20 @@ find_named_certificate(cms_context *cms, char *name, CERTCertificate **cert)
+ 	}
+ 
+ 	CERTCertListNode *node = NULL;
+-        for (node = CERT_LIST_HEAD(certlist); !CERT_LIST_END(node,certlist);
+-						node = CERT_LIST_NEXT(node)) {
+-		if (!strcmp(node->cert->subjectName, name))
++	for_each_cert(certlist, tmpnode) {
++		if (!strcmp(tmpnode->cert->subjectName, name)) {
++			node = tmpnode;
+ 			break;
++		}
+ 	}
+ 	/* If we're looking up the issuer of some cert, and the issuer isn't
+ 	 * in the database, we'll get back what is essentially a template
+ 	 * that's in NSS's cache waiting to be filled out.  We can't use that,
+ 	 * it'll just cause CERT_DupCertificate() to segfault. */
+-	if (CERT_LIST_END(node, certlist)
+-			|| !node->cert || !node->cert->derCert.data
+-			|| !node->cert->derCert.len
+-			|| !node->cert->derIssuer.data
+-			|| !node->cert->derIssuer.len) {
++	if (!node || !node->cert || !node->cert->derCert.data
++	    || !node->cert->derCert.len
++	    || !node->cert->derIssuer.data
++	    || !node->cert->derIssuer.len) {
+ 		PK11_DestroySlotListElement(slots, &psle);
+ 		PK11_FreeSlotList(slots);
+ 		CERT_DestroyCertList(certlist);
+@@ -635,8 +635,6 @@ find_named_certificate(cms_context *cms, char *name, CERTCertificate **cert)
+ 		return -1;
+ 	}
+ 
+-
+-
+ 	*cert = CERT_DupCertificate(node->cert);
+ 
+ 	PK11_DestroySlotListElement(slots, &psle);
+diff --git a/src/cms_common.h b/src/cms_common.h
+index 266fa224be0..b0dc12fc3ab 100644
+--- a/src/cms_common.h
++++ b/src/cms_common.h
+@@ -34,6 +34,9 @@
+ #define save_port_err() \
+ 	for (error_t saved_errno_0_ = 0, saved_errno_1_ = PORT_GetError(); saved_errno_0_ < 1; saved_errno_0_++, PORT_SetError(saved_errno_1_))
+ 
++#define for_each_cert(cl, node) \
++	for (CERTCertListNode *node = CERT_LIST_HEAD(cl); !CERT_LIST_END(node, cl); node = CERT_LIST_NEXT(node))
++
+ #define cmserr(rv, cms, fmt, args...) ({					\
+ 		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt ": %s",	\
+ 			__FILE__, __func__, __LINE__, ## args,		\
+-- 
+2.29.2
+

@@ -1,7 +1,7 @@
-From 91389be2ef26cc688cf6e9602ee50169bcc46c46 Mon Sep 17 00:00:00 2001
+From 8b985ccb2bf86aed612cac9813eadbe03905b91a Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 18 Feb 2020 16:28:56 -0500
-Subject: [PATCH 02/12] pesigcheck: Fix a wrong assignment
+Subject: [PATCH 02/42] pesigcheck: Fix a wrong assignment
 
 gcc says:
 

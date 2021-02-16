@@ -1,0 +1,343 @@
+From d2b39d942ab696d8aaf11280f4b037142ebc3643 Mon Sep 17 00:00:00 2001
+From: Peter Jones <pjones@redhat.com>
+Date: Fri, 17 May 2019 14:04:48 -0400
+Subject: [PATCH 16/42] Make save_port_err() { } saner to read.
+
+Signed-off-by: Peter Jones <pjones@redhat.com>
+---
+ src/cms_common.c  | 65 ++++++++++++++++++++++++++++++++++-------------
+ src/signed_data.c | 39 ++++++++++++++++++++--------
+ src/cms_common.h  | 14 +++++-----
+ 3 files changed, 83 insertions(+), 35 deletions(-)
+
+diff --git a/src/cms_common.c b/src/cms_common.c
+index 17f7bf252c7..9218f69ef9e 100644
+--- a/src/cms_common.c
++++ b/src/cms_common.c
+@@ -350,7 +350,9 @@ unlock_nss_token(cms_context *cms)
+ 	PK11SlotListElement *psle = NULL;
+ 	psle = PK11_GetFirstSafe(slots);
+ 	if (!psle) {
+-		save_port_err(PK11_FreeSlotList(slots));
++		save_port_err() {
++			PK11_FreeSlotList(slots);
++		}
+ 		cmsreterr(-1, cms, "could not get pk11 safe");
+ 	}
+ 
+@@ -362,7 +364,9 @@ unlock_nss_token(cms_context *cms)
+ 	}
+ 
+ 	if (!psle) {
+-		save_port_err(PK11_FreeSlotList(slots));
++		save_port_err() {
++			PK11_FreeSlotList(slots);
++		}
+ 		cms->log(cms, LOG_ERR, "could not find token \"%s\"",
+ 			cms->tokenname);
+ 		return -1;
+@@ -406,7 +410,9 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 	PK11SlotListElement *psle = NULL;
+ 	psle = PK11_GetFirstSafe(slots);
+ 	if (!psle) {
+-		save_port_err(PK11_FreeSlotList(slots));
++		save_port_err() {
++			PK11_FreeSlotList(slots);
++		}
+ 		cmsreterr(-1, cms, "could not get pk11 safe");
+ 	}
+ 
+@@ -418,7 +424,9 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 	}
+ 
+ 	if (!psle) {
+-		save_port_err(PK11_FreeSlotList(slots));
++		save_port_err() {
++			PK11_FreeSlotList(slots);
++		}
+ 		cms->log(cms, LOG_ERR, "could not find token \"%s\"",
+ 			cms->tokenname);
+ 		return -1;
+@@ -439,9 +447,10 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 	CERTCertList *certlist = NULL;
+ 	certlist = PK11_ListCertsInSlot(psle->slot);
+ 	if (!certlist) {
+-		save_port_err(
++		save_port_err() {
+ 			PK11_DestroySlotListElement(slots, &psle);
+-			PK11_FreeSlotList(slots));
++			PK11_FreeSlotList(slots);
++		}
+ 		cmsreterr(-1, cms, "could not get certificate list");
+ 	}
+ 
+@@ -466,10 +475,11 @@ find_certificate(cms_context *cms, int needs_private_key)
+ 					&cbdata);
+ 	}
+ 	if (status != SECSuccess || cbdata.cert == NULL) {
+-		save_port_err(
++		save_port_err() {
+ 			CERT_DestroyCertList(certlist);
+ 			PK11_DestroySlotListElement(slots, &psle);
+-			PK11_FreeSlotList(slots));
++			PK11_FreeSlotList(slots);
++		}
+ 		cmsreterr(-1, cms, "could not find certificate in list");
+ 	}
+ 
+@@ -502,7 +512,9 @@ find_slot_for_token(cms_context *cms, PK11SlotInfo **slot)
+ 	PK11SlotListElement *psle = NULL;
+ 	psle = PK11_GetFirstSafe(slots);
+ 	if (!psle) {
+-		save_port_err(PK11_FreeSlotList(slots));
++		save_port_err() {
++			PK11_FreeSlotList(slots);
++		}
+ 		cmsreterr(-1, cms, "could not get pk11 safe");
+ 	}
+ 
+@@ -514,7 +526,9 @@ find_slot_for_token(cms_context *cms, PK11SlotInfo **slot)
+ 	}
+ 
+ 	if (!psle) {
+-		save_port_err(PK11_FreeSlotList(slots));
++		save_port_err() {
++			PK11_FreeSlotList(slots);
++		}
+ 		cms->log(cms, LOG_ERR, "could not find token \"%s\"",
+ 			cms->tokenname);
+ 		return -1;
+@@ -555,7 +569,9 @@ find_named_certificate(cms_context *cms, char *name, CERTCertificate **cert)
+ 	PK11SlotListElement *psle = NULL;
+ 	psle = PK11_GetFirstSafe(slots);
+ 	if (!psle) {
+-		save_port_err(PK11_FreeSlotList(slots));
++		save_port_err() {
++			PK11_FreeSlotList(slots);
++		}
+ 		cmsreterr(-1, cms, "could not get pk11 safe");
+ 	}
+ 
+@@ -567,7 +583,9 @@ find_named_certificate(cms_context *cms, char *name, CERTCertificate **cert)
+ 	}
+ 
+ 	if (!psle) {
+-		save_port_err(PK11_FreeSlotList(slots));
++		save_port_err() {
++			PK11_FreeSlotList(slots);
++		}
+ 		cms->log(cms, LOG_ERR, "could not find token \"%s\"",
+ 			cms->tokenname);
+ 		return -1;
+@@ -588,9 +606,10 @@ find_named_certificate(cms_context *cms, char *name, CERTCertificate **cert)
+ 	CERTCertList *certlist = NULL;
+ 	certlist = PK11_ListCertsInSlot(psle->slot);
+ 	if (!certlist) {
+-		save_port_err(
++		save_port_err() {
+ 			PK11_DestroySlotListElement(slots, &psle);
+-			PK11_FreeSlotList(slots));
++			PK11_FreeSlotList(slots);
++		}
+ 		cmsreterr(-1, cms, "could not get certificate list");
+ 	}
+ 
+@@ -1158,7 +1177,9 @@ wrap_in_seq(cms_context *cms, SECItem *der, SECItem *items, int num_items)
+ 	int rc = 0;
+ 	ret = SEC_ASN1EncodeItem(cms->arena, der, items, tmpl);
+ 	if (ret == NULL) {
+-		save_port_err(PORT_ArenaRelease(cms->arena, mark));
++		save_port_err() {
++			PORT_ArenaRelease(cms->arena, mark);
++		}
+ 		cmsreterr(-1, cms, "could not encode set");
+ 	}
+ 	PORT_ArenaUnmark(cms->arena, mark);
+@@ -1261,7 +1282,9 @@ generate_ava(cms_context *cms, SECItem *der, CERTAVA *certava)
+ 
+ 	oid = SECOID_FindOID(&certava->type);
+ 	if (!oid) {
+-		save_port_err(PORT_FreeArena(arena, PR_TRUE));
++		save_port_err() {
++			PORT_FreeArena(arena, PR_TRUE);
++		}
+ 		cms->arena = real_arena;
+ 		cmsreterr(-1, cms, "could not find OID");
+ 	}
+@@ -1279,7 +1302,9 @@ generate_ava(cms_context *cms, SECItem *der, CERTAVA *certava)
+ 	SECItem tmp;
+ 	ret = SEC_ASN1EncodeItem(arena, &tmp, &ava, AVATemplate);
+ 	if (ret == NULL) {
+-		save_port_err(PORT_FreeArena(arena, PR_TRUE));
++		save_port_err() {
++			PORT_FreeArena(arena, PR_TRUE);
++		}
+ 		cms->arena = real_arena;
+ 		cmsreterr(-1, cms, "could not encode AVA");
+ 	}
+@@ -1288,7 +1313,9 @@ generate_ava(cms_context *cms, SECItem *der, CERTAVA *certava)
+ 	der->len = tmp.len;
+ 	der->data = PORT_ArenaAlloc(real_arena, tmp.len);
+ 	if (!der->data) {
+-		save_port_err(PORT_FreeArena(arena, PR_TRUE));
++		save_port_err() {
++			PORT_FreeArena(arena, PR_TRUE);
++		}
+ 		cms->arena = real_arena;
+ 		cmsreterr(-1, cms, "could not allocate AVA");
+ 	}
+@@ -1479,3 +1506,5 @@ generate_keys(cms_context *cms, PK11SlotInfo *slot,
+ 		cmsreterr(-1, cms, "could not generate RSA keypair");
+ 	return 0;
+ }
++
++// vim:fenc=utf-8:tw=75:noet
+diff --git a/src/signed_data.c b/src/signed_data.c
+index af3a84ff4ab..c6dff5481bb 100644
+--- a/src/signed_data.c
++++ b/src/signed_data.c
+@@ -81,14 +81,18 @@ generate_certificate_list(cms_context *cms, SECItem ***certificate_list_p)
+ 
+ 	certificates = PORT_ArenaZAlloc(cms->arena, sizeof (SECItem *) * 3);
+ 	if (!certificates) {
+-		save_port_err(PORT_ArenaRelease(cms->arena, mark));
++		save_port_err() {
++			PORT_ArenaRelease(cms->arena, mark);
++		}
+ 		cmsreterr(-1, cms, "could not allocate certificate list");
+ 	}
+ 	int i = 0;
+ 
+ 	certificates[i] = PORT_ArenaZAlloc(cms->arena, sizeof (SECItem));
+ 	if (!certificates[i]) {
+-		save_port_err(PORT_ArenaRelease(cms->arena, mark));
++		save_port_err() {
++			PORT_ArenaRelease(cms->arena, mark);
++		}
+ 		cmsreterr(-1, cms, "could not allocate certificate entry");
+ 	}
+ 	SECITEM_CopyItem(cms->arena, certificates[i++], &cms->cert->derCert);
+@@ -106,8 +110,9 @@ generate_certificate_list(cms_context *cms, SECItem ***certificate_list_p)
+ 				certificates[i] = PORT_ArenaZAlloc(cms->arena,
+ 							sizeof (SECItem));
+ 				if (!certificates[i]) {
+-					save_port_err(
+-						PORT_ArenaRelease(cms->arena, mark));
++					save_port_err() {
++						PORT_ArenaRelease(cms->arena, mark);
++					}
+ 					cmsreterr(-1, cms,"could not allocate "
+ 						"certificate entry");
+ 				}
+@@ -275,7 +280,9 @@ generate_spc_signed_data(cms_context *cms, SECItem *sdp)
+ 	void *mark = PORT_ArenaMark(cms->arena);
+ 
+ 	if (SEC_ASN1EncodeInteger(cms->arena, &sd.version, 1) == NULL) {
+-		save_port_err(PORT_ArenaRelease(cms->arena, mark));
++		save_port_err() {
++			PORT_ArenaRelease(cms->arena, mark);
++		}
+ 		cms->ci_digest = NULL;
+ 		cmsreterr(-1, cms, "could not encode integer");
+ 	}
+@@ -309,7 +316,9 @@ generate_spc_signed_data(cms_context *cms, SECItem *sdp)
+ 	SECItem encoded = { 0, };
+ 	if (SEC_ASN1EncodeItem(cms->arena, &encoded, &sd, SignedDataTemplate)
+ 			== NULL) {
+-		save_port_err(PORT_ArenaRelease(cms->arena, mark));
++		save_port_err() {
++			PORT_ArenaRelease(cms->arena, mark);
++		}
+ 		cms->ci_digest = NULL;
+ 		cmsreterr(-1, cms, "could not encode SignedData");
+ 	}
+@@ -325,7 +334,9 @@ generate_spc_signed_data(cms_context *cms, SECItem *sdp)
+ 	SECItem wrapper = { 0, };
+ 	if (SEC_ASN1EncodeItem(cms->arena, &wrapper, &sdw,
+ 			ContentInfoTemplate) == NULL) {
+-		save_port_err(PORT_ArenaRelease(cms->arena, mark));
++		save_port_err() {
++			PORT_ArenaRelease(cms->arena, mark);
++		}
+ 		cms->ci_digest = NULL;
+ 		cmsreterr(-1, cms, "could not encode SignedData");
+ 	}
+@@ -347,7 +358,9 @@ generate_authvar_signed_data(cms_context *cms, SECItem *sdp)
+ 	void *mark = PORT_ArenaMark(cms->arena);
+ 
+ 	if (SEC_ASN1EncodeInteger(cms->arena, &sd.version, 1) == NULL) {
+-		save_port_err(PORT_ArenaRelease(cms->arena, mark));
++		save_port_err() {
++			PORT_ArenaRelease(cms->arena, mark);
++		}
+ 		cmsreterr(-1, cms, "could not encode integer");
+ 	}
+ 
+@@ -376,7 +389,9 @@ generate_authvar_signed_data(cms_context *cms, SECItem *sdp)
+ 	SECItem encoded = { 0, };
+ 	if (SEC_ASN1EncodeItem(cms->arena, &encoded, &sd, SignedDataTemplate)
+ 			== NULL) {
+-		save_port_err(PORT_ArenaRelease(cms->arena, mark));
++		save_port_err() {
++			PORT_ArenaRelease(cms->arena, mark);
++		}
+ 		cmsreterr(-1, cms, "could not encode SignedData");
+ 	}
+ 
+@@ -391,7 +406,9 @@ generate_authvar_signed_data(cms_context *cms, SECItem *sdp)
+ 	SECItem wrapper = { 0, };
+ 	if (SEC_ASN1EncodeItem(cms->arena, &wrapper, &sdw,
+ 			ContentInfoTemplate) == NULL) {
+-		save_port_err(PORT_ArenaRelease(cms->arena, mark));
++		save_port_err() {
++			PORT_ArenaRelease(cms->arena, mark);
++		}
+ 		cmsreterr(-1, cms, "could not encode SignedData");
+ 	}
+ 
+@@ -399,3 +416,5 @@ generate_authvar_signed_data(cms_context *cms, SECItem *sdp)
+ 	PORT_ArenaUnmark(cms->arena, mark);
+ 	return 0;
+ }
++
++// vim:fenc=utf-8:tw=75:noet
+diff --git a/src/cms_common.h b/src/cms_common.h
+index c2b5981ba66..266fa224be0 100644
+--- a/src/cms_common.h
++++ b/src/cms_common.h
+@@ -19,21 +19,20 @@
+ #ifndef CMS_COMMON_H
+ #define CMS_COMMON_H 1
+ 
+-#include <errno.h>
+ #include <cert.h>
+ #include <secpkcs7.h>
++
++#include <errno.h>
+ #include <signal.h>
+ #include <stdarg.h>
+ #include <syslog.h>
+ #include <time.h>
+ #include <unistd.h>
+ 
+-#define save_port_err(x)				\
+-	({						\
+-		int __saved_errno = PORT_GetError();	\
+-		x;					\
+-		PORT_SetError(__saved_errno);		\
+-	})
++#include "util.h"
++
++#define save_port_err() \
++	for (error_t saved_errno_0_ = 0, saved_errno_1_ = PORT_GetError(); saved_errno_0_ < 1; saved_errno_0_++, PORT_SetError(saved_errno_1_))
+ 
+ #define cmserr(rv, cms, fmt, args...) ({					\
+ 		(cms)->log((cms), LOG_ERR, "%s:%s:%d: " fmt ": %s",	\
+@@ -173,3 +172,4 @@ typedef struct {
+ } secuPWData;
+ 
+ #endif /* CMS_COMMON_H */
++// vim:fenc=utf-8:tw=75:noet
+-- 
+2.29.2
+
