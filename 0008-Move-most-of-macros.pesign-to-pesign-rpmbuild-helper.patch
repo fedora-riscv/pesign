@@ -1,7 +1,7 @@
-From 6c16b978fd33f3611e9f7aaf4f9c44bce1679485 Mon Sep 17 00:00:00 2001
+From fff0474cec240576352cebb3dc379f957e68536b Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 6 Jul 2020 13:54:35 -0400
-Subject: [PATCH] Move most of macros.pesign to pesign-rpmbuild-helper
+Subject: [PATCH 08/12] Move most of macros.pesign to pesign-rpmbuild-helper
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -58,7 +58,7 @@ index 74327ba13f3..a7ca89159c6 100644
  	$(INSTALL) -m 600 pesign-users $(INSTALLROOT)/etc/pesign/users
  	$(INSTALL) -m 600 pesign-groups $(INSTALLROOT)/etc/pesign/groups
 diff --git a/src/macros.pesign b/src/macros.pesign
-index 5a6da1c6809..2e984b4eeb3 100644
+index 5a6da1c6809..34af57c5b3b 100644
 --- a/src/macros.pesign
 +++ b/src/macros.pesign
 @@ -6,7 +6,7 @@
@@ -375,5 +375,5 @@ index 00000000000..c5287c27e0c
 +
 +# vim:filetype=sh:fenc=utf-8:tw=78:sts=4:sw=4
 -- 
-2.26.2
+2.29.2
 

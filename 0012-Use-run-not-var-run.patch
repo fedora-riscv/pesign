@@ -1,7 +1,7 @@
-From db4c6e8cc57271dce6d204a3144982e544e55025 Mon Sep 17 00:00:00 2001
+From d2365c50af8aee2701e1a96dff96696353b9a027 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 16 Jul 2020 16:28:26 -0400
-Subject: [PATCH] Use /run not /var/run
+Subject: [PATCH 12/12] Use /run not /var/run
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -101,5 +101,5 @@ index b0e0f84ff0b..bf8edec8ff3 100644
      echo
      rm -f /var/lock/subsys/pesign
 -- 
-2.26.2
+2.29.2
 

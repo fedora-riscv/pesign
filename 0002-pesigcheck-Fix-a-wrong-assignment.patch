@@ -1,7 +1,7 @@
-From c555fd74c009242c3864576bd5f17a1f8f4fdffd Mon Sep 17 00:00:00 2001
+From 91389be2ef26cc688cf6e9602ee50169bcc46c46 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 18 Feb 2020 16:28:56 -0500
-Subject: [PATCH] pesigcheck: Fix a wrong assignment
+Subject: [PATCH 02/12] pesigcheck: Fix a wrong assignment
 
 gcc says:
 
@@ -45,5 +45,5 @@ index 524cce307bf..8fa0f1ad03d 100644
  			has_valid_cert = true;
  		}
 -- 
-2.24.1
+2.29.2
 

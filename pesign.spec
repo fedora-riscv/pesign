@@ -60,16 +60,8 @@ This package contains the pesign utility for signing UEFI binaries as
 well as other associated tools.
 
 %prep
-%setup -q -T -b 0
+%autosetup -S git_am -n pesign-%{version}
 %setup -q -T -D -c -n pesign-%{version}/ -a 1
-git init
-git config user.email "pesign-owner@fedoraproject.org"
-git config user.name "Fedora Ninjas"
-git add .
-git commit -a -q -m "%{version} baseline."
-git am %{patches} </dev/null
-git config --unset user.email
-git config --unset user.name
 
 %build
 make PREFIX=%{_prefix} LIBDIR=%{_libdir}

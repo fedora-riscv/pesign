@@ -1,7 +1,7 @@
-From ea81cec14d31cd0b0dbde5b42414bfae9daec9b8 Mon Sep 17 00:00:00 2001
+From e06c88a9bb1a21e052dc1b471e2361574a8045cc Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 14 Jul 2020 16:44:09 -0400
-Subject: [PATCH 07/11] client: remove an extra debug print
+Subject: [PATCH 07/12] client: remove an extra debug print
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -21,5 +21,5 @@ index 0082be1f597..c9966295e5f 100644
  	pm->command = attached ? (add_file_type ? CMD_SIGN_ATTACHED_WITH_FILE_TYPE
  						: CMD_SIGN_ATTACHED)
 -- 
-2.26.2
+2.29.2
 

@@ -1,7 +1,7 @@
-From c662ad097eaa0d8c3691a22254f5d0e9622b26b7 Mon Sep 17 00:00:00 2001
+From a30095e011cb1debf07a91889bca67d34b45d38c Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 6 Jul 2020 16:13:09 -0400
-Subject: [PATCH 6/7] client: try /run and /var/run for the socket path.
+Subject: [PATCH 06/12] client: try /run and /var/run for the socket path.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -9,10 +9,10 @@ Signed-off-by: Peter Jones <pjones@redhat.com>
  1 file changed, 29 insertions(+), 11 deletions(-)
 
 diff --git a/src/client.c b/src/client.c
-index 2119ef33bf8..a38383415d5 100644
+index a4f1d1dbbe7..0082be1f597 100644
 --- a/src/client.c
 +++ b/src/client.c
-@@ -49,24 +49,24 @@ print_flag_name(FILE *f, int flag)
+@@ -61,24 +61,24 @@ print_flag_name(FILE *f, int flag)
  }
  
  static int
@@ -45,7 +45,7 @@ index 2119ef33bf8..a38383415d5 100644
  	}
  
  	socklen_t len = strlen(addr_un.sun_path) +
-@@ -74,14 +74,32 @@ connect_to_server(void)
+@@ -86,14 +86,32 @@ connect_to_server(void)
  
  	rc = connect(sd, (struct sockaddr *)&addr_un, len);
  	if (rc < 0) {
@@ -82,5 +82,5 @@ index 2119ef33bf8..a38383415d5 100644
  check_response(int sd, char **srvmsg);
  
 -- 
-2.26.2
+2.29.2
 

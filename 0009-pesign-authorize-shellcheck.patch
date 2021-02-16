@@ -1,7 +1,7 @@
-From 3107894285164a3d25ca215a76593ebb6d4bc84c Mon Sep 17 00:00:00 2001
+From 9a8966fa718467d04458c82f7f36822b9099d236 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 14 Jul 2020 15:07:32 -0400
-Subject: [PATCH 09/11] pesign-authorize: shellcheck
+Subject: [PATCH 09/12] pesign-authorize: shellcheck
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -56,5 +56,5 @@ index a496f601ab4..55cd5c4e55b 100755
  			:;
  		fi
 -- 
-2.26.2
+2.29.2
 

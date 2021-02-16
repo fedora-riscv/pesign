@@ -1,7 +1,7 @@
-From f886b7088dfea224e28c03b097c85c9bc20f5441 Mon Sep 17 00:00:00 2001
+From 68f08a8064a25272a2da6a850ecd3571ac417f7f Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Fri, 12 Jun 2020 11:49:44 -0400
-Subject: [PATCH] Rename /var/run/ to /run/
+Subject: [PATCH 04/12] Rename /var/run/ to /run/
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -10,7 +10,7 @@ Signed-off-by: Peter Jones <pjones@redhat.com>
  2 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/src/macros.pesign b/src/macros.pesign
-index 56f75cafbc4..5a6da1c6809 100644
+index 7c5cba170e9..21bf3917795 100644
 --- a/src/macros.pesign
 +++ b/src/macros.pesign
 @@ -45,14 +45,14 @@
@@ -42,5 +42,5 @@ index c1cf35597d8..3375ad52a44 100644
 -D /var/run/pesign 0770 pesign pesign -
 +D /run/pesign 0770 pesign pesign -
 -- 
-2.26.2
+2.29.2
 

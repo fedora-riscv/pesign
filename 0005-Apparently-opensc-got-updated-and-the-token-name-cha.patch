@@ -1,7 +1,8 @@
-From 56eaa15e986d808c670381ca375216eb3abd1588 Mon Sep 17 00:00:00 2001
+From c2431235d1eca91a11635819f9d250b938083f58 Mon Sep 17 00:00:00 2001
 From: Jeremy Cline <jcline@redhat.com>
 Date: Tue, 18 Feb 2020 16:37:53 -0500
-Subject: [PATCH] Apparently opensc got updated and the token name changed
+Subject: [PATCH 05/12] Apparently opensc got updated and the token name
+ changed
 
 All the kernel builds started failing yesterday because the signing
 token could not be found. Update the token name in the macro shipped by
@@ -13,7 +14,7 @@ Signed-off-by: Peter Jones <pjones@redhat.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/macros.pesign b/src/macros.pesign
-index 7c5cba170e9..56f75cafbc4 100644
+index 21bf3917795..5a6da1c6809 100644
 --- a/src/macros.pesign
 +++ b/src/macros.pesign
 @@ -9,7 +9,7 @@
@@ -26,5 +27,5 @@ index 7c5cba170e9..56f75cafbc4 100644
  
  %_pesign /usr/bin/pesign
 -- 
-2.26.2
+2.29.2
 
