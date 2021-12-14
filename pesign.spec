@@ -5,7 +5,7 @@ Summary: Signing utility for UEFI binaries
 Version: 113
 Release: 17%{?dist}
 License: GPLv2
-URL:     https://github.com/vathpela/pesign
+URL:     https://github.com/rhboot/pesign
 
 Obsoletes: pesign-rh-test-certs <= 0.111-7
 BuildRequires: make
