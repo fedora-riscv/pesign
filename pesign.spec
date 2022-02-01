@@ -2,28 +2,29 @@
 
 Name:    pesign
 Summary: Signing utility for UEFI binaries
-Version: 113
-Release: 18%{?dist}
-License: GPLv2
+Version: 114
+Release: 1%{?dist}
+License: GPL-2.0-only
 URL:     https://github.com/rhboot/pesign
 
 Obsoletes: pesign-rh-test-certs <= 0.111-7
-BuildRequires: make
+BuildRequires: efivar-devel >= 31-1
 BuildRequires: gcc
 BuildRequires: git
+BuildRequires: libuuid-devel
+BuildRequires: make
+BuildRequires: mandoc
 BuildRequires: nspr
+BuildRequires: nspr-devel >= 4.9.2-1
 BuildRequires: nss
+BuildRequires: nss-devel >= 3.13.6-1
+BuildRequires: nss-tools
 BuildRequires: nss-util
 BuildRequires: popt-devel
-BuildRequires: nss-tools
-BuildRequires: nspr-devel >= 4.9.2-1
-BuildRequires: nss-devel >= 3.13.6-1
-BuildRequires: efivar-devel >= 31-1
-BuildRequires: libuuid-devel
+BuildRequires: python3
+BuildRequires: python3-rpm-macros
 BuildRequires: tar
 BuildRequires: xz
-BuildRequires: python3-rpm-macros
-BuildRequires: python3
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 17
 BuildRequires: systemd-rpm-macros
 %endif
@@ -42,20 +43,6 @@ BuildRequires: rh-signing-tools >= 1.20-2
 Source0: https://github.com/rhboot/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
 Source2: pesign.py
-
-Patch0001: 0001-efikeygen-Fix-the-build-with-nss-3.44.patch
-Patch0002: 0002-pesigcheck-Fix-a-wrong-assignment.patch
-Patch0003: 0003-Make-0.112-client-and-server-work-with-the-113-proto.patch
-Patch0004: 0004-Rename-var-run-to-run.patch
-Patch0005: 0005-Apparently-opensc-got-updated-and-the-token-name-cha.patch
-Patch0006: 0006-client-try-run-and-var-run-for-the-socket-path.patch
-Patch0007: 0007-client-remove-an-extra-debug-print.patch
-Patch0008: 0008-Move-most-of-macros.pesign-to-pesign-rpmbuild-helper.patch
-Patch0009: 0009-pesign-authorize-shellcheck.patch
-Patch0010: 0010-pesign-authorize-don-t-setfacl-etc-pki-pesign-foo.patch
-Patch0011: 0011-kernel-building-hack.patch
-Patch0012: 0012-Use-run-not-var-run.patch
-Patch0013: 0013-Turn-off-free-nonheap-object.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -141,7 +128,6 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %doc README TODO
 %{_bindir}/authvar
 %{_bindir}/efikeygen
-%{_bindir}/efisiglist
 %{_bindir}/pesigcheck
 %{_bindir}/pesign
 %{_bindir}/pesign-client
@@ -168,6 +154,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Tue Feb 01 2022 Robbie Harwood <rharwood@redhat.com> - 114-1
+- New upstream version (114)
+
 * Fri Jan 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 113-18
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
