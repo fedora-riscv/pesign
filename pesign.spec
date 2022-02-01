@@ -44,6 +44,8 @@ Source0: https://github.com/rhboot/pesign/releases/download/%{version}/pesign-%{
 Source1: certs.tar.xz
 Source2: pesign.py
 
+Patch0001: 0001-Fix-format-strings-for-32-bit-arches.patch
+
 %description
 This package contains the pesign utility for signing UEFI binaries as
 well as other associated tools.
