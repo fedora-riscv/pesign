@@ -1,7 +1,7 @@
-From 1f8d0985d59ed41e291398f937d32493898bd711 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 1 Feb 2022 17:37:14 -0500
-Subject: [PATCH] Fix format strings for 32-bit arches
+Subject: [PATCH 2/3] Fix format strings for 32-bit arches
 
 Sadly, in 2022, this remains a thing.
 
