@@ -8,7 +8,7 @@ License: GPL-2.0-only
 URL:     https://github.com/rhboot/pesign
 
 Obsoletes: pesign-rh-test-certs <= 0.111-7
-BuildRequires: efivar-devel >= 31-1
+BuildRequires: efivar-devel >= 38-1
 BuildRequires: gcc
 BuildRequires: git
 BuildRequires: libuuid-devel
