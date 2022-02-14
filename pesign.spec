@@ -1,5 +1,8 @@
 %global macrosdir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
 
+# No.  I have enough trouble already.
+%undefine _auto_set_build_flags
+
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 114
