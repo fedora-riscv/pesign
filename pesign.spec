@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 114
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL-2.0-only
 URL:     https://github.com/rhboot/pesign
 
@@ -47,6 +47,8 @@ Source2: pesign.py
 Patch0001: 0001-Revert-Move-license-to-GPLv3.patch
 Patch0002: 0002-Fix-format-strings-for-32-bit-arches.patch
 Patch0003: 0003-macros-drop-_pesign_args.patch
+Patch0004: 0004-Handle-NULL-pwdata-in-cms_set_pw_data.patch
+Patch0005: 0005-fcf-protection-is-arch-specific.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -158,6 +160,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Mon Feb 14 2022 Robbie Harwood <rharwood@redhat.com> - 114-3
+- Fix explicit NULL deref when daemonizing
+
 * Wed Feb 02 2022 Robbie Harwood <rharwood@redhat.com> - 114-2
 - Attempt to fix signing parsing by dropping pesign_args
 

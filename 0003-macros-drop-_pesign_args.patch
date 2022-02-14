@@ -1,7 +1,7 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 389decab7b9bcba307e52709b00741a19405f02b Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Wed, 2 Feb 2022 16:07:46 -0500
-Subject: [PATCH 3/3] macros: drop %{_pesign_args}
+Subject: [PATCH 3/5] macros: drop %{_pesign_args}
 
 Effectively reverts 30b488682a92c524bb9c0d450c34e9abc0b56de9
 
