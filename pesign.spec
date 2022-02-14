@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 114
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL-2.0-only
 URL:     https://github.com/rhboot/pesign
 
@@ -160,6 +160,10 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Mon Feb 14 2022 Robbie Harwood <rharwood@redhat.com> - 114-4
+- Disable -fanalyzer since it's broken and pragmas don't work
+- See-also: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104370
+
 * Mon Feb 14 2022 Robbie Harwood <rharwood@redhat.com> - 114-3
 - Fix explicit NULL deref when daemonizing
 

@@ -1,0 +1,26 @@
+From 288b05dcd5a3b48836c4904e38b14e38a0cdfa07 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Mon, 14 Feb 2022 17:26:19 -0500
+Subject: [PATCH] Disable analyzer until it works
+
+See-also: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104370
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+---
+ Make.defaults | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Make.defaults b/Make.defaults
+index 130c1ee..5e56a76 100644
+--- a/Make.defaults
++++ b/Make.defaults
+@@ -36,7 +36,6 @@ DIAGFLAGS ?= -fmessage-length=0 \
+ 	     -fdiagnostics-color=always \
+ 	     -fdiagnostics-format=text \
+ 	     -fdiagnostics-show-cwe \
+-	     -fanalyzer \
+ 	     $(call enabled,ENABLE_LEAK_CHECKER,-Wno-analyzer-malloc-leak,)
+ AS	?= $(CROSS_COMPILE)as
+ AR	?= $(CROSS_COMPILE)$(if $(filter $(CC),clang),llvm-ar,$(notdir $(CC))-ar)
+-- 
+2.34.1
+
