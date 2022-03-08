@@ -5,8 +5,8 @@
 
 Name:    pesign
 Summary: Signing utility for UEFI binaries
-Version: 114
-Release: 4%{?dist}
+Version: 115
+Release: 1%{?dist}
 License: GPL-2.0-only
 URL:     https://github.com/rhboot/pesign
 
@@ -47,11 +47,7 @@ Source0: https://github.com/rhboot/pesign/releases/download/%{version}/pesign-%{
 Source1: certs.tar.xz
 Source2: pesign.py
 
-Patch0001: 0001-Revert-Move-license-to-GPLv3.patch
-Patch0002: 0002-Fix-format-strings-for-32-bit-arches.patch
-Patch0003: 0003-macros-drop-_pesign_args.patch
-Patch0004: 0004-Handle-NULL-pwdata-in-cms_set_pw_data.patch
-Patch0005: 0005-fcf-protection-is-arch-specific.patch
+Patch0001: 0001-daemon-remove-always-true-comparison.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -163,6 +159,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Tue Mar 08 2022 Robbie Harwood <rharwood@redhat.com> - 115-1
+- New upstream version (115)
+
 * Mon Feb 14 2022 Robbie Harwood <rharwood@redhat.com> - 114-4
 - Disable -fanalyzer since it's broken and pragmas don't work
 - See-also: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104370
