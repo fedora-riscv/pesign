@@ -1,7 +1,7 @@
-From 3107894285164a3d25ca215a76593ebb6d4bc84c Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 14 Jul 2020 15:07:32 -0400
-Subject: [PATCH 09/11] pesign-authorize: shellcheck
+Subject: [PATCH] pesign-authorize: shellcheck
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Peter Jones <pjones@redhat.com>
  1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/src/pesign-authorize b/src/pesign-authorize
-index a496f601ab4..55cd5c4e55b 100755
+index a496f60..55cd5c4 100755
 --- a/src/pesign-authorize
 +++ b/src/pesign-authorize
 @@ -12,21 +12,21 @@ set -u
@@ -55,6 +55,3 @@ index a496f601ab4..55cd5c4e55b 100755
  		else
  			:;
  		fi
--- 
-2.26.2
-

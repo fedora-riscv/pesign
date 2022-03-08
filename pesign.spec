@@ -3,7 +3,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 113
-Release: 17%{?dist}
+Release: 18%{?dist}
 License: GPLv2
 URL:     https://github.com/vathpela/pesign
 
@@ -56,6 +56,8 @@ Patch0010: 0010-pesign-authorize-don-t-setfacl-etc-pki-pesign-foo.patch
 Patch0011: 0011-kernel-building-hack.patch
 Patch0012: 0012-Use-run-not-var-run.patch
 Patch0013: 0013-Turn-off-free-nonheap-object.patch
+Patch0014: 0014-Fix-bad-free-of-cms-data-DoS-only.patch
+Patch0015: 0015-daemon-remove-always-true-comparison.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -168,6 +170,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Tue Mar 08 2022 Robbie Harwood <rharwood@redhat.com> - 113-18
+- Backport DoS fix from 115
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 113-17
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 

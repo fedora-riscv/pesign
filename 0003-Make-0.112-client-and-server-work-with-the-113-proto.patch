@@ -1,4 +1,4 @@
-From 84547e6b7173e4b10a1931fd25f329ea9a8f68b0 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Thu, 11 Jun 2020 16:23:14 -0400
 Subject: [PATCH] Make 0.112 client and server work with the 113 protocol and
@@ -11,16 +11,16 @@ the file type was added.
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
- src/client.c | 74 +++++++++++++++++++++++++++++++++++++---------------
- src/daemon.c | 63 +++++++++++++++++++++++++++++---------------
+ src/client.c | 74 +++++++++++++++++++++++++++++++++++++++++++-----------------
+ src/daemon.c | 63 ++++++++++++++++++++++++++++++++++-----------------
  src/daemon.h |  2 ++
  3 files changed, 97 insertions(+), 42 deletions(-)
 
 diff --git a/src/client.c b/src/client.c
-index aa373abd981..57bcc09cbe8 100644
+index 4a9a44e..a4f1d1d 100644
 --- a/src/client.c
 +++ b/src/client.c
-@@ -11,6 +11,7 @@
+@@ -23,6 +23,7 @@
  #include <fcntl.h>
  #include <popt.h>
  #include <pwd.h>
@@ -28,7 +28,7 @@ index aa373abd981..57bcc09cbe8 100644
  #include <stddef.h>
  #include <stdlib.h>
  #include <sys/socket.h>
-@@ -84,8 +85,8 @@ connect_to_server(void)
+@@ -96,8 +97,8 @@ connect_to_server(void)
  static int32_t
  check_response(int sd, char **srvmsg);
  
@@ -39,7 +39,7 @@ index aa373abd981..57bcc09cbe8 100644
  {
  	struct msghdr msg;
  	struct iovec iov[1];
-@@ -104,7 +105,7 @@ check_cmd_version(int sd, uint32_t command, char *name, int32_t version)
+@@ -116,7 +117,7 @@ check_cmd_version(int sd, uint32_t command, char *name, int32_t version)
  	ssize_t n;
  	n = sendmsg(sd, &msg, 0);
  	if (n < 0) {
@@ -48,7 +48,7 @@ index aa373abd981..57bcc09cbe8 100644
  		exit(1);
  	}
  
-@@ -120,11 +121,17 @@ check_cmd_version(int sd, uint32_t command, char *name, int32_t version)
+@@ -132,11 +133,17 @@ check_cmd_version(int sd, uint32_t command, char *name, int32_t version)
  
  	char *srvmsg = NULL;
  	int32_t rc = check_response(sd, &srvmsg);
@@ -68,7 +68,7 @@ index aa373abd981..57bcc09cbe8 100644
  }
  
  static void
-@@ -134,7 +141,7 @@ send_kill_daemon(int sd)
+@@ -146,7 +153,7 @@ send_kill_daemon(int sd)
  	struct iovec iov;
  	pesignd_msghdr pm;
  
@@ -77,7 +77,7 @@ index aa373abd981..57bcc09cbe8 100644
  
  	pm.version = PESIGND_VERSION;
  	pm.command = CMD_KILL_DAEMON;
-@@ -276,7 +283,7 @@ unlock_token(int sd, char *tokenname, char *pin)
+@@ -288,7 +295,7 @@ unlock_token(int sd, char *tokenname, char *pin)
  
  	uint32_t size1 = pesignd_string_size(pin);
  
@@ -86,7 +86,7 @@ index aa373abd981..57bcc09cbe8 100644
  
  	pm.version = PESIGND_VERSION;
  	pm.command = CMD_UNLOCK_TOKEN;
-@@ -353,7 +360,7 @@ is_token_unlocked(int sd, char *tokenname)
+@@ -365,7 +372,7 @@ is_token_unlocked(int sd, char *tokenname)
  
  	uint32_t size0 = pesignd_string_size(tokenname);
  
@@ -95,7 +95,7 @@ index aa373abd981..57bcc09cbe8 100644
  
  	pm.version = PESIGND_VERSION;
  	pm.command = CMD_IS_TOKEN_UNLOCKED;
-@@ -452,6 +459,9 @@ static void
+@@ -464,6 +471,9 @@ static void
  sign(int sd, char *infile, char *outfile, char *tokenname, char *certname,
  	int attached, uint32_t format)
  {
@@ -105,7 +105,7 @@ index aa373abd981..57bcc09cbe8 100644
  	int infd = open(infile, O_RDONLY);
  	if (infd < 0) {
  		fprintf(stderr, "pesign-client: could not open input file "
-@@ -481,12 +491,28 @@ oom:
+@@ -493,12 +503,28 @@ oom:
  		exit(1);
  	}
  
@@ -138,7 +138,7 @@ index aa373abd981..57bcc09cbe8 100644
  	iov[0].iov_base = pm;
  	iov[0].iov_len = sizeof (*pm);
  
-@@ -503,25 +529,31 @@ oom:
+@@ -515,25 +541,31 @@ oom:
  	}
  
  	char *buffer;
@@ -178,7 +178,7 @@ index aa373abd981..57bcc09cbe8 100644
  
  	n = sendmsg(sd, &msg, 0);
  	if (n < 0) {
-@@ -535,7 +567,7 @@ oom:
+@@ -547,7 +579,7 @@ oom:
  	send_fd(sd, outfd);
  
  	char *srvmsg = NULL;
@@ -188,10 +188,10 @@ index aa373abd981..57bcc09cbe8 100644
  		fprintf(stderr, "pesign-client: signing failed: \"%s\"\n",
  			srvmsg);
 diff --git a/src/daemon.c b/src/daemon.c
-index 9374d59be30..494beb9af72 100644
+index 84b9ebc..8522250 100644
 --- a/src/daemon.c
 +++ b/src/daemon.c
-@@ -12,6 +12,7 @@
+@@ -25,6 +25,7 @@
  #include <poll.h>
  #include <pwd.h>
  #include <signal.h>
@@ -199,7 +199,7 @@ index 9374d59be30..494beb9af72 100644
  #include <stdlib.h>
  #include <stdio.h>
  #include <string.h>
-@@ -561,7 +562,7 @@ out:
+@@ -569,7 +570,7 @@ out:
  
  static void
  handle_signing(context *ctx, struct pollfd *pollfd, socklen_t size,
@@ -208,7 +208,7 @@ index 9374d59be30..494beb9af72 100644
  {
  	struct msghdr msg;
  	struct iovec iov;
-@@ -585,8 +586,12 @@ oom:
+@@ -593,8 +594,12 @@ oom:
  
  	n = recvmsg(pollfd->fd, &msg, MSG_WAITALL);
  
@@ -223,7 +223,7 @@ index 9374d59be30..494beb9af72 100644
  
  	pesignd_string *tn = (pesignd_string *)(buffer + sizeof(uint32_t));
  	if (n < (long long)sizeof(tn->size)) {
-@@ -666,34 +671,44 @@ finish:
+@@ -674,34 +679,44 @@ finish:
  	teardown_digests(ctx->cms);
  }
  
@@ -286,7 +286,7 @@ index 9374d59be30..494beb9af72 100644
  }
  
  static void
-@@ -725,6 +740,12 @@ cmd_table_t cmd_table[] = {
+@@ -733,6 +748,12 @@ cmd_table_t cmd_table[] = {
  		{ CMD_UNLOCK_TOKEN, handle_unlock_token, "unlock-token", 0 },
  		{ CMD_SIGN_ATTACHED, handle_sign_attached, "sign-attached", 0 },
  		{ CMD_SIGN_DETACHED, handle_sign_detached, "sign-detached", 0 },
@@ -300,10 +300,10 @@ index 9374d59be30..494beb9af72 100644
  		{ CMD_IS_TOKEN_UNLOCKED, handle_is_token_unlocked,
  			"is-token-unlocked", 0 },
 diff --git a/src/daemon.h b/src/daemon.h
-index dd430512f1a..834d62c72d0 100644
+index 69384ce..0368dc9 100644
 --- a/src/daemon.h
 +++ b/src/daemon.h
-@@ -33,6 +33,8 @@ typedef enum {
+@@ -45,6 +45,8 @@ typedef enum {
  	CMD_RESPONSE,
  	CMD_IS_TOKEN_UNLOCKED,
  	CMD_GET_CMD_VERSION,
@@ -312,6 +312,3 @@ index dd430512f1a..834d62c72d0 100644
  	CMD_LIST_END
  } pesignd_cmd;
  
--- 
-2.26.2
-

@@ -1,4 +1,4 @@
-From b535d1ac5cbcdf18a97d97a92581e38080d9e521 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 14 May 2019 11:28:38 -0400
 Subject: [PATCH] efikeygen: Fix the build with nss 3.44
@@ -28,7 +28,7 @@ Signed-off-by: Peter Jones <pjones@redhat.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/efikeygen.c b/src/efikeygen.c
-index ede76ef0b48..2cd953e9781 100644
+index 121a238..848480a 100644
 --- a/src/efikeygen.c
 +++ b/src/efikeygen.c
 @@ -208,7 +208,7 @@ static int
@@ -40,6 +40,3 @@ index ede76ef0b48..2cd953e9781 100644
  
  	if (is_ca)
  		type |= NS_CERT_TYPE_SSL_CA |
--- 
-2.23.0
-

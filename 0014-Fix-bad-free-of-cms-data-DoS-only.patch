@@ -1,0 +1,39 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Robbie Harwood <rharwood@redhat.com>
+Date: Thu, 3 Mar 2022 15:37:02 -0500
+Subject: [PATCH] Fix bad free of cms data (DoS only)
+
+handle_unlock_token() set the CMS data to an offset of an allocated
+buffer, rather than something allocated in its own right.
+cms_set_pw_data() would then attempt to free this value.  Additionally,
+should pesignd not take SIGABRT at that point, handle_unlock_token()
+would then also free buffer.
+
+Signed-off-by: Robbie Harwood <rharwood@redhat.com>
+(cherry picked from commit 7b78af412dc0ca5db54c426a13550cf35caa9516)
+---
+ src/daemon.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/daemon.c b/src/daemon.c
+index 8522250..3ae3c8d 100644
+--- a/src/daemon.c
++++ b/src/daemon.c
+@@ -166,6 +166,7 @@ handle_unlock_token(context *ctx, struct pollfd *pollfd, socklen_t size)
+ 	struct msghdr msg;
+ 	struct iovec iov;
+ 	ssize_t n;
++	char *pin = NULL;
+ 
+ 	int rc = cms_context_alloc(&ctx->cms);
+ 	if (rc < 0) {
+@@ -233,7 +234,8 @@ malformed:
+ 	if (!ctx->cms->tokenname)
+ 		goto oom;
+ 
+-	char *pin = (char *)tp->value;
++	if (!tp->value)
++		pin = strndup((char *)tp->value, tp->size);
+ 	if (!pin)
+ 		goto oom;
+ 

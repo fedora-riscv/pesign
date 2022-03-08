@@ -1,4 +1,4 @@
-From 6c16b978fd33f3611e9f7aaf4f9c44bce1679485 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Mon, 6 Jul 2020 13:54:35 -0400
 Subject: [PATCH] Move most of macros.pesign to pesign-rpmbuild-helper
@@ -7,13 +7,13 @@ Signed-off-by: Peter Jones <pjones@redhat.com>
 ---
  Make.defaults                 |   1 +
  src/Makefile                  |   8 +-
- src/macros.pesign             |  74 ++++--------
- src/pesign-rpmbuild-helper.in | 222 ++++++++++++++++++++++++++++++++++
+ src/macros.pesign             |  74 +++++---------
+ src/pesign-rpmbuild-helper.in | 222 ++++++++++++++++++++++++++++++++++++++++++
  4 files changed, 252 insertions(+), 53 deletions(-)
  create mode 100644 src/pesign-rpmbuild-helper.in
 
 diff --git a/Make.defaults b/Make.defaults
-index 0bacafe0d01..d4cd626c11e 100644
+index 0bacafe..d4cd626 100644
 --- a/Make.defaults
 +++ b/Make.defaults
 @@ -16,6 +16,7 @@ INSTALLROOT = $(DESTDIR)
@@ -25,7 +25,7 @@ index 0bacafe0d01..d4cd626c11e 100644
  PKG_CONFIG = $(CROSS_COMPILE)pkg-config
  CC	:= $(if $(filter default,$(origin CC)),$(CROSS_COMPILE)gcc,$(CC))
 diff --git a/src/Makefile b/src/Makefile
-index 74327ba13f3..a7ca89159c6 100644
+index 74327ba..a7ca891 100644
 --- a/src/Makefile
 +++ b/src/Makefile
 @@ -5,7 +5,7 @@ include $(TOPDIR)/Make.version
@@ -58,7 +58,7 @@ index 74327ba13f3..a7ca89159c6 100644
  	$(INSTALL) -m 600 pesign-users $(INSTALLROOT)/etc/pesign/users
  	$(INSTALL) -m 600 pesign-groups $(INSTALLROOT)/etc/pesign/groups
 diff --git a/src/macros.pesign b/src/macros.pesign
-index 5a6da1c6809..2e984b4eeb3 100644
+index 5a6da1c..34af57c 100644
 --- a/src/macros.pesign
 +++ b/src/macros.pesign
 @@ -6,7 +6,7 @@
@@ -148,7 +148,7 @@ index 5a6da1c6809..2e984b4eeb3 100644
 +%{nil}
 diff --git a/src/pesign-rpmbuild-helper.in b/src/pesign-rpmbuild-helper.in
 new file mode 100644
-index 00000000000..c5287c27e0c
+index 0000000..c5287c2
 --- /dev/null
 +++ b/src/pesign-rpmbuild-helper.in
 @@ -0,0 +1,222 @@
@@ -374,6 +374,3 @@ index 00000000000..c5287c27e0c
 +main "${@}"
 +
 +# vim:filetype=sh:fenc=utf-8:tw=78:sts=4:sw=4
--- 
-2.26.2
-

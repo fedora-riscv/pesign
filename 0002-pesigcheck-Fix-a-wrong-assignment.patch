@@ -1,4 +1,4 @@
-From c555fd74c009242c3864576bd5f17a1f8f4fdffd Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Peter Jones <pjones@redhat.com>
 Date: Tue, 18 Feb 2020 16:28:56 -0500
 Subject: [PATCH] pesigcheck: Fix a wrong assignment
@@ -23,7 +23,7 @@ Signed-off-by: Peter Jones <pjones@redhat.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/pesigcheck.c b/src/pesigcheck.c
-index 524cce307bf..8fa0f1ad03d 100644
+index 524cce3..8fa0f1a 100644
 --- a/src/pesigcheck.c
 +++ b/src/pesigcheck.c
 @@ -318,7 +318,7 @@ check_signature(pesigcheck_context *ctx, int *nreasons,
@@ -44,6 +44,3 @@ index 524cce307bf..8fa0f1ad03d 100644
  			nreason += 1;
  			has_valid_cert = true;
  		}
--- 
-2.24.1
-
