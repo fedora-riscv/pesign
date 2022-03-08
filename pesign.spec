@@ -48,6 +48,7 @@ Source1: certs.tar.xz
 Source2: pesign.py
 
 Patch0001: 0001-daemon-remove-always-true-comparison.patch
+Patch0002: 0002-Disable-wchar-size-warning-for-armv7hl.patch
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
