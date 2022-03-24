@@ -1,0 +1,2 @@
+Patch0001: 0001-daemon-remove-always-true-comparison.patch
+Patch0002: 0002-Fix-building-signed-kernels-on-setups-other-than-koj.patch
