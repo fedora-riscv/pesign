@@ -6,7 +6,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 115
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL-2.0-only
 URL:     https://github.com/rhboot/pesign
 
@@ -161,6 +161,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Fri Mar 25 2022 Robbie Harwood <rharwood@redhat.com> - 115-3
+- Add -D_GLIBCXX_ASSERTIONS to CPPFLAGS
+
 * Thu Mar 24 2022 Robbie Harwood <rharwood@redhat.com> - 115-2
 - Add support for non-koji signing in macros
 - Resolves: #1880858
