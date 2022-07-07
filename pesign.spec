@@ -6,7 +6,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 115
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPL-2.0-only
 URL:     https://github.com/rhboot/pesign
 
@@ -161,6 +161,10 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Thu Jul 07 2022 Robbie Harwood <rharwood@redhat.com> - 115-6
+- Fix formatting of man pages
+- Resolves: #2104778
+
 * Mon Apr 04 2022 Robbie Harwood <rharwood@redhat.com> - 115-5
 - Detect presence of rpm-sign when checking for rhel-ness
 
