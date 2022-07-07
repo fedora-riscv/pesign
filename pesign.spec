@@ -6,7 +6,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 115
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPL-2.0-only
 URL:     https://github.com/rhboot/pesign
 
@@ -46,9 +46,9 @@ BuildRequires: rh-signing-tools >= 1.20-2
 Source0: https://github.com/rhboot/pesign/releases/download/%{version}/pesign-%{version}.tar.bz2
 Source1: certs.tar.xz
 Source2: pesign.py
+Source3: pesign.patches
 
-Patch0001: 0001-daemon-remove-always-true-comparison.patch
-Patch0002: 0002-Disable-wchar-size-warning-for-armv7hl.patch
+%include %{SOURCE3}
 
 %description
 This package contains the pesign utility for signing UEFI binaries as
@@ -160,6 +160,10 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Thu Jul 07 2022 Robbie Harwood <rharwood@redhat.com> - 115-2
+- Fix formatting of man pages
+- Resolves: #2104778
+
 * Tue Mar 08 2022 Robbie Harwood <rharwood@redhat.com> - 115-1
 - New upstream version (115)
 

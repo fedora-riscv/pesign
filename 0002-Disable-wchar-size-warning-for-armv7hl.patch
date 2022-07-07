@@ -1,4 +1,4 @@
-From 1b6d20007538413e58d7d7565f490fd47785bd91 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Robbie Harwood <rharwood@redhat.com>
 Date: Tue, 8 Mar 2022 16:30:01 -0500
 Subject: [PATCH] Disable wchar size warning (for armv7hl)
@@ -38,6 +38,3 @@ index 96463ba..4897299 100644
  
  TARGETS = setupsb.efi dumpsb.efi clearpk.efi
  
--- 
-2.34.1
-
