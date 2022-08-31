@@ -6,7 +6,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 115
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPL-2.0-only
 URL:     https://github.com/rhboot/pesign
 
@@ -132,12 +132,13 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %files
 %{!?_licensedir:%global license %%doc}
 %license COPYING
-%doc README TODO
+%doc README.md TODO
 %{_bindir}/authvar
 %{_bindir}/efikeygen
 %{_bindir}/pesigcheck
 %{_bindir}/pesign
 %{_bindir}/pesign-client
+%{_bindir}/pesum
 %dir %{_libexecdir}/pesign/
 %dir %attr(0770,pesign,pesign) %{_sysconfdir}/pki/pesign/
 %config(noreplace) %attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/*
@@ -161,6 +162,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Wed Aug 31 2022 Robbie Harwood <rharwood@redhat.com> - 115-9
+- Roll up to pjones's smartcard/cms fixes
+
 * Tue Aug 02 2022 Robbie Harwood <rharwood@redhat.com> - 115-8
 - Rebuild for python bytecode change
 - See-also: #2107826

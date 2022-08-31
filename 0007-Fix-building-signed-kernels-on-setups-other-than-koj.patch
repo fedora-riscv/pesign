@@ -8,7 +8,6 @@ https://bugzilla.redhat.com/show_bug.cgi?id=1880858
 
 Signed-off-by: Julian Sikorski <belegdol+github@gmail.com>
 Suggested-by: Will Springer <skirmisher@protonmail.com>
-(cherry picked from commit 9969b1757a1941c9f57081b308026d687f6c0943)
 ---
  src/pesign-rpmbuild-helper.in | 24 +++++++++++-------------
  1 file changed, 11 insertions(+), 13 deletions(-)

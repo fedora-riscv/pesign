@@ -12,7 +12,6 @@ feed this into man(1).
 Tell mandoc explicitly to produce man pages.
 
 Signed-off-by: Robbie Harwood <rharwood@redhat.com>
-(cherry picked from commit 102c3d1d81c090750abb3815481d5cfd3e596677)
 ---
  Make.rules | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

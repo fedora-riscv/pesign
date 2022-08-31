@@ -9,7 +9,7 @@ Signed-off-by: Robbie Harwood <rharwood@redhat.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Make.defaults b/Make.defaults
-index 130c1ee..4b0e77c 100644
+index 1c18904..05aadd0 100644
 --- a/Make.defaults
 +++ b/Make.defaults
 @@ -79,7 +79,7 @@ ccldflags = $(cflags) $(CCLDFLAGS) $(LDFLAGS) \

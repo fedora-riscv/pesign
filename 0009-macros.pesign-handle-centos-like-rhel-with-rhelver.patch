@@ -4,7 +4,6 @@ Date: Tue, 10 Aug 2021 12:39:08 -0400
 Subject: [PATCH] macros.pesign: handle centos like rhel with --rhelver
 
 Signed-off-by: Peter Jones <pjones@redhat.com>
-(cherry picked from commit a1bc65c8b0fc20dbe9c9714ee3a31937184ba7f6)
 ---
  src/macros.pesign | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
