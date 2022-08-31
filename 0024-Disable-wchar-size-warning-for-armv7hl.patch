@@ -10,7 +10,7 @@ Signed-off-by: Robbie Harwood <rharwood@redhat.com>
  2 files changed, 7 insertions(+)
 
 diff --git a/Make.defaults b/Make.defaults
-index 130c1ee..1724caa 100644
+index 05aadd0..38a457e 100644
 --- a/Make.defaults
 +++ b/Make.defaults
 @@ -67,6 +67,10 @@ cflags	= $(CFLAGS) $(ARCH3264) \

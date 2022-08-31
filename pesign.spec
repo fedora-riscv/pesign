@@ -6,7 +6,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 115
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPL-2.0-only
 URL:     https://github.com/rhboot/pesign
 
@@ -131,12 +131,13 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %files
 %{!?_licensedir:%global license %%doc}
 %license COPYING
-%doc README TODO
+%doc README.md TODO
 %{_bindir}/authvar
 %{_bindir}/efikeygen
 %{_bindir}/pesigcheck
 %{_bindir}/pesign
 %{_bindir}/pesign-client
+%{_bindir}/pesum
 %dir %{_libexecdir}/pesign/
 %dir %attr(0770,pesign,pesign) %{_sysconfdir}/pki/pesign/
 %config(noreplace) %attr(0660,pesign,pesign) %{_sysconfdir}/pki/pesign/*
@@ -160,6 +161,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Wed Aug 31 2022 Robbie Harwood <rharwood@redhat.com> - 115-3
+- Sync with rawhide at 115-9.fc38
+
 * Thu Jul 07 2022 Robbie Harwood <rharwood@redhat.com> - 115-2
 - Fix formatting of man pages
 - Resolves: #2104778
