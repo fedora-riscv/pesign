@@ -6,7 +6,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 115
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL-2.0-only
 URL:     https://github.com/rhboot/pesign
 
@@ -161,6 +161,10 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Tue Jan 31 2023 Robbie Harwood <rharwood@redhat.com> - 115-4
+- Port pesign-authorize to normal file permissions
+- Resolves: CVE-2022-3560
+
 * Wed Aug 31 2022 Robbie Harwood <rharwood@redhat.com> - 115-3
 - Sync with rawhide at 115-9.fc38
 
