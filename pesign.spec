@@ -6,7 +6,7 @@
 Name:    pesign
 Summary: Signing utility for UEFI binaries
 Version: 116
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPL-2.0-only
 URL:     https://github.com/rhboot/pesign
 
@@ -38,7 +38,7 @@ Requires:      nss-util
 Requires:      popt
 Requires:      rpm
 Requires(pre): shadow-utils
-ExclusiveArch: %{ix86} x86_64 ia64 aarch64 %{arm}
+ExclusiveArch: %{ix86} x86_64 ia64 aarch64 %{arm} riscv64
 %if 0%{?rhel} == 7
 BuildRequires: rh-signing-tools >= 1.20-2
 %endif
@@ -162,6 +162,9 @@ certutil -d %{_sysconfdir}/pki/pesign/ -X -L > /dev/null
 %{python3_sitelib}/mockbuild/plugins/pesign.*
 
 %changelog
+* Tue Mar 05 2024 Liu Yang <Yang.Liu.sn@gmail.com> - 116-4
+- Add riscv64.
+
 * Fri Feb 02 2024 Peter Jones <pjones@redhat.com> - 116-3
 - Fix incorrect calloc() invocations caught by -Wcalloc-transposed-args
 
